@@ -9,7 +9,7 @@
         <link rel="manifest" href="site.webmanifest">
         <link rel="icon" href="favicon.ico">
         <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
-
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
         <meta name="theme-color" content="#000000">
         <meta name="description" content="Use NutrinoAI to create, share, and discover delicious recipes. Leverage the limitless power of AI to turn simple ideas into full meals.">
         <title>NutrinoAI</title>
@@ -2058,8 +2058,7 @@
         });
     });
 </script>
-    
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const userEmail = localStorage.getItem("loggedInUser");
