@@ -1,26 +1,34 @@
-const API_URL = "https://nutrino-ai.onrender.com/api/fetch-recipe"; // API URL without config.js
+const API_URL = "https://nutrino-ai.onrender.com/api/fetch-recipe"; // API URL
 
 async function fetchRecipe(prompt) {
+    const authToken = localStorage.getItem("authToken");
+
+    if (!authToken) {
+        displayError("Authentication failed. Please log in again.");
+        window.location.href = "login.html";
+        return null;
+    }
+
     try {
         const response = await fetch(API_URL, {
             method: "POST",
             headers: { 
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${localStorage.getItem("authToken") || ""}`
+                "Authorization": `Bearer ${authToken}`
             },
             body: JSON.stringify({ prompt })
         });
 
         const data = await response.json();
+
         if (!response.ok) {
-            displayError(`Error: ${data.error || "Unable to generate recipe"}`);
-            return null;
+            throw new Error(data?.error || "Unable to generate recipe");
         }
 
         return data;
     } catch (error) {
         console.error("Error fetching recipe:", error);
-        displayError("Failed to fetch recipe. Please try again.");
+        displayError(error.message);
         return null;
     }
 }
@@ -53,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.warn("Generate Recipe button or search input not found.");
     }
 
-    // Add recipe search links
+    // Add click event for predefined recipe links
     document.querySelectorAll(".Group-root1").forEach(item => {
         item.addEventListener("click", function () {
             const recipeName = this.querySelector(".Text-root1")?.textContent;
