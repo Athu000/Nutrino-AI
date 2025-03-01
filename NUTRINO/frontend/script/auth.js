@@ -13,11 +13,11 @@ function initGoogleAuth() {
     }
 
     google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID, // ✅ Ensure this matches your Google Cloud Client ID
+        client_id: GOOGLE_CLIENT_ID, 
         callback: handleCredentialResponse
     });
 
-    // Render the sign-in button
+    // Render Google sign-in button
     const signInButton = document.getElementById("g-signin");
     if (signInButton) {
         google.accounts.id.renderButton(signInButton, { theme: "outline", size: "large" });
@@ -36,9 +36,8 @@ function initGoogleAuth() {
 // Handle Google Login Response
 async function handleCredentialResponse(response) {
     try {
-        // Ensure jwt_decode is available
         if (typeof jwt_decode === "undefined") {
-            console.error("jwt_decode is not defined. Ensure the library is loaded.");
+            console.error("jwt_decode is not loaded.");
             displayError("Authentication failed. Please refresh and try again.");
             return;
         }
@@ -61,7 +60,11 @@ async function handleCredentialResponse(response) {
             }
 
             // Save user details in local storage
-            localStorage.setItem("loggedInUser", userData.email);
+            localStorage.setItem("loggedInUser", JSON.stringify({
+                email: userData.email,
+                name: userData.name,
+                picture: userData.picture || "" 
+            }));
             localStorage.setItem("authToken", response.credential);
 
             // Redirect user after login
@@ -75,14 +78,41 @@ async function handleCredentialResponse(response) {
 
 // Check User Login Status on Page Load
 document.addEventListener("DOMContentLoaded", () => {
-    const loggedInUser = localStorage.getItem("loggedInUser");
-    const userEmailElement = document.getElementById("user-email");
+    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+    const authLinks = document.getElementById("auth-links");
+    const userInfo = document.getElementById("user-info");
+    const userNameSpan = document.getElementById("user-name");
+    const userProfilePic = document.getElementById("user-profile-pic");
+    const logoutButton = document.getElementById("logout-button");
 
     if (loggedInUser) {
-        if (userEmailElement) {
-            userEmailElement.textContent = `Logged in as: ${loggedInUser}`;
+        // Hide login/signup links
+        if (authLinks) authLinks.style.display = "none";
+
+        // Show user info
+        if (userInfo) userInfo.style.display = "flex";
+        if (userNameSpan) userNameSpan.innerText = `Welcome, ${loggedInUser.name || loggedInUser.email}`;
+        
+        // Display profile picture if available
+        if (loggedInUser.picture && userProfilePic) {
+            userProfilePic.src = loggedInUser.picture;
+            userProfilePic.style.display = "block";
+        }
+
+        // Show logout button
+        if (logoutButton) {
+            logoutButton.style.display = "inline-block";
+            logoutButton.addEventListener("click", function () {
+                localStorage.removeItem("loggedInUser");
+                localStorage.removeItem("authToken");
+                window.location.href = "index.html"; // Redirect after logout
+            });
         }
     } else {
+        // Show login/signup buttons if user is not logged in
+        if (authLinks) authLinks.style.display = "block";
+        if (userInfo) userInfo.style.display = "none";
+        
         initGoogleAuth();
     }
 
