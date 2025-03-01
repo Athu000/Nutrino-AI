@@ -12,7 +12,7 @@ async function fetchRecipe(prompt) {
     try {
         const response = await fetch(API_URL, {
             method: "POST",
-            headers: { 
+            headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${authToken}`
             },
@@ -30,45 +30,5 @@ async function fetchRecipe(prompt) {
         console.error("Error fetching recipe:", error);
         displayError(error.message);
         return null;
-    }
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-    const generateButton = document.getElementById("generateRecipe");
-    const searchInput = document.getElementById("rec_search");
-
-    if (generateButton && searchInput) {
-        generateButton.addEventListener("click", async () => {
-            const query = searchInput.value.trim();
-            if (!query) {
-                displayError("Enter a recipe name!");
-                return;
-            }
-
-            generateButton.innerText = "Loading...";
-            generateButton.disabled = true;
-
-            const recipeData = await fetchRecipe(query);
-
-            if (recipeData) {
-                window.location.href = `generated_recipe.html?data=${encodeURIComponent(JSON.stringify(recipeData))}`;
-            } else {
-                generateButton.innerText = "Create";
-                generateButton.disabled = false;
-            }
-        });
-    } else {
-        console.warn("Generate Recipe button or search input not found.");
-    }
-});
-
-// Function to Display Error Messages in UI
-function displayError(message) {
-    const errorContainer = document.getElementById("error-message");
-    if (errorContainer) {
-        errorContainer.innerText = message;
-        errorContainer.style.display = "block";
-    } else {
-        console.error("Error container not found.");
     }
 }
