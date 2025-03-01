@@ -1,4 +1,3 @@
-// Ensure API_URL is only defined once
 if (typeof API_URL === "undefined") {
     var API_URL = "https://nutrino-ai.onrender.com/api/fetch-recipe";
 }
