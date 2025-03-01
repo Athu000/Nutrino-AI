@@ -2,6 +2,7 @@
   "name": "nutrino-ai-backend",
   "version": "1.0.0",
   "description": "Backend for Nutrino AI",
+  "type": "module",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -11,9 +12,6 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "node-fetch": "^3.3.1"
-  },
-  {
-  "type": "module"
   },
   "engines": {
     "node": ">=14.0.0"
