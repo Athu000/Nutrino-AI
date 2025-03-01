@@ -13,7 +13,7 @@ function initGoogleAuth() {
     }
 
     google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
+        client_id: GOOGLE_CLIENT_ID, 
         callback: handleCredentialResponse
     });
 
@@ -61,12 +61,11 @@ async function handleCredentialResponse(response) {
             localStorage.setItem("loggedInUser", JSON.stringify({
                 email: userData.email,
                 name: userData.name,
-                picture: userData.picture || ""
+                picture: userData.picture || "" 
             }));
             localStorage.setItem("authToken", response.credential);
 
-            // Redirect user after login
-            window.location.href = "dashboard.html";
+            updateAuthUI();
         }
     } catch (error) {
         console.error("Authentication Error:", error);
@@ -74,47 +73,33 @@ async function handleCredentialResponse(response) {
     }
 }
 
-// Update UI for login/logout state
-document.addEventListener("DOMContentLoaded", () => {
+// Update UI Elements Based on Login Status
+function updateAuthUI() {
     const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
     const loginLink = document.getElementById("login-link");
-    const signupButton = document.getElementById("signup-link")?.querySelector("button");
-    const userNameSpan = document.getElementById("user-name");
+    const signupLink = document.getElementById("signup-link");
+    const userInfo = document.getElementById("user-info");
+    const userEmailSpan = document.getElementById("user-email");
     const logoutButton = document.getElementById("logout-button");
 
     if (loggedInUser) {
-        // Change Sign Up button to username
-        if (signupButton) {
-            signupButton.textContent = loggedInUser.name || loggedInUser.email;
-            signupButton.disabled = true;
-        }
+        if (loginLink) loginLink.style.display = "none";
+        if (signupLink) signupLink.style.display = "none";
+        if (userInfo) userInfo.style.display = "flex";
+        if (userEmailSpan) userEmailSpan.textContent = loggedInUser.name || loggedInUser.email;
+        if (logoutButton) logoutButton.style.display = "inline-block";
 
-        // Change Login to Logout
-        if (loginLink) {
-            loginLink.textContent = "Logout";
-            loginLink.href = "#";
-            loginLink.addEventListener("click", () => logoutUser());
-        }
-
-        // Show Logout button
-        if (logoutButton) {
-            logoutButton.style.display = "inline-block";
-            logoutButton.addEventListener("click", () => logoutUser());
-        }
-
-        // Display user info
-        if (userNameSpan) userNameSpan.innerText = `Welcome, ${loggedInUser.name || loggedInUser.email}`;
+        logoutButton.addEventListener("click", function () {
+            localStorage.removeItem("loggedInUser");
+            localStorage.removeItem("authToken");
+            window.location.href = "index.html"; // Redirect after logout
+        });
+    } else {
+        if (loginLink) loginLink.style.display = "block";
+        if (signupLink) signupLink.style.display = "block";
+        if (userInfo) userInfo.style.display = "none";
     }
-});
-
-// Logout function
-function logoutUser() {
-    localStorage.removeItem("loggedInUser");
-    localStorage.removeItem("authToken");
-    window.location.href = "index.html"; // Redirect after logout
 }
 
-// Function to Display Error Messages in UI
-function displayError(message) {
-    alert(message);
-}
+// Run on page load
+document.addEventListener("DOMContentLoaded", updateAuthUI);
