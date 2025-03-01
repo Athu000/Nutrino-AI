@@ -1,26 +1,26 @@
-# 🛠 Ignore dependencies
+# Ignore Node.js dependencies
 node_modules/
 package-lock.json
 yarn.lock
 
-# 🔒 Ignore environment variables (Do NOT push API keys)
+# Ignore API keys & credentials
 .env
-.env.local
-.env.*.local
+*.json  # Prevent accidental commit of Google Cloud credentials
 
-# 🖥️ Ignore system-generated files
+# Ignore system-generated files
 .DS_Store
 Thumbs.db
 
-# 🚀 Ignore Vercel & Netlify build files
+# Ignore Vercel & Netlify build files
 .vercel/
 .netlify/
 
-# 🗑️ Ignore log files
+# Ignore log files
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 *.log
+
 
 # ⚠️ Ignore sensitive credential files
 *.pem
