@@ -3,54 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | Nutrino AI</title>
+    <title>Dashboard</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="dashboard-container">
+    <div class="container">
         <h2>Welcome to Nutrino</h2>
         <p>Your personalized AI nutrition assistant.</p>
-
-        <div id="user-info" style="display: none;">
-            <p><strong>Logged in as:</strong> <span id="user-email"></span></p>
-        </div>
-
-        <button id="logout-button" style="display: none;">Logout</button>
-        <button id="continue" style="display: none;">Continue to Nutrino</button>
+        <span id="userEmailSpan"></span> <!-- User email display -->
+        
+        <button id="continueButton">Continue</button>
+        <button id="logoutButton">Logout</button>
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const userData = JSON.parse(localStorage.getItem("loggedInUser"));
+        document.addEventListener("DOMContentLoaded", function () {
             const authToken = localStorage.getItem("authToken");
-            const userInfo = document.getElementById("user-info");
-            const userEmailSpan = document.getElementById("user-email");
-            const logoutButton = document.getElementById("logout-button");
-            const continueButton = document.getElementById("continue");
+            const rawUserData = localStorage.getItem("loggedInUser");
+            
+            let userData;
+            try {
+                userData = JSON.parse(rawUserData);
+            } catch (error) {
+                userData = null;
+            }
 
-            // If user is not logged in, redirect to login page
             if (!userData || !authToken) {
                 window.location.href = "login.html";
                 return;
             }
 
-            // Display user information
-            userInfo.style.display = "block";
-            userEmailSpan.textContent = userData.name || userData.email;
-            logoutButton.style.display = "inline-block";
-            continueButton.style.display = "inline-block";
+            // Display user info
+            const userEmailSpan = document.getElementById("userEmailSpan");
+            userEmailSpan.textContent = `Logged in as: ${userData.email}`;
 
-            // Logout function
-            logoutButton.addEventListener("click", () => {
-                localStorage.removeItem("loggedInUser");
-                localStorage.removeItem("authToken");
-                window.location.href = "index.html";
-            });
+            // Get buttons
+            const logoutButton = document.getElementById("logoutButton");
+            const continueButton = document.getElementById("continueButton");
 
-            // Continue to main site
-            continueButton.addEventListener("click", () => {
-                window.location.href = "https://nutrino-ai.netlify.app/";
-            });
+            // Ensure buttons exist before adding event listeners
+            if (logoutButton) {
+                logoutButton.addEventListener("click", function () {
+                    localStorage.removeItem("authToken");
+                    localStorage.removeItem("loggedInUser");
+                    window.location.href = "login.html";
+                });
+            }
+
+            if (continueButton) {
+                continueButton.addEventListener("click", function () {
+                    window.location.href = "home.html"; // Change this to your correct page
+                });
+            }
         });
     </script>
 </body>
