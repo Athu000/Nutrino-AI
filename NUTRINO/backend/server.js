@@ -20,6 +20,8 @@ app.get("/", (req, res) => {
 // ✅ Recipe Fetching API Route
 app.post("/api/fetch-recipe", async (req, res) => {
     try {
+        console.log("Received Request:", req.body); // ✅ Debugging request data
+
         const { prompt } = req.body;
         if (!prompt) {
             return res.status(400).json({ error: "Prompt is required" });
@@ -28,7 +30,10 @@ app.post("/api/fetch-recipe", async (req, res) => {
         // ✅ Fetch Recipe from Gemini API
         const response = await fetch(API_URL, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${API_KEY}` // ✅ Ensure API Key is in headers
+            },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: `Generate a structured recipe for: ${prompt}` }] }]
             }),
@@ -36,6 +41,8 @@ app.post("/api/fetch-recipe", async (req, res) => {
 
         // ✅ Handle API Response Properly
         const data = await response.json();
+        console.log("API Response:", data); // ✅ Debugging API response
+
         if (!response.ok) {
             return res.status(response.status).json({ error: data.error?.message || "API request failed" });
         }
