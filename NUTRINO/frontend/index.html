@@ -1,2097 +1,2096 @@
-
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>NUTRINO AI</title><!-- Load Config and API Scripts -->
-        <script src="script/NutrinoAPI.js"></script>
-        <script src="script/generated_recipe.js"></script>
-        <script src="script/auth.js"></script>
-        <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-        <link rel="icon" type="image/png" sizes="32x32" href="NUTRINOAI_files/favicon-32x32.png">
-        <link rel="manifest" href="site.webmanifest">
-        <link rel="icon" href="favicon.ico">
-        <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jwt-decode/3.1.2/jwt-decode.min.js"></script>
-        
-        <script src="https://accounts.google.com/gsi/client" async defer></script>
-        <meta name="theme-color" content="#000000">
-        <meta name="description" content="Use NutrinoAI to create, share, and discover delicious recipes. Leverage the limitless power of AI to turn simple ideas into full meals.">
-        <title>NutrinoAI</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com/">
-        <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
-        <style>
-            @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');</style>
-        <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width">
-        <meta name="next-head-count" content="14">
-        <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
-        <style data-emotion="mantine-rtl-global animation-13ebo6h">
-            @keyframes animation-13ebo6h {
-                from {
-                    box-shadow: 0 0 0.5px 0 #6033c9;
-                    opacity: 0.6;
-                }
-
-                to {
-                    box-shadow: 0 0 0.5px 4.4px #240380;
-                    opacity: 0;
-                }
-            }
-        </style>
-
-        <style>
-            html {
-                font-family: sans-serif;
-                line-height: 1.15;
-                -webkit-text-size-adjust: 100%;
-                -moz-text-size-adjust: 100%;
-                -ms-text-size-adjust: 100%;
-                text-size-adjust: 100%;
-            }
-
-            body {
-                margin: 0;
-            }
-
-            article,aside,footer,header,nav,section,figcaption,figure,main {
-                display: block;
-            }
-
-            h1 {
-                font-size: 2em;
-            }
-
-            hr {
-                box-sizing: content-box;
-                height: 0;
-                overflow: visible;
-            }
-
-            pre {
-                font-family: monospace,monospace;
-                font-size: 1em;
-            }
-
-            a {
-                background: transparent;
-                text-decoration-skip: objects;
-            }
-
-            a:active,a:hover {
-                outline-width: 0;
-            }
-
-            abbr[title] {
-                border-bottom: none;
-                -webkit-text-decoration: underline;
-                text-decoration: underline;
-            }
-
-            b,strong {
-                font-weight: bolder;
-            }
-
-            code,kbp,samp {
-                font-family: monospace,monospace;
-                font-size: 1em;
-            }
-
-            dfn {
-                font-style: italic;
-            }
-
-            mark {
-                background-color: #ff0;
-                color: #000;
-            }
-
-            small {
-                font-size: 80%;
-            }
-
-            sub,sup {
-                font-size: 75%;
-                line-height: 0;
-                position: relative;
-                vertical-align: baseline;
-            }
-
-            sup {
-                top: -0.5em;
-            }
-
-            sub {
-                bottom: -0.25em;
-            }
-
-            audio,video {
-                display: inline-block;
-            }
-
-            audio:not([controls]) {
-                display: none;
-                height: 0;
-            }
-
-            img {
-                border-style: none;
-                vertical-align: middle;
-            }
-
-            svg:not(:root) {
-                overflow: hidden;
-            }
-
-            button,input,optgroup,select,textarea {
-                font-family: sans-serif;
-                font-size: 100%;
-                line-height: 1.15;
-                margin: 0;
-            }
-
-            button,input {
-                overflow: visible;
-            }
-
-            button,select {
-                text-transform: none;
-            }
-
-            button,[type=reset],[type=submit] {
-                -webkit-appearance: button;
-            }
-
-            button::-moz-focus-inner,[type=button]::-moz-focus-inner,[type=reset]::-moz-focus-inner,[type=submit]::-moz-focus-inner {
-                border-style: none;
-                padding: 0;
-            }
-
-            button:-moz-focusring,[type=button]:-moz-focusring,[type=reset]:-moz-focusring,[type=submit]:-moz-focusring {
-                outline: 1px dotted ButtonText;
-            }
-
-            legend {
-                box-sizing: border-box;
-                color: inherit;
-                display: table;
-                max-width: 100%;
-                padding: 0;
-                white-space: normal;
-            }
-
-            progress {
-                display: inline-block;
-                vertical-align: baseline;
-            }
-
-            textarea {
-                overflow: auto;
-            }
-
-            [type=checkbox],[type=radio] {
-                box-sizing: border-box;
-                padding: 0;
-            }
-
-            [type=number]::-webkit-inner-spin-button,[type=number]::-webkit-outer-spin-button {
-                height: auto;
-            }
-
-            [type=search] {
-                -webkit-appearance: none;
-                -moz-appearance: none;
-                -ms-appearance: none;
-                appearance: none;
-            }
-
-            [type=search]::-webkit-search-cancel-button,[type=search]::-webkit-search-decoration {
-                -webkit-appearance: none;
-                -moz-appearance: none;
-                -ms-appearance: none;
-                appearance: none;
-            }
-
-            ::-webkit-file-upload-button {
-                -webkit-appearance: button;
-                -moz-appearance: button;
-                -ms-appearance: button;
-                appearance: button;
-                font: inherit;
-            }
-
-            details,menu {
-                display: block;
-            }
-
-            summary {
-                display: -webkit-box;
-                display: -webkit-list-item;
-                display: -ms-list-itembox;
-                display: list-item;
-            }
-
-            canvas {
-                display: inline-block;
-            }
-
-            template {
-                display: none;
-            }
-
-            [hidden] {
-                display: none;
-            }
-        </style>
-        <style data-emotion="css-global 1j3c5om">
-            *,*::before,*::after {
-                box-sizing: border-box;
-            }
-
-            html {
-                -webkit-print-color-scheme: light;
-                color-scheme: light;
-            }
-
-            body {
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                background-color: #fff;
-                color: #000;
-                line-height: 1.55;
-                font-size: 16px;
-                -webkit-font-smoothing: antialiased;
-                -moz-osx-font-smoothing: grayscale;
-            }
-            
-            .PAGE{
-                min-height: 70px;
-                padding-top: 75px;
-            }
-            .header1{
-                padding-top: 12px;
-                background-color: #000000;
-                border-bottom: 1px solid #303030;
-                position: fixed;
-                z-index: 100;
-                left: 0;
-                right: 0;
-                top: 0;
-                min-height: 50px;
-                padding-top: 25px;
-            }
-            .headContainer1{
-                padding-left: 16px;
-                padding-right: 16px;
-                max-width: 960px;
-                margin-left: auto;
-                margin-right: auto;
-                padding-bottom: 12px;
-            }
-            .headContainer2 {
-                box-sizing: border-box;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                flex-wrap: wrap;
-                justify-content: space-between;
-                gap: 16px;
-                box-sizing: border-box;
-                flex-grow: 0;
-            }
-            .headContainer3{
-                box-sizing: border-box;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                flex-wrap: wrap;
-                justify-content: flex-start;
-                gap: 16px;
-                box-sizing: border-box;
-                flex-grow: 0;
-            }
-            .LOGONAME{
-                position: relative;
-                display: block;
-            }
-            .AILOGO
-            {
-                top: 3px;
-                right: 3px;
-                transform: translate(50%, -50%);
-                z-index: 100;
-                position: absolute;
-                min-width: 16px;
-                height: 16px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                font-size: 12px;
-                padding-left: calc(10px / 2);
-                padding-right: calc(10px / 2);
-                border-radius: 1000px;
-                background-color: #00ccff;
-                color: #fff;
-                white-space: nowrap;
-                top: 3px;
-                right: 3px;
-                transform: translate(50%, -50%);
-                position: absolute;
-                min-width: 16px;
-                height: 16px;
-                border-radius: 1000px;
-            }
-            .BUTTON_LOG {
-                -webkit-tap-highlight-color: transparent;
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                cursor: pointer;
-                border: 0;
-                padding: 0;
-                appearance: none;
-                font-size: 16px;
-                background-color: transparent;
-                text-align: left;
-                color: #000;
-                text-decoration: none;
-                box-sizing: border-box;
-                height: 36px;
-                padding-left: 18px;
-                padding-right: 18px;
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                -webkit-tap-highlight-color: transparent;
-                display: inline-block;
-                width: auto;
-                border-radius: 4px;
-                font-weight: 600;
-                position: relative;
-                line-height: 1;
-                font-size: 14px;
-                user-select: none;
-                cursor: pointer;
-                border: 1px solid transparent;
-                background-color: #00ccff;
-                color: #fff;
-            }
-
-            .BUTTON_LOG:focus {
-                outline-offset: 2px;
-                outline: 2px solid #0400ff;
-            }
-
-            .BUTTON_LOG:focus:not(:focus-visible) {
-                outline: none;
-            }
-
-            .BUTTON_LOG:focus {
-                outline-offset: 2px;
-                outline: 2px solid #0400ff;
-            }
-
-            .BUTTON_LOG:focus:not(:focus-visible) {
-                outline: none;
-            }
-
-            @media (hover: hover) {
-                .BUTTON_LOG:hover {
-                    background-color:#0400ff;
-                }
-            }
-
-            @media (hover: none) {
-                .BUTTON_LOG:active {
-                    background-color:#0400ff;
-                }
-            }
-
-            .BUTTON_LOG:active {
-                transform: translateY(1px);
-            }
-
-            .BUTTON_LOG:disabled,.BUTTON_LOG[data-disabled] {
-                border-color: transparent;
-                background-color: #e9ecef;
-                color: #adb5bd;
-                cursor: not-allowed;
-                background-image: none;
-                pointer-events: none;
-            }
-
-            .BUTTON_LOG:disabled:active,.BUTTON_LOG[data-disabled]:active {
-                transform: none;
-            }
-
-            .BUTTON_LOG[data-loading] {
-                pointer-events: none;
-            }
-
-            .BUTTON_LOG[data-loading]::before {
-                content: "";
-                position: absolute;
-                top: -1px;
-                left: -1px;
-                right: -1px;
-                bottom: -1px;
-                background-color: rgba(255, 255, 255, .5);
-                border-radius: 4px;
-                cursor: not-allowed;
-            }
-            .NUTRINOspell {
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                -webkit-tap-highlight-color: transparent;
-                color: inherit;
-                font-size: inherit;
-                line-height: 1.55;
-                text-decoration: none;
-                font-family: 'Pacifico',cursive;
-                font-size: 24px;
-                line-height: 1;
-                display: inline-block;
-                width: 65px;
-                height: 14px;
-                color: #00ccff;
-                padding-right: 12px;
-            }
-
-            .NUTRINOspell:focus {
-                outline-offset: 2px;
-                outline: 2px solid #0400ff;
-            }
-
-            .NUTRINOspell:focus:not(:focus-visible) {
-                outline: none;
-            }
-            .LOGIN1 {
-                display: block;
-                line-height: 1;
-                padding: 8px 12px;
-                border-radius: 4px;
-                text-decoration: none;
-                color: #495057;
-                font-size: 14px;
-                font-weight: 500;
-            }	
-
-            .LOGIN1:hover {
-                background-color: #3d3d3d;
-            }
-
-            @media (max-width: 767px) {
-                .LOGIN1 {
-                    border-radius:0;
-                    padding: 16px;
-                }
-            }
-            .SIGNUP_but{
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                height: 100%;
-                overflow: visible;
-            }
-            .BUT_LABEL{
-                white-space: nowrap;
-                height: 100%;
-                overflow: hidden;
-                display: flex;
-                align-items: center;
-            }
-            .break{
-                width: 0;
-                min-width: 0;
-                height: 20px;
-                min-height: 20px;
-            }
-            .page1 {
-                padding-left: 16px;
-                padding-right: 16px;
-                max-width: 960px;
-                margin-left: auto;
-                margin-right: auto;
-                min-height: 80vh;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                text-align: center;
-                padding-bottom: 24px;
-                z-index: 1;
-                position: relative;
-            }
-
-            @media (max-width: 767px) {
-                .page1 {
-                    padding-bottom:24px;
-                }
-            }
-            .label1 {
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                -webkit-tap-highlight-color: transparent;
-                color: inherit;
-                font-size: inherit;
-                line-height: 1.55;
-                text-decoration: none;
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                font-weight: 700;
-                font-size: 34px;
-                line-height: 1.3;
-                margin: 0;
-                color: #00ccff;
-                font-size: 55px;
-                font-weight: 900;
-                line-height: 1.1;
-            }
-
-            .label1:focus {
-                outline-offset: 2px;
-                outline: 2px solid #00ccff;
-            }
-
-            .label1:focus:not(:focus-visible) {
-                outline: none;
-            }
-
-            @media (max-width: 767px) {
-                .label1 {
-                    font-size:40px;
-                    line-height: 1.2;
-                }
-            }
-
-            @media (max-width: 575px) {
-                .label1 {
-                    font-size:28px;
-                    line-height: 1.3;
-                }
-            }
-            .label2 {
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                -webkit-tap-highlight-color: transparent;
-                color: #868e96;
-                font-size: 20px;
-                line-height: 1.55;
-                text-decoration: none;
-                max-width: 600px;
-                margin-top: 24px;
-            }	
-
-            .label2:focus {
-                outline-offset: 2px;
-                outline: 2px solid #00eeff;
-            }
-
-            .label2:focus:not(:focus-visible) {
-                outline: none;
-            }
-
-            @media (max-width: 767px) {
-                .label2 {
-                    max-width:100%;
-                    font-size: 14px;
-                }
-            }
-            .auth {
-                margin-top: 36px;
-            }
-
-            @media (max-width: 767px) {
-                .auth {
-                    width:100%;
-                }
-            }
-
-            .button1 {
-                -webkit-tap-highlight-color: transparent;
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                cursor: pointer;
-                border: 0;
-                padding: 0;
-                appearance: none;
-                font-size: 16px;
-                background-color: transparent;
-                text-align: left;
-                color: #000;
-                text-decoration: none;
-                box-sizing: border-box;
-                height: 60px;
-                padding-left: 21.333333333333332px;
-                padding-right: 21.333333333333332px;
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                -webkit-tap-highlight-color: transparent;
-                display: inline-block;
-                width: auto;
-                border-radius: 4px;
-                font-weight: 600;
-                position: relative;
-                line-height: 1;
-                font-size: 20px;
-                user-select: none;
-                cursor: pointer;
-                border: 1px solid #ced4da;
-                background-color: #fff;
-                color: #000;
-            }
-
-            .button1:focus {
-                outline-offset: 2px;
-                outline: 2px solid #00ccff;
-            }
-
-            .button1:focus:not(:focus-visible) {
-                outline: none;
-            }
-
-            .button1:focus {
-                outline-offset: 2px;
-                outline: 2px solid #00ccff;
-            }
-
-            .button1:focus:not(:focus-visible) {
-                outline: none;
-            }
-
-            @media (hover: hover) {
-                .button1:hover {
-                    background-color:#f8f9fa;
-                }
-            }
-
-            @media (hover: none) {
-                .button1:active {
-                    background-color:#f8f9fa;
-                }
-            }
-
-            .button1:active {
-                transform: translateY(1px);
-            }
-
-            .button1:disabled,.button1[data-disabled] {
-                border-color: transparent;
-                background-color: #e9ecef;
-                color: #adb5bd;
-                cursor: not-allowed;
-                background-image: none;
-                pointer-events: none;
-            }
-
-            .button1:disabled:active,.button1[data-disabled]:active {
-                transform: none;
-            }
-
-            .button1[data-loading] {
-                pointer-events: none;
-            }
-
-            .button1[data-loading]::before {
-                content: "";
-                position: absolute;
-                top: -1px;
-                left: -1px;
-                right: -1px;
-                bottom: -1px;
-                background-color: rgba(255, 255, 255, .5);
-                border-radius: 4px;
-                cursor: not-allowed;
-            }
-            .button-inner {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                height: 100%;
-                overflow: visible;
-            }
-            .lefticon {
-                display: flex;
-                align-items: center;
-                margin-right: 10px;
-            }
-            .Image-figure {
-                margin: 0;
-            }
-            .imageWrapper {
-                position: relative;
-            }
-            .Gimage {
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                display: block;
-                width: 100%;
-                height: 100%;
-                border: 0;
-                border-radius: 0;
-            }
-            .sign-in-label {
-                white-space: nowrap;
-                height: 100%;
-                overflow: hidden;
-                display: flex;
-                align-items: center;
-            }
-            .Button-rightIcon {
-                display: flex;
-                align-items: center;
-                margin-left: 10px;
-            }
-            .break2 {
-                width: 0;
-                min-width: 0;
-                height: 24px;
-                min-height: 24px;
-            }
-            .Card-root {
-                outline: 0;
-                -webkit-tap-highlight-color: transparent;
-                display: block;
-                text-decoration: none;
-                color: #000;
-                background-color: #fff;
-                box-sizing: border-box;
-                border-radius: 8px;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05),rgba(0, 0, 0, 0.05) 0px 10px 15px -5px,rgba(0, 0, 0, 0.04) 0px 7px 7px -5px;
-                border: 1px solid #dee2e6;
-                position: relative;
-                overflow: hidden;
-                background-color: #fff;
-                align-self: stretch;
-                padding: 20px;
-            }	
-            .Textarea-root {
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                line-height: 1.55;
-            }
-            .Textarea-wrapper {
-                position: relative;
-            }
-            .Nutrino-input {
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                -webkit-tap-highlight-color: transparent;
-                line-height: 1.55;
-                appearance: none;
-                resize: none;
-                box-sizing: border-box;
-                font-size: 20px;
-                width: 100%;
-                color: #000;
-                display: block;
-                text-align: left;
-                border-width: 0;
-                background-color: transparent;
-                min-height: 28px;
-                outline: 0;
-                padding-top: 10px;
-                padding-bottom: 10px;
-            }
-
-            .Nutrino-input:disabled {
-                background-color: transparent;
-            }
-
-            .Nutrino-input:disabled:focus,.Nutrino-input:disabled:focus-within {
-                outline: none;
-                border-color: transparent;
-            }
-
-            .Nutrino-input::placeholder {
-                user-select: none;
-                color: #adb5bd;
-                opacity: 1;
-            }
-
-            .Nutrino-input::-webkit-inner-spin-button,.Nutrino-input::-webkit-outer-spin-button,.Nutrino-input::-webkit-search-decoration,.Nutrino-input::-webkit-search-cancel-button,.Nutrino-input::-webkit-search-results-button,.Nutrino-input::-webkit-search-results-decoration {
-                appearance: none;
-            }
-
-            .Nutrino-input[type=number] {
-                -moz-appearance: textfield;
-            }
-
-            .Nutrino-input:focus,.Nutrino-input:focus-within {
-                outline: none;
-                border-color: transparent;
-            }
-            .Group-root {
-                box-sizing: border-box;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                flex-wrap: wrap;
-                justify-content: space-between;
-                gap: 16px;
-            }
-
-            .Group-root>* {
-                box-sizing: border-box;
-                flex-grow: 0;
-            }
-
-            @media (max-width: 767px) {
-                .Group-root {
-                    flex-direction:column;
-                    align-items: stretch;
-                }
-            }
-            .Group-root1 {
-                box-sizing: border-box;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                flex-wrap: wrap;
-                justify-content: flex-start;
-                gap: 16px;
-            }
-
-            .Group-root1>* {
-                box-sizing: border-box;
-                flex-grow: 0;
-            }
-            .Text-root {
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                -webkit-tap-highlight-color: transparent;
-                color: inherit;
-                font-size: inherit;
-                line-height: 1.55;
-                text-decoration: none;
-            }
-
-            .Text-root:focus {
-                outline-offset: 2px;
-                outline: 2px solid #00eeff;
-            }
-
-            .Text-root:focus:not(:focus-visible) {
-                outline: none;
-            }
-            .NumberInput {
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                height: 36px;
-                -webkit-tap-highlight-color: transparent;
-                line-height: 34px;
-                appearance: none;
-                resize: none;
-                box-sizing: border-box;
-                font-size: 14px;
-                width: 100%;
-                color: #000;
-                display: block;	
-                text-align: left;
-                min-height: 36px;
-                padding-left: 12px;
-                padding-right: 25px;
-                border-radius: 4px;
-                border: 1px solid #ced4da;
-                background-color: #fff;
-                transition: border-color 100ms ease;
-            }
-
-            .NumberInput:disabled {
-                background-color: #f1f3f5;
-                color: #909296;
+    <title>NUTRINO AI</title><!-- Load Config and API Scripts -->
+    <script src="script/NutrinoAPI.js"></script>
+    <script src="script/generated_recipe.js"></script>
+    <script src="script/auth.js"></script>
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="NUTRINOAI_files/favicon-32x32.png">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="icon" href="favicon.ico">
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jwt-decode/3.1.2/jwt-decode.min.js"></script>
+    
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="Use NutrinoAI to create, share, and discover delicious recipes. Leverage the limitless power of AI to turn simple ideas into full meals.">
+    <title>NutrinoAI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');</style>
+    <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width">
+    <meta name="next-head-count" content="14">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <style data-emotion="mantine-rtl-global animation-13ebo6h">
+        @keyframes animation-13ebo6h {
+            from {
+                box-shadow: 0 0 0.5px 0 #6033c9;
                 opacity: 0.6;
-                cursor: not-allowed;
             }
 
-            .NumberInput:disabled::placeholder {
-                color: #909296;
+            to {
+                box-shadow: 0 0 0.5px 4.4px #240380;
+                opacity: 0;
             }
+        }
+    </style>
 
-            .NumberInput::placeholder {
-                user-select: none;
-                color: #adb5bd;
-                opacity: 1;
-            }
+    <style>
+        html {
+            font-family: sans-serif;
+            line-height: 1.15;
+            -webkit-text-size-adjust: 100%;
+            -moz-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
 
-            .NumberInput::-webkit-inner-spin-button,.NumberInput::-webkit-outer-spin-button,.NumberInput::-webkit-search-decoration,.NumberInput::-webkit-search-cancel-button,.NumberInput::-webkit-search-results-button,.NumberInput::-webkit-search-results-decoration {
-                appearance: none;
-            }
+        body {
+            margin: 0;
+        }
 
-            .NumberInput[type=number] {
-                -moz-appearance: textfield;
-            }
+        article,aside,footer,header,nav,section,figcaption,figure,main {
+            display: block;
+        }
 
-            .NumberInput:focus,.NumberInput:focus-within {
-                outline: none;
-                border-color: #00eeff;
-            }
-            .NumberInput-rightSection {
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                right: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 25px;
-            }
-            .NumberInput-rightSection1 {
-                display: flex;
-                flex-direction: column;
-                height: calc(100% - 2px);
-                margin: 1px;
-                margin-right: 1px;
-                overflow: hidden;
-                border-top-right-radius: 4px;
-                border-bottom-right-radius: 4px;
-            }
-            .NumberInput-controlUp {
-                margin: 0;
-                position: relative;
-                flex: 0 0 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                box-sizing: border-box;
-                width: 24px;
-                padding: 0;
-                -webkit-tap-highlight-color: transparent;
-                border-bottom: 1px solid #ced4da;
-                border-left: 1px solid #ced4da;
-                border-top: 0;
-                border-right: 0;
-                background-color: transparent;
-                margin-right: 1px;
-                color: #000;
-            }
+        h1 {
+            font-size: 2em;
+        }
 
-            .NumberInput-controlUp:not(:disabled):hover {
-                background-color: #f8f9fa;
-            }
+        hr {
+            box-sizing: content-box;
+            height: 0;
+            overflow: visible;
+        }
 
-            .NumberInput-controlUp:disabled {
-                color: #ced4da;
-            }
+        pre {
+            font-family: monospace,monospace;
+            font-size: 1em;
+        }
 
-            .NumberInput-controlDown {
-                margin: 0;
-                position: relative;
-                flex: 0 0 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                box-sizing: border-box;
-                width: 24px;
-                padding: 0;
-                -webkit-tap-highlight-color: transparent;
-                border-bottom: 1px solid #ced4da;
-                border-left: 1px solid #ced4da;
-                border-top: 0;
-                border-right: 0;
-                background-color: transparent;
-                margin-right: 1px;
-                color: #000;
-                border-bottom: 0;
-            }
+        a {
+            background: transparent;
+            text-decoration-skip: objects;
+        }
 
-            .NumberInput-controlDown:not(:disabled):hover {
-                background-color: #f8f9fa;
-            }
+        a:active,a:hover {
+            outline-width: 0;
+        }
 
-            .NumberInput-controlDown:disabled {
-                color: #ced4da;
-            }
-            .Button-root2 {
-                -webkit-tap-highlight-color: transparent;
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                cursor: pointer;
-                border: 0;
-                padding: 0;
-                appearance: none;
-                font-size: 16px;
-                background-color: transparent;
-                text-align: left;
-                color: #000;
-                text-decoration: none;
-                box-sizing: border-box;
-                height: 36px;
-                padding-left: 18px;
-                padding-right: 18px;
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                -webkit-tap-highlight-color: transparent;
-                display: inline-block;
-                width: auto;
-                border-radius: 4px;
-                font-weight: 600;
-                position: relative;
-                line-height: 1;
-                font-size: 14px;
-                user-select: none;
-                cursor: pointer;
-                border: 1px solid transparent;
-                background-color: rgba(235, 251, 238, 1);
-                color: #00eeff;
-            }
+        abbr[title] {
+            border-bottom: none;
+            -webkit-text-decoration: underline;
+            text-decoration: underline;
+        }
 
-            .Button-root2:focus {
-                outline-offset: 2px;
-                outline: 2px solid #00eeff;
-            }
+        b,strong {
+            font-weight: bolder;
+        }
 
-            .Button-root2:focus:not(:focus-visible) {
-                outline: none;
-            }
+        code,kbp,samp {
+            font-family: monospace,monospace;
+            font-size: 1em;
+        }
 
-            .Button-root2:focus {
-                outline-offset: 2px;
-                outline: 2px solid #00eeff;
-            }
+        dfn {
+            font-style: italic;
+        }
 
-            .Button-root2:focus:not(:focus-visible) {
-                outline: none;
-            }
+        mark {
+            background-color: #ff0;
+            color: #000;
+        }
 
-            @media (hover: hover) {
-                .Button-root2:hover {
-                    background-color:rgba(211, 249, 216, 0.65);
-                }
-            }
+        small {
+            font-size: 80%;
+        }
 
-            @media (hover: none) {
-                .Button-root2:active {
-                    background-color:rgba(211, 249, 216, 0.65);
-                }
-            }
+        sub,sup {
+            font-size: 75%;
+            line-height: 0;
+            position: relative;
+            vertical-align: baseline;
+        }
 
-            .Button-root2:active {
-                transform: translateY(1px);
-            }
+        sup {
+            top: -0.5em;
+        }
 
-            .Button-root2:disabled,.Button-root2[data-disabled] {
-                border-color: transparent;
-                background-color: #e9ecef;
-                color: #adb5bd;
-                cursor: not-allowed;
-                background-image: none;
-                pointer-events: none;
-            }
+        sub {
+            bottom: -0.25em;
+        }
 
-            .Button-root2:disabled:active,.Button-root2[data-disabled]:active {
-                transform: none;
-            }
+        audio,video {
+            display: inline-block;
+        }
 
-            .Button-root2[data-loading] {
-                pointer-events: none;
-            }
+        audio:not([controls]) {
+            display: none;
+            height: 0;
+        }
 
-            .Button-root2[data-loading]::before {
-                content: "";
-                position: absolute;
-                top: -1px;
-                left: -1px;
-                right: -1px;
-                bottom: -1px;
-                background-color: rgba(255, 255, 255, .5);
-                border-radius: 4px;
-                cursor: not-allowed;
-            }
-            .button-inner{
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                height: 100%;
-                overflow: visible;
-            }
+        img {
+            border-style: none;
+            vertical-align: middle;
+        }
 
-            .Button-label1 {
-                white-space: nowrap;
-                height: 100%;
-                overflow: hidden;
-                display: flex;
-                align-items: center;
-            }
-            .Grid-col {
-                box-sizing: border-box;
-                flex-grow: 0;
-                padding: 8px;
-                flex-basis: 100%;
-                flex-shrink: 0;
-                max-width: 100%;
-            }
+        svg:not(:root) {
+            overflow: hidden;
+        }
 
-            @media (min-width: 576px) {
-                .Grid-col {
-                    flex-shrink:0;
-                }
-            }
+        button,input,optgroup,select,textarea {
+            font-family: sans-serif;
+            font-size: 100%;
+            line-height: 1.15;
+            margin: 0;
+        }
 
-            @media (min-width: 768px) {
-                .Grid-col {
-                    flex-basis:100%;
-                    flex-shrink: 0;
-                    max-width: 100%;
-                    flex-grow: 0;
-                }
-            }
+        button,input {
+            overflow: visible;
+        }
 
-            @media (min-width: 992px) {
-                .Grid-col {
-                    flex-shrink:0;
-                }
-            }
+        button,select {
+            text-transform: none;
+        }
 
-            @media (min-width: 1200px) {
-                .Grid-col {
-                    flex-shrink:0;
-                }
-            }
+        button,[type=reset],[type=submit] {
+            -webkit-appearance: button;
+        }
 
-            @media (min-width: 1400px) {
-                .Grid-col {
-                    flex-shrink:0;
-                }
-            }
+        button::-moz-focus-inner,[type=button]::-moz-focus-inner,[type=reset]::-moz-focus-inner,[type=submit]::-moz-focus-inner {
+            border-style: none;
+            padding: 0;
+        }
 
-            .Title-root  {
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                -webkit-tap-highlight-color: transparent;
-                color: inherit;
-                font-size: inherit;
-                line-height: 1.55;
-                text-decoration: none;
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                font-weight: 700;
-                font-size: 34px;	
+        button:-moz-focusring,[type=button]:-moz-focusring,[type=reset]:-moz-focusring,[type=submit]:-moz-focusring {
+            outline: 1px dotted ButtonText;
+        }
+
+        legend {
+            box-sizing: border-box;
+            color: inherit;
+            display: table;
+            max-width: 100%;
+            padding: 0;
+            white-space: normal;
+        }
+
+        progress {
+            display: inline-block;
+            vertical-align: baseline;
+        }
+
+        textarea {
+            overflow: auto;
+        }
+
+        [type=checkbox],[type=radio] {
+            box-sizing: border-box;
+            padding: 0;
+        }
+
+        [type=number]::-webkit-inner-spin-button,[type=number]::-webkit-outer-spin-button {
+            height: auto;
+        }
+
+        [type=search] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            -ms-appearance: none;
+            appearance: none;
+        }
+
+        [type=search]::-webkit-search-cancel-button,[type=search]::-webkit-search-decoration {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            -ms-appearance: none;
+            appearance: none;
+        }
+
+        ::-webkit-file-upload-button {
+            -webkit-appearance: button;
+            -moz-appearance: button;
+            -ms-appearance: button;
+            appearance: button;
+            font: inherit;
+        }
+
+        details,menu {
+            display: block;
+        }
+
+        summary {
+            display: -webkit-box;
+            display: -webkit-list-item;
+            display: -ms-list-itembox;
+            display: list-item;
+        }
+
+        canvas {
+            display: inline-block;
+        }
+
+        template {
+            display: none;
+        }
+
+        [hidden] {
+            display: none;
+        }
+    </style>
+    <style data-emotion="css-global 1j3c5om">
+        *,*::before,*::after {
+            box-sizing: border-box;
+        }
+
+        html {
+            -webkit-print-color-scheme: light;
+            color-scheme: light;
+        }
+
+        body {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            background-color: #fff;
+            color: #000;
+            line-height: 1.55;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .PAGE{
+            min-height: 70px;
+            padding-top: 75px;
+        }
+        .header1{
+            padding-top: 12px;
+            background-color: #000000;
+            border-bottom: 1px solid #303030;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            right: 0;
+            top: 0;
+            min-height: 50px;
+            padding-top: 25px;
+        }
+        .headContainer1{
+            padding-left: 16px;
+            padding-right: 16px;
+            max-width: 960px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-bottom: 12px;
+        }
+        .headContainer2 {
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 16px;
+            box-sizing: border-box;
+            flex-grow: 0;
+        }
+        .headContainer3{
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            gap: 16px;
+            box-sizing: border-box;
+            flex-grow: 0;
+        }
+        .LOGONAME{
+            position: relative;
+            display: block;
+        }
+        .AILOGO
+        {
+            top: 3px;
+            right: 3px;
+            transform: translate(50%, -50%);
+            z-index: 100;
+            position: absolute;
+            min-width: 16px;
+            height: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            padding-left: calc(10px / 2);
+            padding-right: calc(10px / 2);
+            border-radius: 1000px;
+            background-color: #00ccff;
+            color: #fff;
+            white-space: nowrap;
+            top: 3px;
+            right: 3px;
+            transform: translate(50%, -50%);
+            position: absolute;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 1000px;
+        }
+        .BUTTON_LOG {
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            cursor: pointer;
+            border: 0;
+            padding: 0;
+            appearance: none;
+            font-size: 16px;
+            background-color: transparent;
+            text-align: left;
+            color: #000;
+            text-decoration: none;
+            box-sizing: border-box;
+            height: 36px;
+            padding-left: 18px;
+            padding-right: 18px;
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            -webkit-tap-highlight-color: transparent;
+            display: inline-block;
+            width: auto;
+            border-radius: 4px;
+            font-weight: 600;
+            position: relative;
+            line-height: 1;
+            font-size: 14px;
+            user-select: none;
+            cursor: pointer;
+            border: 1px solid transparent;
+            background-color: #00ccff;
+            color: #fff;
+        }
+
+        .BUTTON_LOG:focus {
+            outline-offset: 2px;
+            outline: 2px solid #0400ff;
+        }
+
+        .BUTTON_LOG:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        .BUTTON_LOG:focus {
+            outline-offset: 2px;
+            outline: 2px solid #0400ff;
+        }
+
+        .BUTTON_LOG:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        @media (hover: hover) {
+            .BUTTON_LOG:hover {
+                background-color:#0400ff;
+            }
+        }
+
+        @media (hover: none) {
+            .BUTTON_LOG:active {
+                background-color:#0400ff;
+            }
+        }
+
+        .BUTTON_LOG:active {
+            transform: translateY(1px);
+        }
+
+        .BUTTON_LOG:disabled,.BUTTON_LOG[data-disabled] {
+            border-color: transparent;
+            background-color: #e9ecef;
+            color: #adb5bd;
+            cursor: not-allowed;
+            background-image: none;
+            pointer-events: none;
+        }
+
+        .BUTTON_LOG:disabled:active,.BUTTON_LOG[data-disabled]:active {
+            transform: none;
+        }
+
+        .BUTTON_LOG[data-loading] {
+            pointer-events: none;
+        }
+
+        .BUTTON_LOG[data-loading]::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            background-color: rgba(255, 255, 255, .5);
+            border-radius: 4px;
+            cursor: not-allowed;
+        }
+        .NUTRINOspell {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            -webkit-tap-highlight-color: transparent;
+            color: inherit;
+            font-size: inherit;
+            line-height: 1.55;
+            text-decoration: none;
+            font-family: 'Pacifico',cursive;
+            font-size: 24px;
+            line-height: 1;
+            display: inline-block;
+            width: 65px;
+            height: 14px;
+            color: #00ccff;
+            padding-right: 12px;
+        }
+
+        .NUTRINOspell:focus {
+            outline-offset: 2px;
+            outline: 2px solid #0400ff;
+        }
+
+        .NUTRINOspell:focus:not(:focus-visible) {
+            outline: none;
+        }
+        .LOGIN1 {
+            display: block;
+            line-height: 1;
+            padding: 8px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #495057;
+            font-size: 14px;
+            font-weight: 500;
+        }	
+
+        .LOGIN1:hover {
+            background-color: #3d3d3d;
+        }
+
+        @media (max-width: 767px) {
+            .LOGIN1 {
+                border-radius:0;
+                padding: 16px;
+            }
+        }
+        .SIGNUP_but{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            overflow: visible;
+        }
+        .BUT_LABEL{
+            white-space: nowrap;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+        .break{
+            width: 0;
+            min-width: 0;
+            height: 20px;
+            min-height: 20px;
+        }
+        .page1 {
+            padding-left: 16px;
+            padding-right: 16px;
+            max-width: 960px;
+            margin-left: auto;
+            margin-right: auto;
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding-bottom: 24px;
+            z-index: 1;
+            position: relative;
+        }
+
+        @media (max-width: 767px) {
+            .page1 {
+                padding-bottom:24px;
+            }
+        }
+        .label1 {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            -webkit-tap-highlight-color: transparent;
+            color: inherit;
+            font-size: inherit;
+            line-height: 1.55;
+            text-decoration: none;
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            font-weight: 700;
+            font-size: 34px;
+            line-height: 1.3;
+            margin: 0;
+            color: #00ccff;
+            font-size: 55px;
+            font-weight: 900;
+            line-height: 1.1;
+        }
+
+        .label1:focus {
+            outline-offset: 2px;
+            outline: 2px solid #00ccff;
+        }
+
+        .label1:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        @media (max-width: 767px) {
+            .label1 {
+                font-size:40px;
+                line-height: 1.2;
+            }
+        }
+
+        @media (max-width: 575px) {
+            .label1 {
+                font-size:28px;
                 line-height: 1.3;
-                margin: 0;
-                color: #00ccff;
             }
+        }
+        .label2 {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            -webkit-tap-highlight-color: transparent;
+            color: #868e96;
+            font-size: 20px;
+            line-height: 1.55;
+            text-decoration: none;
+            max-width: 600px;
+            margin-top: 24px;
+        }	
 
-            .Title-root :focus {
-                outline-offset: 2px;
-                outline: 2px solid #00eeff;
+        .label2:focus {
+            outline-offset: 2px;
+            outline: 2px solid #00eeff;
+        }
+
+        .label2:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        @media (max-width: 767px) {
+            .label2 {
+                max-width:100%;
+                font-size: 14px;
             }
+        }
+        .auth {
+            margin-top: 36px;
+        }
 
-            .Title-root :focus:not(:focus-visible) {
-                outline: none;
+        @media (max-width: 767px) {
+            .auth {
+                width:100%;
             }
+        }
 
-            .Grid-col1 {
-                box-sizing: border-box;
-                flex-grow: 0;
-                padding: 8px;
-                flex-basis: 100%;
+        .button1 {
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            cursor: pointer;
+            border: 0;
+            padding: 0;
+            appearance: none;
+            font-size: 16px;
+            background-color: transparent;
+            text-align: left;
+            color: #000;
+            text-decoration: none;
+            box-sizing: border-box;
+            height: 60px;
+            padding-left: 21.333333333333332px;
+            padding-right: 21.333333333333332px;
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            -webkit-tap-highlight-color: transparent;
+            display: inline-block;
+            width: auto;
+            border-radius: 4px;
+            font-weight: 600;
+            position: relative;
+            line-height: 1;
+            font-size: 20px;
+            user-select: none;
+            cursor: pointer;
+            border: 1px solid #ced4da;
+            background-color: #fff;
+            color: #000;
+        }
+
+        .button1:focus {
+            outline-offset: 2px;
+            outline: 2px solid #00ccff;
+        }
+
+        .button1:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        .button1:focus {
+            outline-offset: 2px;
+            outline: 2px solid #00ccff;
+        }
+
+        .button1:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        @media (hover: hover) {
+            .button1:hover {
+                background-color:#f8f9fa;
+            }
+        }
+
+        @media (hover: none) {
+            .button1:active {
+                background-color:#f8f9fa;
+            }
+        }
+
+        .button1:active {
+            transform: translateY(1px);
+        }
+
+        .button1:disabled,.button1[data-disabled] {
+            border-color: transparent;
+            background-color: #e9ecef;
+            color: #adb5bd;
+            cursor: not-allowed;
+            background-image: none;
+            pointer-events: none;
+        }
+
+        .button1:disabled:active,.button1[data-disabled]:active {
+            transform: none;
+        }
+
+        .button1[data-loading] {
+            pointer-events: none;
+        }
+
+        .button1[data-loading]::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            background-color: rgba(255, 255, 255, .5);
+            border-radius: 4px;
+            cursor: not-allowed;
+        }
+        .button-inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            overflow: visible;
+        }
+        .lefticon {
+            display: flex;
+            align-items: center;
+            margin-right: 10px;
+        }
+        .Image-figure {
+            margin: 0;
+        }
+        .imageWrapper {
+            position: relative;
+        }
+        .Gimage {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            display: block;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            border-radius: 0;
+        }
+        .sign-in-label {
+            white-space: nowrap;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+        .Button-rightIcon {
+            display: flex;
+            align-items: center;
+            margin-left: 10px;
+        }
+        .break2 {
+            width: 0;
+            min-width: 0;
+            height: 24px;
+            min-height: 24px;
+        }
+        .Card-root {
+            outline: 0;
+            -webkit-tap-highlight-color: transparent;
+            display: block;
+            text-decoration: none;
+            color: #000;
+            background-color: #fff;
+            box-sizing: border-box;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05),rgba(0, 0, 0, 0.05) 0px 10px 15px -5px,rgba(0, 0, 0, 0.04) 0px 7px 7px -5px;
+            border: 1px solid #dee2e6;
+            position: relative;
+            overflow: hidden;
+            background-color: #fff;
+            align-self: stretch;
+            padding: 20px;
+        }	
+        .Textarea-root {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            line-height: 1.55;
+        }
+        .Textarea-wrapper {
+            position: relative;
+        }
+        .Nutrino-input {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            -webkit-tap-highlight-color: transparent;
+            line-height: 1.55;
+            appearance: none;
+            resize: none;
+            box-sizing: border-box;
+            font-size: 20px;
+            width: 100%;
+            color: #000;
+            display: block;
+            text-align: left;
+            border-width: 0;
+            background-color: transparent;
+            min-height: 28px;
+            outline: 0;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .Nutrino-input:disabled {
+            background-color: transparent;
+        }
+
+        .Nutrino-input:disabled:focus,.Nutrino-input:disabled:focus-within {
+            outline: none;
+            border-color: transparent;
+        }
+
+        .Nutrino-input::placeholder {
+            user-select: none;
+            color: #adb5bd;
+            opacity: 1;
+        }
+
+        .Nutrino-input::-webkit-inner-spin-button,.Nutrino-input::-webkit-outer-spin-button,.Nutrino-input::-webkit-search-decoration,.Nutrino-input::-webkit-search-cancel-button,.Nutrino-input::-webkit-search-results-button,.Nutrino-input::-webkit-search-results-decoration {
+            appearance: none;
+        }
+
+        .Nutrino-input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .Nutrino-input:focus,.Nutrino-input:focus-within {
+            outline: none;
+            border-color: transparent;
+        }
+        .Group-root {
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .Group-root>* {
+            box-sizing: border-box;
+            flex-grow: 0;
+        }
+
+        @media (max-width: 767px) {
+            .Group-root {
+                flex-direction:column;
+                align-items: stretch;
+            }
+        }
+        .Group-root1 {
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            gap: 16px;
+        }
+
+        .Group-root1>* {
+            box-sizing: border-box;
+            flex-grow: 0;
+        }
+        .Text-root {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            -webkit-tap-highlight-color: transparent;
+            color: inherit;
+            font-size: inherit;
+            line-height: 1.55;
+            text-decoration: none;
+        }
+
+        .Text-root:focus {
+            outline-offset: 2px;
+            outline: 2px solid #00eeff;
+        }
+
+        .Text-root:focus:not(:focus-visible) {
+            outline: none;
+        }
+        .NumberInput {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            height: 36px;
+            -webkit-tap-highlight-color: transparent;
+            line-height: 34px;
+            appearance: none;
+            resize: none;
+            box-sizing: border-box;
+            font-size: 14px;
+            width: 100%;
+            color: #000;
+            display: block;	
+            text-align: left;
+            min-height: 36px;
+            padding-left: 12px;
+            padding-right: 25px;
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+            background-color: #fff;
+            transition: border-color 100ms ease;
+        }
+
+        .NumberInput:disabled {
+            background-color: #f1f3f5;
+            color: #909296;
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .NumberInput:disabled::placeholder {
+            color: #909296;
+        }
+
+        .NumberInput::placeholder {
+            user-select: none;
+            color: #adb5bd;
+            opacity: 1;
+        }
+
+        .NumberInput::-webkit-inner-spin-button,.NumberInput::-webkit-outer-spin-button,.NumberInput::-webkit-search-decoration,.NumberInput::-webkit-search-cancel-button,.NumberInput::-webkit-search-results-button,.NumberInput::-webkit-search-results-decoration {
+            appearance: none;
+        }
+
+        .NumberInput[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .NumberInput:focus,.NumberInput:focus-within {
+            outline: none;
+            border-color: #00eeff;
+        }
+        .NumberInput-rightSection {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 25px;
+        }
+        .NumberInput-rightSection1 {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 2px);
+            margin: 1px;
+            margin-right: 1px;
+            overflow: hidden;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+        .NumberInput-controlUp {
+            margin: 0;
+            position: relative;
+            flex: 0 0 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            width: 24px;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            border-bottom: 1px solid #ced4da;
+            border-left: 1px solid #ced4da;
+            border-top: 0;
+            border-right: 0;
+            background-color: transparent;
+            margin-right: 1px;
+            color: #000;
+        }
+
+        .NumberInput-controlUp:not(:disabled):hover {
+            background-color: #f8f9fa;
+        }
+
+        .NumberInput-controlUp:disabled {
+            color: #ced4da;
+        }
+
+        .NumberInput-controlDown {
+            margin: 0;
+            position: relative;
+            flex: 0 0 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            width: 24px;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            border-bottom: 1px solid #ced4da;
+            border-left: 1px solid #ced4da;
+            border-top: 0;
+            border-right: 0;
+            background-color: transparent;
+            margin-right: 1px;
+            color: #000;
+            border-bottom: 0;
+        }
+
+        .NumberInput-controlDown:not(:disabled):hover {
+            background-color: #f8f9fa;
+        }
+
+        .NumberInput-controlDown:disabled {
+            color: #ced4da;
+        }
+        .Button-root2 {
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            cursor: pointer;
+            border: 0;
+            padding: 0;
+            appearance: none;
+            font-size: 16px;
+            background-color: transparent;
+            text-align: left;
+            color: #000;
+            text-decoration: none;
+            box-sizing: border-box;
+            height: 36px;
+            padding-left: 18px;
+            padding-right: 18px;
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            -webkit-tap-highlight-color: transparent;
+            display: inline-block;
+            width: auto;
+            border-radius: 4px;
+            font-weight: 600;
+            position: relative;
+            line-height: 1;
+            font-size: 14px;
+            user-select: none;
+            cursor: pointer;
+            border: 1px solid transparent;
+            background-color: rgba(235, 251, 238, 1);
+            color: #00eeff;
+        }
+
+        .Button-root2:focus {
+            outline-offset: 2px;
+            outline: 2px solid #00eeff;
+        }
+
+        .Button-root2:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        .Button-root2:focus {
+            outline-offset: 2px;
+            outline: 2px solid #00eeff;
+        }
+
+        .Button-root2:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        @media (hover: hover) {
+            .Button-root2:hover {
+                background-color:rgba(211, 249, 216, 0.65);
+            }
+        }
+
+        @media (hover: none) {
+            .Button-root2:active {
+                background-color:rgba(211, 249, 216, 0.65);
+            }
+        }
+
+        .Button-root2:active {
+            transform: translateY(1px);
+        }
+
+        .Button-root2:disabled,.Button-root2[data-disabled] {
+            border-color: transparent;
+            background-color: #e9ecef;
+            color: #adb5bd;
+            cursor: not-allowed;
+            background-image: none;
+            pointer-events: none;
+        }
+
+        .Button-root2:disabled:active,.Button-root2[data-disabled]:active {
+            transform: none;
+        }
+
+        .Button-root2[data-loading] {
+            pointer-events: none;
+        }
+
+        .Button-root2[data-loading]::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            background-color: rgba(255, 255, 255, .5);
+            border-radius: 4px;
+            cursor: not-allowed;
+        }
+        .button-inner{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .Button-label1 {
+            white-space: nowrap;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+        .Grid-col {
+            box-sizing: border-box;
+            flex-grow: 0;
+            padding: 8px;
+            flex-basis: 100%;
+            flex-shrink: 0;
+            max-width: 100%;
+        }
+
+        @media (min-width: 576px) {
+            .Grid-col {
+                flex-shrink:0;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .Grid-col {
+                flex-basis:100%;
                 flex-shrink: 0;
                 max-width: 100%;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-
-            @media (min-width: 576px) {
-                .Grid-col1 {
-                    flex-shrink:0;
-                }
-            }
-
-            @media (min-width: 768px) {
-                .Grid-col1 {
-                    flex-basis:100%;
-                    flex-shrink: 0;
-                    max-width: 100%;
-                    flex-grow: 0;
-                }
-            }
-
-            @media (min-width: 992px) {
-                .Grid-col1 {
-                    flex-basis:33.333333333333336%;
-                    flex-shrink: 0;
-                    flex-grow: 0;
-                }
-            }
-
-            @media (min-width: 1200px) {
-                .Grid-col1 {                   
-
-                    flex-shrink: 0;
-
-                    flex-grow: 0;
-                }
-            }
-
-            @media (min-width: 1400px) {
-                .Grid-col1 {
-
-                    flex-shrink: 0;
-                    flex-grow: 0;
-                }
-            }
-
-            .ThemeIcon-root  {
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                box-sizing: border-box;
-                width: 40px;
-                height: 40px;
-                min-width: 40px;
-                min-height: 40px;
-                border-radius: 40px;
-                background-color: rgba(235, 251, 238, 1);
-                color: #00ccff;
-                border: 1px solid transparent;
-            }
-            .Grid-col-container {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr); /* 3 columns */
-                grid-template-rows: repeat(2, auto); /* 2 rows */
-                gap: 16px; /* Adjust the gap between items as needed */
-            }
-            .direct1 {
-                text-decoration: none;
-                margin-bottom: 20px;
-                display: flex;
-            }
-            .imagerec {
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                display: block;
-                width: 100%;
-                height: 100%;
-                border: 0;
-                border-radius: 4px;
-            }
-            
-            .Card-cardSection {
-                display: block;
-                margin-left: -20px;
-                margin-right: -20px;
-            }
-
-            .Card-cardSection+.Card-cardSection {
-                border-top: 0;
-            }
-
-            .Card-cardSection[data-first] {
-                margin-top: -20px;
-                border-top: 0;
-            }
-
-            .Card-cardSection[data-last] {
-                margin-bottom: -20px;
-                border-bottom: 0;
-            }
-
-            .Group-root1 {
-                box-sizing: border-box;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                flex-wrap: wrap;
-                justify-content: space-between;
-                gap: 16px;
-                margin-top: 16px;
-                margin-bottom: 10px;
-            }
-
-            .Group-root1>* {
-                box-sizing: border-box;
                 flex-grow: 0;
             }
-            
-            .Text-root1 {
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                -webkit-tap-highlight-color: transparent;
-                color: inherit;
-                font-size: inherit;
-                line-height: 1.55;
-                text-decoration: none;
-                font-weight: 500;
-            }
+        }
 
-            .Text-root1:focus {
-                outline-offset: 2px;
-                outline: 2px solid #00eeff;
+        @media (min-width: 992px) {
+            .Grid-col {
+                flex-shrink:0;
             }
+        }
 
-            .Text-root1:focus:not(:focus-visible) {
-                outline: none;
+        @media (min-width: 1200px) {
+            .Grid-col {
+                flex-shrink:0;
             }
+        }
 
-            .Text-root2 {
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                -webkit-tap-highlight-color: transparent;
-                color: #868e96;
-                font-size: 14px;
-                line-height: 1.55;
-                text-decoration: none;
+        @media (min-width: 1400px) {
+            .Grid-col {
+                flex-shrink:0;
             }
+        }
 
-            .Text-root2:focus {
-                outline-offset: 2px;
-                outline: 2px solid #00eeff;
-            }
+        .Title-root  {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            -webkit-tap-highlight-color: transparent;
+            color: inherit;
+            font-size: inherit;
+            line-height: 1.55;
+            text-decoration: none;
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            font-weight: 700;
+            font-size: 34px;	
+            line-height: 1.3;
+            margin: 0;
+            color: #00ccff;
+        }
 
-            .Text-root2:focus:not(:focus-visible) {
-                outline: none;
-            }
-            .break3 {
-                width: 0;
-                min-width: 0;
-                height: 12px;
-                min-height: 12px;
-            }
-            .Alert-root {
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                position: relative;
-                overflow: hidden;
-                padding: 12px 16px;
-                border-radius: 4px;
-                border: 1px solid transparent;
-                background-color: rgba(248, 249, 250, 1);
-                color: #868e96;
-            }
+        .Title-root :focus {
+            outline-offset: 2px;
+            outline: 2px solid #00eeff;
+        }
 
-            .Alert-title {
-                box-sizing: border-box;
-                margin: 0;
-                margin-bottom: 7px;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                line-height: 1.55;
-                font-size: 14px;
-                font-weight: 700;
-            }
+        .Title-root :focus:not(:focus-visible) {
+            outline: none;
+        }
 
-            .Alert-title[data-with-close-button] {
-                padding-right: 16px;
-            }
-            .Alert-label {
-                display: block;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            .Alert-messagel {
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                line-height: 1.55;
-                text-overflow: ellipsis;
-                overflow: hidden;
-                font-size: 14px;
-                color: #000;
-            }
-            
-            .break4 {
-                width: 0;
-                min-width: 0;
-                height: 12px;
-                min-height: 12px;
-            }
+        .Grid-col1 {
+            box-sizing: border-box;
+            flex-grow: 0;
+            padding: 8px;
+            flex-basis: 100%;
+            flex-shrink: 0;
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-            .buttoncreate {
-                -webkit-tap-highlight-color: transparent;
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                cursor: pointer;
-                border: 0;
-                padding: 0;
-                appearance: none;
-                font-size: 16px;
-                background-color: transparent;
-                text-align: left;
-                color: #000;
-                text-decoration: none;
-                box-sizing: border-box;
-                height: 36px;
-                padding-left: 18px;
-                padding-right: 12px;
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                -webkit-tap-highlight-color: transparent;
-                display: inline-block;
-                width: auto;
-                border-radius: 4px;
-                font-weight: 600;
-                position: relative;
-                line-height: 1;
-                font-size: 14px;
-                user-select: none;
-                cursor: pointer;
-                border: 1px solid transparent;
-                background-color: transparent;
-                color: #00eeff;
+        @media (min-width: 576px) {
+            .Grid-col1 {
+                flex-shrink:0;
             }
+        }
 
-            .buttoncreate:focus {
-                outline-offset: 2px;
-                outline: 2px solid #00eeff;
+        @media (min-width: 768px) {
+            .Grid-col1 {
+                flex-basis:100%;
+                flex-shrink: 0;
+                max-width: 100%;
+                flex-grow: 0;
             }
+        }
 
-            .buttoncreate:focus:not(:focus-visible) {
-                outline: none;
+        @media (min-width: 992px) {
+            .Grid-col1 {
+                flex-basis:33.333333333333336%;
+                flex-shrink: 0;
+                flex-grow: 0;
             }
+        }
 
-            .buttoncreate:focus {
-                outline-offset: 2px;
-                outline: 2px solid #00eeff;
+        @media (min-width: 1200px) {
+            .Grid-col1 {                   
+
+                flex-shrink: 0;
+
+                flex-grow: 0;
             }
+        }
 
-            .buttoncreate:focus:not(:focus-visible) {
-                outline: none;
+        @media (min-width: 1400px) {
+            .Grid-col1 {
+
+                flex-shrink: 0;
+                flex-grow: 0;
             }
+        }
 
-            @media (hover: hover) {
-                .buttoncreate:hover {
-                    background-color:rgba(235, 251, 238, 1);
-                }
+        .ThemeIcon-root  {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            min-height: 40px;
+            border-radius: 40px;
+            background-color: rgba(235, 251, 238, 1);
+            color: #00ccff;
+            border: 1px solid transparent;
+        }
+        .Grid-col-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 columns */
+            grid-template-rows: repeat(2, auto); /* 2 rows */
+            gap: 16px; /* Adjust the gap between items as needed */
+        }
+        .direct1 {
+            text-decoration: none;
+            margin-bottom: 20px;
+            display: flex;
+        }
+        .imagerec {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            display: block;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            border-radius: 4px;
+        }
+        
+        .Card-cardSection {
+            display: block;
+            margin-left: -20px;
+            margin-right: -20px;
+        }
+
+        .Card-cardSection+.Card-cardSection {
+            border-top: 0;
+        }
+
+        .Card-cardSection[data-first] {
+            margin-top: -20px;
+            border-top: 0;
+        }
+
+        .Card-cardSection[data-last] {
+            margin-bottom: -20px;
+            border-bottom: 0;
+        }
+
+        .Group-root1 {
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 16px;
+            margin-top: 16px;
+            margin-bottom: 10px;
+        }
+
+        .Group-root1>* {
+            box-sizing: border-box;
+            flex-grow: 0;
+        }
+        
+        .Text-root1 {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            -webkit-tap-highlight-color: transparent;
+            color: inherit;
+            font-size: inherit;
+            line-height: 1.55;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .Text-root1:focus {
+            outline-offset: 2px;
+            outline: 2px solid #00eeff;
+        }
+
+        .Text-root1:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        .Text-root2 {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            -webkit-tap-highlight-color: transparent;
+            color: #868e96;
+            font-size: 14px;
+            line-height: 1.55;
+            text-decoration: none;
+        }
+
+        .Text-root2:focus {
+            outline-offset: 2px;
+            outline: 2px solid #00eeff;
+        }
+
+        .Text-root2:focus:not(:focus-visible) {
+            outline: none;
+        }
+        .break3 {
+            width: 0;
+            min-width: 0;
+            height: 12px;
+            min-height: 12px;
+        }
+        .Alert-root {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            position: relative;
+            overflow: hidden;
+            padding: 12px 16px;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            background-color: rgba(248, 249, 250, 1);
+            color: #868e96;
+        }
+
+        .Alert-title {
+            box-sizing: border-box;
+            margin: 0;
+            margin-bottom: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            line-height: 1.55;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .Alert-title[data-with-close-button] {
+            padding-right: 16px;
+        }
+        .Alert-label {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .Alert-messagel {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            line-height: 1.55;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            font-size: 14px;
+            color: #000;
+        }
+        
+        .break4 {
+            width: 0;
+            min-width: 0;
+            height: 12px;
+            min-height: 12px;
+        }
+
+        .buttoncreate {
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            cursor: pointer;
+            border: 0;
+            padding: 0;
+            appearance: none;
+            font-size: 16px;
+            background-color: transparent;
+            text-align: left;
+            color: #000;
+            text-decoration: none;
+            box-sizing: border-box;
+            height: 36px;
+            padding-left: 18px;
+            padding-right: 12px;
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            -webkit-tap-highlight-color: transparent;
+            display: inline-block;
+            width: auto;
+            border-radius: 4px;
+            font-weight: 600;
+            position: relative;
+            line-height: 1;
+            font-size: 14px;
+            user-select: none;
+            cursor: pointer;
+            border: 1px solid transparent;
+            background-color: transparent;
+            color: #00eeff;
+        }
+
+        .buttoncreate:focus {
+            outline-offset: 2px;
+            outline: 2px solid #00eeff;
+        }
+
+        .buttoncreate:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        .buttoncreate:focus {
+            outline-offset: 2px;
+            outline: 2px solid #00eeff;
+        }
+
+        .buttoncreate:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        @media (hover: hover) {
+            .buttoncreate:hover {
+                background-color:rgba(235, 251, 238, 1);
             }
+        }
 
-            @media (hover: none) {
-                .buttoncreate:active {
-                    background-color:rgba(235, 251, 238, 1);
-                }
-            }
-
+        @media (hover: none) {
             .buttoncreate:active {
-                transform: translateY(1px);
+                background-color:rgba(235, 251, 238, 1);
             }
+        }
 
-            .buttoncreate:disabled,.buttoncreate[data-disabled] {
-                border-color: transparent;
-                background-color: #e9ecef;
-                color: #adb5bd;
-                cursor: not-allowed;
-                background-image: none;
-                pointer-events: none;
-            }
+        .buttoncreate:active {
+            transform: translateY(1px);
+        }
 
-            .buttoncreate:disabled:active,.buttoncreate[data-disabled]:active {
-                transform: none;
-            }
+        .buttoncreate:disabled,.buttoncreate[data-disabled] {
+            border-color: transparent;
+            background-color: #e9ecef;
+            color: #adb5bd;
+            cursor: not-allowed;
+            background-image: none;
+            pointer-events: none;
+        }
 
-            .buttoncreate[data-loading] {
-                pointer-events: none;
-            }
+        .buttoncreate:disabled:active,.buttoncreate[data-disabled]:active {
+            transform: none;
+        }
 
-            .buttoncreate[data-loading]::before {
-                content: "";
-                position: absolute;
-                top: -1px;
-                left: -1px;
-                right: -1px;
-                bottom: -1px;
-                background-color: rgba(255, 255, 255, .5);
-                border-radius: 4px;
-                cursor: not-allowed;
-            }
-            .footer {
-                margin-top: 120px;
-                border-top: 1px solid #e9ecef;
-            }
+        .buttoncreate[data-loading] {
+            pointer-events: none;
+        }
 
-            .footer-container {    
-                text-size-adjust: 100%;
-    color-scheme: light;
-    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-    color: #000;
-    line-height: 1.55;
-    font-size: 16px;
-    -webkit-font-smoothing: antialiased;
-    box-sizing: border-box;
-    padding-left: 16px;
-    padding-right: 16px;
-    max-width: 960px;
-    margin-left: auto;
-    margin-right: auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 24px;
-    padding-bottom: 24px;
-            }
+        .buttoncreate[data-loading]::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            background-color: rgba(255, 255, 255, .5);
+            border-radius: 4px;
+            cursor: not-allowed;
+        }
+        .footer {
+            margin-top: 120px;
+            border-top: 1px solid #e9ecef;
+        }
 
-            @media (max-width: 575px) {
-                .footer-container {
-                    flex-direction:column;
-                }
-            }
-            .footer-indicator {
-                position: relative;
-                display: block;
-            }
+        .footer-container {    
+            text-size-adjust: 100%;
+color-scheme: light;
+font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+color: #000;
+line-height: 1.55;
+font-size: 16px;
+-webkit-font-smoothing: antialiased;
+box-sizing: border-box;
+padding-left: 16px;
+padding-right: 16px;
+max-width: 960px;
+margin-left: auto;
+margin-right: auto;
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding-top: 24px;
+padding-bottom: 24px;
+        }
 
-            .Indicator-common {
-                top: 3px;
-                right: 3px;
-                transform: translate(50%, -50%);
-                z-index: 100;
-                position: absolute;
-                min-width: 16px;
-                height: 16px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                font-size: 12px;
-                padding-left: calc(10px / 2);
-                padding-right: calc(10px / 2);
-                border-radius: 1000px;
-                background-color: #00ccff;
-                color: #fff;
-                white-space: nowrap;
-                top: 3px;
-                right: 3px;
-                transform: translate(50%, -50%);
-                position: absolute;
-                min-width: 16px;
-                height: 16px;
-                border-radius: 1000px;
+        @media (max-width: 575px) {
+            .footer-container {
+                flex-direction:column;
             }
-            .Text-root50 {
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                -webkit-tap-highlight-color: transparent;
-                color: inherit;
-                font-size: inherit;
-                line-height: 1.55;
-                text-decoration: none;
-                font-family: 'Pacifico',cursive;
-                font-size: 24px;
-                line-height: 1;
-                display: inline-block;
-                width: 65px;
-                height: 14px;
-                color: #00ccff;
-                padding-right: 12px;
-            }
+        }
+        .footer-indicator {
+            position: relative;
+            display: block;
+        }
 
-            .Text-root50:focus {
-                outline-offset: 2px;
-                outline: 2px solid #0400ff;
-            }
+        .Indicator-common {
+            top: 3px;
+            right: 3px;
+            transform: translate(50%, -50%);
+            z-index: 100;
+            position: absolute;
+            min-width: 16px;
+            height: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            padding-left: calc(10px / 2);
+            padding-right: calc(10px / 2);
+            border-radius: 1000px;
+            background-color: #00ccff;
+            color: #fff;
+            white-space: nowrap;
+            top: 3px;
+            right: 3px;
+            transform: translate(50%, -50%);
+            position: absolute;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 1000px;
+        }
+        .Text-root50 {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            -webkit-tap-highlight-color: transparent;
+            color: inherit;
+            font-size: inherit;
+            line-height: 1.55;
+            text-decoration: none;
+            font-family: 'Pacifico',cursive;
+            font-size: 24px;
+            line-height: 1;
+            display: inline-block;
+            width: 65px;
+            height: 14px;
+            color: #00ccff;
+            padding-right: 12px;
+        }
 
-            .Text-root50:focus:not(:focus-visible) {
-                outline: none;
-            }
+        .Text-root50:focus {
+            outline-offset: 2px;
+            outline: 2px solid #0400ff;
+        }
 
-            .Text-root40 {
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                -webkit-tap-highlight-color: transparent;
-                color: #868e96;
-                font-size: inherit;
-                line-height: 1.55;
-                text-decoration: none;
-            }
+        .Text-root50:focus:not(:focus-visible) {
+            outline: none;
+        }
 
-            .Text-root40:focus {
-                outline-offset: 2px;
-                outline: 2px solid #00eeff;
-            }
+        .Text-root40 {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            -webkit-tap-highlight-color: transparent;
+            color: #868e96;
+            font-size: inherit;
+            line-height: 1.55;
+            text-decoration: none;
+        }
 
-            .Text-root40:focus:not(:focus-visible) {
-                outline: none;
-            }
+        .Text-root40:focus {
+            outline-offset: 2px;
+            outline: 2px solid #00eeff;
+        }
 
+        .Text-root40:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        .Group-root2 {
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            gap: 16px;
+        }
+
+        .Group-root2>* {
+            box-sizing: border-box;
+            flex-grow: 0;
+        }
+
+        @media (max-width: 575px) {
             .Group-root2 {
-                box-sizing: border-box;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                flex-wrap: wrap;
-                justify-content: flex-start;
-                gap: 16px;
+                margin-top:16px;
             }
+        }
 
-            .Group-root2>* {
-                box-sizing: border-box;
-                flex-grow: 0;
+        .anchor-root {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            -webkit-tap-highlight-color: transparent;
+            color: #868e96;
+            font-size: 14px;
+            line-height: 1.55;
+            text-decoration: none;
+            background-color: transparent;
+            cursor: pointer;
+            padding: 0;
+            border: 0;
+        }
+
+        .anchor-root:focus {
+            outline-offset: 2px;
+            outline: 2px solid #00eeff;
+        }
+
+        .anchor-root:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        @media (hover: hover) {
+            .anchor-root:hover {
+                text-decoration:underline;
             }
+        }
 
-            @media (max-width: 575px) {
-                .Group-root2 {
-                    margin-top:16px;
-                }
+        @media (hover: none) {
+            .anchor-root:active {
+                text-decoration:underline;
             }
+        }
 
-            .anchor-root {
-                font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-                -webkit-tap-highlight-color: transparent;
-                color: #868e96;
-                font-size: 14px;
-                line-height: 1.55;
-                text-decoration: none;
-                background-color: transparent;
-                cursor: pointer;
-                padding: 0;
-                border: 0;
-            }
+    </style>
+    <!-- Add this script before </body> -->
 
-            .anchor-root:focus {
-                outline-offset: 2px;
-                outline: 2px solid #00eeff;
-            }
-
-            .anchor-root:focus:not(:focus-visible) {
-                outline: none;
-            }
-
-            @media (hover: hover) {
-                .anchor-root:hover {
-                    text-decoration:underline;
-                }
-            }
-
-            @media (hover: none) {
-                .anchor-root:active {
-                    text-decoration:underline;
-                }
-            }
-
-        </style>
-        <!-- Add this script before </body> -->
-
-    </head>
-    <body>
-        <div class="PAGE">
-            <div class="header1">
-                <div class="headContainer1">
-                    <div class="headContainer2">
-                        <div class="headContainer3">
-                            <a href="NUTRINOAI.html">
-                                <div class="LOGONAME" style="padding-right: 88px;">
-                                    <div class="AILOGO">AI</div>
-                                    <div class="NUTRINOspell">NUTRINO</div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="headContainer3" id="auth-links">
-                            <a href="login.html" class="LOGIN1" id="login-link">Login</a>
-                                <a href="signup.html" id="signup-link">
-                                <button class="BUTTON_LOG" type="button">Sign Up</button>
-                                </a>
-                        </div>
-
-                        <div id="user-info" class="user-info" style="display: none;">
-                            <img id="user-profile-pic" src="" alt="Profile Picture" width="40" style="border-radius: 50%; display: none;">                        
-                                <span id="user-name" class="welcome-text"></span>
-                            <button id="logout-button" class="BUTTON_LOG" style="display: none;">Logout</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="break"></div>
-
-
-            <div class="mantine-rtl-1s8spa1">
-                <div class="page1">
-                    <h1 class="label1">Create amazing recipes with AI</h1>
-                    <div class="label2">Create, share, and discover delicious recipes. Leverage the limitless power of AI to turn simple ideas into full meals. Throw out your cookbook and start creating.</div>
-                    <a href="#" id="google-signin-btn" class="auth">
-                        <button class="button1" type="button" data-button="true">
-                            <div class="button-inner">
-                                <span class="lefticon">
-                                    <div class="IMAGE_ROOT" style="width:18px">
-                                        <figure class="Image-figure">
-                                            <div class="imageWrapper">
-                                                <img class="Gimage" src="./NUTRINOAI_files/googleICON.png" style="object-fit:cover;width:18px;height:18px">
-                                            </div>
-                                        </figure>
-                                    </div>
-                                </span>
-                                <span class="sign-in-label">Sign in with Google</span>
-                                <span class="Button-rightIcon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                                        <line x1="13" y1="18" x2="19" y2="12"></line>
-                                        <line x1="13" y1="6" x2="19" y2="12"></line>
-                                    </svg>
-                                </span>
-                            </div>
-                        </button>
-                    </a>
-                    <script>
-                        document.addEventListener("DOMContentLoaded", () => {
-                            const googleSignInButton = document.getElementById("google-signin-btn");
-                            if (googleSignInButton) {
-                                googleSignInButton.addEventListener("click", (event) => {
-                                    event.preventDefault();
-                                    google.accounts.id.prompt();
-                                });
-                            }
-                        });
-                    </script>
-                    
-                    <div class="break2"></div>
-                    <div class="break2"></div>
-                    <div class="break2"></div>
-                    <div class="break2"></div>
-                    <div class="Card-root">
-                        <div class="Textarea-root">
-                            <div class="Textarea-wrapper">
-                                <textarea class="Nutrino-input" id="rec_search" placeholder="Create a recipe that is..." maxlength="256" aria-invalid="false"></textarea>
-                            </div>
-                        </div>
-                        <div class="Group-root">
-                            <div class="Group-root1">
-                                <div class="Text-root">for</div>
-                                <div class="NumberInput-root">
-                                    <div class="NumberInput-wrapper">
-                                        <input class="NumberInput" id="NumberInput-input" type="text" max="256" step="1" inputmode="numeric" aria-invalid="false" value="2">
-                                    </div>
-                                </div>
-                                <div class="Text-root">people</div>
-                            </div>
-                            <button class="Button-root2" type="button" id="generateRecipe">
-                                <div class="Button-inner">
-                                    <span class="Button-label1">Create</span>
-                                </div>
-                            </button>                                                      
-                        </div>
-                    </div>
-                    <script>
-                        document.addEventListener("DOMContentLoaded", () => {
-                            document.getElementById("generateRecipe").addEventListener("click", async () => {
-                                const query = document.getElementById("rec_search")?.value.trim();
-                                if (!query) {
-                                    alert("Enter a recipe name!");
-                                    return;
-                                }
-                                document.getElementById("generateRecipe").innerText = "Loading...";
-                                const recipeData = await fetchRecipe(query);
-                                if (recipeData) {
-                                    window.location.href = `generated_recipe.html?data=${encodeURIComponent(JSON.stringify(recipeData))}`;
-                                } else {
-                                    document.getElementById("generateRecipe").innerText = "Create";
-                                }
-                            });
-                        });
-                    </script>
-                    
-                    <div class="Grid-col ">
-                        <div class="1q1idfv"></div>
-                        <div class="1q1idfv"></div>
-                        <h1 class="Title-root ">
-                            Your imagination is the limit.Generate unique recipes with any restriction or ingredient.
-                        </h1>
-                    </div>
-                    <div class="Grid-col-container">
-                        <div class="Grid-col1">
-                            <div>
-                                <div class="ThemeIcon-root ">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-ban" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                        <circle cx="12" cy="12" r="9"></circle>
-                                        <line x1="5.7" y1="5.7" x2="18.3" y2="18.3"></line>
-                                    </svg>
-                                </div>
-                                <div class="Text-root" style="margin-top:12px;margin-bottom:7px">Dietary restrictions made easy</div>
-                                <div class="Text-root 1fntsro" style="line-height:1.6">Vegan. Vegetarian. Gluten-free. Dairy-free. Zero carb. Whatever dietary restriction you may have, let NUTRINOAI create a delicious recipe for you.</div>
-                            </div>
-                        </div>
-                        <div class="Grid-col1">
-                            <div>
-                                <div class="ThemeIcon-root ">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-fridge" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                        <rect x="5" y="3" width="14" height="18" rx="2"></rect>
-                                        <path d="M5 10h14"></path>
-                                        <path d="M9 13v3"></path>
-                                        <path d="M9 6v1"></path>
-                                    </svg>
-                                </div>
-                                <div class="Text-root" style="margin-top:12px;margin-bottom:7px">Make the most of your fridge</div>
-                                <div class="Text-root 1fntsro" style="line-height:1.6">Only have a banana, some spinach, and a potato in your fridge? Let NUTRINOAI figure out how to turn that into something great.</div>
-                            </div>
-                        </div>
-                        <div class="Grid-col1">
-                            <div>
-                                <div class="ThemeIcon-root ">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hourglass" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                        <path d="M6.5 7h11"></path>
-                                        <path d="M6.5 17h11"></path>
-                                        <path d="M6 20v-2a6 6 0 1 1 12 0v2a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1z"></path>
-                                        <path d="M6 4v2a6 6 0 1 0 12 0v-2a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1z"></path>
-                                    </svg>
-                                </div>
-                                <div class="Text-root" style="margin-top:12px;margin-bottom:7px">Always the right timing</div>
-                                <div class="Text-root 1fntsro" style="line-height:1.6">Need something fast? Want something to spend an evening on? Just add a note about and let NUTRINOAI iron out the details.</div>
-                            </div>
-                        </div>
-                        <div class="Grid-col1">
-                            <div>
-                                <div class="ThemeIcon-root ">
-                                    <svg xmlns="http://www.w3.org/2000/svg" ```html="" <svg="" class="icon icon-tabler icon-tabler-confetti" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                        <path d="M4 5h2"></path>
-                                        <path d="M5 4v2"></path>
-                                        <path d="M11.5 4l-.5 2"></path>
-                                        <path d="M18 5h2"></path>
-                                        <path d="M19 4v2"></path>
-                                        <path d="M15 9l-1 1"></path>
-                                        <path d="M18 13l2 -.5"></path>
-                                        <path d="M18 19h2"></path>
-                                        <path d="M19 18v2"></path>
-                                        <path d="M14 16.518l-6.518 -6.518l-4.39 9.58a1.003 1.003 0 0 0 1.329 1.329l9.579 -4.39z"></path>
-                                    </svg>
-                                </div>
-                                <div class="Text-root" style="margin-top:12px;margin-bottom:7px">Keep it festive</div>
-                                <div class="Text-root 1fntsro" style="line-height:1.6">Need a holiday ready pie? All good. Let NUTRINOAI handle holidays and themes for your next event.</div>
-                            </div>
-                        </div>
-                        <div class="Grid-col1">
-                            <div>
-                                <div class="ThemeIcon-root ">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-zzz-off" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                        <path d="M4 12h6l-6 8h6"></path>
-                                        <path d="M14 4h6l-5.146 6.862m1.146 1.138h4"></path>
-                                        <path d="M3 3l18 18"></path>
-                                    </svg>
-                                </div>
-                                <div class="Text-root" style="margin-top:12px;margin-bottom:7px">Never get bored</div>
-                                <div class="Text-root 1fntsro" style="line-height:1.6">Never eat the same meal twice. Mix and match - or even re-use the same prompt. Every recipe is unique and generated on the fly by advanced models.</div>
-                            </div>
-                        </div>
-                        <div class="Grid-col1">
-                            <div>
-                                <div class="ThemeIcon-root ">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-salad" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                        <path d="M4 11h16a1 1 0 0 1 1 1v.5c0 1.5 -2.517 5.573 -4 6.5v1a1 1 0 0 1 -1 1h-8a1 1 0 0 1 -1 -1v-1c-1.687 -1.054 -4 -5 -4 -6.5v-.5a1 1 0 0 1 1 -1z"></path>
-                                        <path d="M18.5 11c.351 -1.017 .426 -2.236 .5 -3.714v-1.286h-2.256c-2.83 0 -4.616 .804 -5.64 2.076"></path>
-                                        <path d="M8 8l1 -4l4 2.5"></path>
-                                        <path d="M13 11v-.5a2.5 2.5 0 1 0 -5 0v.5"></path>
-                                    </svg>
-                                </div>
-                                <div class="Text-root" style="margin-top:12px;margin-bottom:7px">Diets without the complexity</div>
-                                <div class="Text-root 1fntsro" style="line-height:1.6">Keto. Paleo. Low-carb. Give NUTRINOAI your diet and let it create a recipe just for you with all the restrictions and none of the effort.</div>
-                            </div>
-                        </div>
-                    </div> 
-                    <div class="Grid-col">
-                        <div class="1q1idfv"></div>
-                        <div class="1q1idfv"></div>
-                        <h1 class="Title-root">
-                            Discover. Get inspired.<br>Browse recipes created by others all over the world.
-                        </h1>
-                    </div>
-                <div class="Grid-col-container">
-                    <div class="Grid-col1">
-                        <a class="direct1" href="generated_recipe.html?recipe=Grilled Cheese and Tomato Sandwich">
-                            <div class="Card-root">
-                                <div class="cardSection" padding="lg" data-first="true">
-                                    <div class="Image-root" style="width:100%">
-                                        <figure class="Image-figure">
-                                            <div class="imageWrapper">
-                                                <img class="imagerec" src="src/production_8e58f7b9-50d7-484c-a7c2-dce72e586e4d.png" alt="Grilled Cheese and Tomato Sandwich" style="object-fit:cover;width:100%;height:400px">
-                                            </div>
-                                        </figure>
-                                    </div>
-                                </div>
-                                <div class="Card-cardSection" padding="lg" data-last="true">
-                                    <div class="Group-root1">
-                                        <div class="Text-root1" class="recipe-link" data-recipe="Grilled Cheese and Tomato Sandwich">
-                                            Grilled Cheese and Tomato Sandwich
-                                        </div>
-                                    </div>
-                                    <div class="Text-root2">A classic lunch favorite, this grilled cheese and tomato sandwich is easy to make and delicious.</div>
-                                    <div class="break3"></div>
-                                    <div class="Alert-root " id="alert1" role="alert" aria-labelledby="alert1-title" aria-describedby="alert1-body">
-                                        <div class="Alert-wrapper" style="display: flex;">
-                                            <div class="Alert-body" style="flex: 1;">
-                                                <div class="Alert-title">
-                                                    <span id="R98a6m-title" class="Alert-label">Prompt</span>
-                                                </div>
-                                                <div id="R98a6m" class="Alert-message">simple and easy lunch
-                                                <!-- -->
-                                                for 
-                                                <!-- -->
-                                                2
-                                                <!-- -->
-                                                people</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="break4"></div>
-                                    <div class="Group-root">
-                                        <div class="Text-root">suggested</div>
-                                        <button class="buttoncreate" type="button" data-button="true">
-                                            <div class="Button-inner">
-                                                <span class="Button-label">View the full recipe</span>
-                                                <span class="Button-icon">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-right" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                                                        <line x1="13" y1="18" x2="19" y2="12"></line>
-                                                        <line x1="13" y1="6" x2="19" y2="12"></line>
-                                                    </svg>
-                                                </span>
-                                            </div>
-                                        </button>
-                                    </div>
-                                </div>
+</head>
+<body>
+    <div class="PAGE">
+        <div class="header1">
+            <div class="headContainer1">
+                <div class="headContainer2">
+                    <div class="headContainer3">
+                        <a href="NUTRINOAI.html">
+                            <div class="LOGONAME" style="padding-right: 88px;">
+                                <div class="AILOGO">AI</div>
+                                <div class="NUTRINOspell">NUTRINO</div>
                             </div>
                         </a>
                     </div>
-                    
-                    <div class="Grid-col1">
-                        <a class="direct1" href="generated_recipe.html?recipe=Asparagus and Chicken with Lemon Cream Sauce">
-                            <div class="Card-root">
-                                <div class="cardSection" padding="lg" data-first="true">
-                                    <div class="Image-root" style="width:100%">
-                                        <figure class="Image-figure">
-                                            <div class="imageWrapper">
-                                                <img class="imagerec" src="src/production_bf4db7e0-0438-493c-bcf2-e5e29c708f53.png" alt="Asparagus and Chicken with Lemon Cream Sauce" style="object-fit:cover;width:100%;height:400px">
-                                            </div>
-                                        </figure>
-                                    </div>
-                                </div>
-                                <div class="Card-cardSection" padding="lg" data-last="true">
-                                    <div class="Group-root1">
-                                        <div class="Text-root1" class="recipe-link" data-recipe="Asparagus and Chicken with Lemon Cream Sauce">
-                                            Asparagus and Chicken with Lemon Cream Sauce
-                                        </div>
-                                    </div>
-                                    <div class="Text-root2">This recipe is a delicious combination of asparagus, chicken, and a creamy lemon sauce.</div>
-                                    <div class="break3"></div>
-                                    <div class="Alert-root " id="alert1" role="alert" aria-labelledby="alert1-title" aria-describedby="alert1-body">
-                                        <div class="Alert-wrapper" style="display: flex;">
-                                            <div class="Alert-body" style="flex: 2;">
-                                                <div class="Alert-title">
-                                                    <span id="R98a6m-title" class="Alert-label">Prompt</span>
-                                                </div>
-                                                <div id="R98a6m" class="Alert-message">simple and easy lunch
-                                                <!-- -->
-                                                for 
-                                                <!-- -->
-                                                2
-                                                <!-- -->
-                                                people</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="break4"></div>
-                                    <div class="Group-root">
-                                        <div class="Text-root">suggested</div>
-                                        <button class="buttoncreate" type="button" data-button="true">
-                                            <div class="Button-inner">
-                                                <span class="Button-label">View the full recipe</span>
-                                                <span class="Button-icon">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-right" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                                                        <line x1="13" y1="18" x2="19" y2="12"></line>
-                                                        <line x1="13" y1="6" x2="19" y2="12"></line>
-                                                    </svg>
-                                                </span>
-                                            </div>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="headContainer3" id="auth-links">
+                        <a href="login.html" class="LOGIN1" id="login-link">Login</a>
+                        <a href="signup.html" id="signup-link">
+                            <button class="BUTTON_LOG" type="button">Sign Up</button>
                         </a>
                     </div>
 
-                    <div class="Grid-col1">
-                        <a class="direct1" href="generated_recipe.html?recipe=Creamy Pesto Chicken and Vegetable Skillet">
-                            <div class="Card-root">
-                                <div class="cardSection" padding="lg" data-first="true">
-                                    <div class="Image-root" style="width:100%">
-                                        <figure class="Image-figure">
-                                            <div class="imageWrapper">
-                                                <img class="imagerec" src="src/production_aa59b8d7-c0fc-49d3-a83c-4b2cc7fa9a38.png" alt="Creamy Pesto Chicken and Vegetable Skillet" style="object-fit:cover;width:100%;height:400px">
-                                            </div>
-                                        </figure>
-                                    </div>
-                                </div>
-                                <div class="Card-cardSection" padding="lg" data-last="true">
-                                    <div class="Group-root1">
-                                        <div class="Text-root1" class="recipe-link" data-recipe="Creamy Pesto Chicken and Vegetable Skillet">
-                                            Creamy Pesto Chicken and Vegetable Skillet
-                                        </div>
-                                    </div>
-                                    <div class="Text-root2">This creamy pesto chicken and vegetable skillet is an easy, one-pan dinner that comes together in 20 minutes. It's a delicious and healthy meal that's perfect for busy weeknights!</div>
-                                    <div class="break3"></div>
-                                    <div class="Alert-root " id="alert1" role="alert" aria-labelledby="alert1-title" aria-describedby="alert1-body">
-                                        <div class="Alert-wrapper" style="display: flex;">
-                                            <div class="Alert-body" style="flex: 2;">
-                                                <div class="Alert-title">
-                                                    <span id="R98a6m-title" class="Alert-label">Prompt</span>
-                                                </div>
-                                                <div id="R98a6m" class="Alert-message">quick and tasty dinner
-                                                <!-- -->
-                                                for 
-                                                <!-- -->
-                                                2
-                                                <!-- -->
-                                                people</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="break4"></div>
-                                    <div class="Group-root">
-                                        <div class="Text-root">suggested</div>
-                                        <button class="buttoncreate" type="button" data-button="true">
-                                            <div class="Button-inner">
-                                                <span class="Button-label">View the full recipe</span>
-                                                <span class="Button-icon">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-right" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                                                        <line x1="13" y1="18" x2="19" y2="12"></line>
-                                                        <line x1="13" y1="6" x2="19" y2="12"></line>
-                                                    </svg>
-                                                </span>
-                                            </div>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                </div>
-                <div class="footer">
-                    <div class="footer-container">
-                        <div class="footer-indicator" style="
-                        padding-right: 90px;">
-                            <div class="Indicator-common">AI</div>
-                            <div class="Text-root50">NUTRINO</div>
-                        </div>
-                        <div class="Text-root40">© 2025</div>
-                        <div class="Group-root2">
-                            <a class="anchor-root " href="mailto:support@nutrinoai.com">support@Nutrinoai.com</a>
-                            <a class="anchor-root " href="file:///C:/privacy">Privacy Policy</a>
-                            <a class="anchor-root " href="file:///C:/terms">Terms of Service</a>
-                        </div>
-                    </div>
-                </div>
+                    <div id="user-info" class="user-info" style="display: none;">
+                        <img id="user-profile-pic" src="" alt="Profile Picture" width="40" style="border-radius: 50%; display: none;">
+                        <span id="user-email" class="welcome-text"></span>
+                        <button id="logout-button" style="display: none;">Logout</button>
+                    </div>                    
                 </div>
             </div>
         </div>
-    
-</body><script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("generateRecipe").addEventListener("click", function () {
-            const query = document.getElementById("rec_search").value.trim();
-            if (!query) {
-                alert("Please enter a recipe idea!");
-                return;
-            }
-            handleRecipeGeneration(query);
-        });
-    });
-</script>
+        <div class="break"></div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const userEmail = localStorage.getItem("loggedInUser");
-        const userProfilePic = localStorage.getItem("userProfilePic");
-        
-        if (userEmail) {
-            document.getElementById("user-info").style.display = "flex-end";
-            document.getElementById("user-email").textContent = userEmail;
-            document.getElementById("auth-links").style.display = "none";
-            if (userProfilePic) {
-                document.getElementById("user-profile-pic").src = userProfilePic;
-                document.getElementById("user-profile-pic").style.display = "block";
-            }
-        }
-    });
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const recipeLinks = document.querySelectorAll(".recipe-link");
 
-        recipeLinks.forEach(link => {
-            link.addEventListener("click", function (event) {
-                event.preventDefault();
-                const recipeName = this.dataset.recipe;
+        <div class="mantine-rtl-1s8spa1">
+            <div class="page1">
+                <h1 class="label1">Create amazing recipes with AI</h1>
+                <div class="label2">Create, share, and discover delicious recipes. Leverage the limitless power of AI to turn simple ideas into full meals. Throw out your cookbook and start creating.</div>
+                <a href="#" id="google-signin-btn" class="auth">
+                    <button class="button1" type="button" data-button="true">
+                        <div class="button-inner">
+                            <span class="lefticon">
+                                <div class="IMAGE_ROOT" style="width:18px">
+                                    <figure class="Image-figure">
+                                        <div class="imageWrapper">
+                                            <img class="Gimage" src="./NUTRINOAI_files/googleICON.png" style="object-fit:cover;width:18px;height:18px">
+                                        </div>
+                                    </figure>
+                                </div>
+                            </span>
+                            <span class="sign-in-label">Sign in with Google</span>
+                            <span class="Button-rightIcon">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <line x1="13" y1="18" x2="19" y2="12"></line>
+                                    <line x1="13" y1="6" x2="19" y2="12"></line>
+                                </svg>
+                            </span>
+                        </div>
+                    </button>
+                </a>
+                <script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                        const googleSignInButton = document.getElementById("google-signin-btn");
+                        if (googleSignInButton) {
+                            googleSignInButton.addEventListener("click", (event) => {
+                                event.preventDefault();
+                                google.accounts.id.prompt();
+                            });
+                        }
+                    });
+                </script>
                 
-                // Redirect to generated_recipe.html with the recipe name
-                window.location.href = `generated_recipe.html?recipe=${encodeURIComponent(recipeName)}`;
-            });
+                <div class="break2"></div>
+                <div class="break2"></div>
+                <div class="break2"></div>
+                <div class="break2"></div>
+                <div class="Card-root">
+                    <div class="Textarea-root">
+                        <div class="Textarea-wrapper">
+                            <textarea class="Nutrino-input" id="rec_search" placeholder="Create a recipe that is..." maxlength="256" aria-invalid="false"></textarea>
+                        </div>
+                    </div>
+                    <div class="Group-root">
+                        <div class="Group-root1">
+                            <div class="Text-root">for</div>
+                            <div class="NumberInput-root">
+                                <div class="NumberInput-wrapper">
+                                    <input class="NumberInput" id="NumberInput-input" type="text" max="256" step="1" inputmode="numeric" aria-invalid="false" value="2">
+                                </div>
+                            </div>
+                            <div class="Text-root">people</div>
+                        </div>
+                        <button class="Button-root2" type="button" id="generateRecipe">
+                            <div class="Button-inner">
+                                <span class="Button-label1">Create</span>
+                            </div>
+                        </button>                                                      
+                    </div>
+                </div>
+                <script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                        document.getElementById("generateRecipe").addEventListener("click", async () => {
+                            const query = document.getElementById("rec_search")?.value.trim();
+                            if (!query) {
+                                alert("Enter a recipe name!");
+                                return;
+                            }
+                            document.getElementById("generateRecipe").innerText = "Loading...";
+                            const recipeData = await fetchRecipe(query);
+                            if (recipeData) {
+                                window.location.href = `generated_recipe.html?data=${encodeURIComponent(JSON.stringify(recipeData))}`;
+                            } else {
+                                document.getElementById("generateRecipe").innerText = "Create";
+                            }
+                        });
+                    });
+                </script>
+                
+                <div class="Grid-col ">
+                    <div class="1q1idfv"></div>
+                    <div class="1q1idfv"></div>
+                    <h1 class="Title-root ">
+                        Your imagination is the limit.Generate unique recipes with any restriction or ingredient.
+                    </h1>
+                </div>
+                <div class="Grid-col-container">
+                    <div class="Grid-col1">
+                        <div>
+                            <div class="ThemeIcon-root ">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-ban" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <circle cx="12" cy="12" r="9"></circle>
+                                    <line x1="5.7" y1="5.7" x2="18.3" y2="18.3"></line>
+                                </svg>
+                            </div>
+                            <div class="Text-root" style="margin-top:12px;margin-bottom:7px">Dietary restrictions made easy</div>
+                            <div class="Text-root 1fntsro" style="line-height:1.6">Vegan. Vegetarian. Gluten-free. Dairy-free. Zero carb. Whatever dietary restriction you may have, let NUTRINOAI create a delicious recipe for you.</div>
+                        </div>
+                    </div>
+                    <div class="Grid-col1">
+                        <div>
+                            <div class="ThemeIcon-root ">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-fridge" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <rect x="5" y="3" width="14" height="18" rx="2"></rect>
+                                    <path d="M5 10h14"></path>
+                                    <path d="M9 13v3"></path>
+                                    <path d="M9 6v1"></path>
+                                </svg>
+                            </div>
+                            <div class="Text-root" style="margin-top:12px;margin-bottom:7px">Make the most of your fridge</div>
+                            <div class="Text-root 1fntsro" style="line-height:1.6">Only have a banana, some spinach, and a potato in your fridge? Let NUTRINOAI figure out how to turn that into something great.</div>
+                        </div>
+                    </div>
+                    <div class="Grid-col1">
+                        <div>
+                            <div class="ThemeIcon-root ">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hourglass" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M6.5 7h11"></path>
+                                    <path d="M6.5 17h11"></path>
+                                    <path d="M6 20v-2a6 6 0 1 1 12 0v2a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1z"></path>
+                                    <path d="M6 4v2a6 6 0 1 0 12 0v-2a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1z"></path>
+                                </svg>
+                            </div>
+                            <div class="Text-root" style="margin-top:12px;margin-bottom:7px">Always the right timing</div>
+                            <div class="Text-root 1fntsro" style="line-height:1.6">Need something fast? Want something to spend an evening on? Just add a note about and let NUTRINOAI iron out the details.</div>
+                        </div>
+                    </div>
+                    <div class="Grid-col1">
+                        <div>
+                            <div class="ThemeIcon-root ">
+                                <svg xmlns="http://www.w3.org/2000/svg" ```html="" <svg="" class="icon icon-tabler icon-tabler-confetti" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M4 5h2"></path>
+                                    <path d="M5 4v2"></path>
+                                    <path d="M11.5 4l-.5 2"></path>
+                                    <path d="M18 5h2"></path>
+                                    <path d="M19 4v2"></path>
+                                    <path d="M15 9l-1 1"></path>
+                                    <path d="M18 13l2 -.5"></path>
+                                    <path d="M18 19h2"></path>
+                                    <path d="M19 18v2"></path>
+                                    <path d="M14 16.518l-6.518 -6.518l-4.39 9.58a1.003 1.003 0 0 0 1.329 1.329l9.579 -4.39z"></path>
+                                </svg>
+                            </div>
+                            <div class="Text-root" style="margin-top:12px;margin-bottom:7px">Keep it festive</div>
+                            <div class="Text-root 1fntsro" style="line-height:1.6">Need a holiday ready pie? All good. Let NUTRINOAI handle holidays and themes for your next event.</div>
+                        </div>
+                    </div>
+                    <div class="Grid-col1">
+                        <div>
+                            <div class="ThemeIcon-root ">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-zzz-off" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M4 12h6l-6 8h6"></path>
+                                    <path d="M14 4h6l-5.146 6.862m1.146 1.138h4"></path>
+                                    <path d="M3 3l18 18"></path>
+                                </svg>
+                            </div>
+                            <div class="Text-root" style="margin-top:12px;margin-bottom:7px">Never get bored</div>
+                            <div class="Text-root 1fntsro" style="line-height:1.6">Never eat the same meal twice. Mix and match - or even re-use the same prompt. Every recipe is unique and generated on the fly by advanced models.</div>
+                        </div>
+                    </div>
+                    <div class="Grid-col1">
+                        <div>
+                            <div class="ThemeIcon-root ">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-salad" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M4 11h16a1 1 0 0 1 1 1v.5c0 1.5 -2.517 5.573 -4 6.5v1a1 1 0 0 1 -1 1h-8a1 1 0 0 1 -1 -1v-1c-1.687 -1.054 -4 -5 -4 -6.5v-.5a1 1 0 0 1 1 -1z"></path>
+                                    <path d="M18.5 11c.351 -1.017 .426 -2.236 .5 -3.714v-1.286h-2.256c-2.83 0 -4.616 .804 -5.64 2.076"></path>
+                                    <path d="M8 8l1 -4l4 2.5"></path>
+                                    <path d="M13 11v-.5a2.5 2.5 0 1 0 -5 0v.5"></path>
+                                </svg>
+                            </div>
+                            <div class="Text-root" style="margin-top:12px;margin-bottom:7px">Diets without the complexity</div>
+                            <div class="Text-root 1fntsro" style="line-height:1.6">Keto. Paleo. Low-carb. Give NUTRINOAI your diet and let it create a recipe just for you with all the restrictions and none of the effort.</div>
+                        </div>
+                    </div>
+                </div> 
+                <div class="Grid-col">
+                    <div class="1q1idfv"></div>
+                    <div class="1q1idfv"></div>
+                    <h1 class="Title-root">
+                        Discover. Get inspired.<br>Browse recipes created by others all over the world.
+                    </h1>
+                </div>
+            <div class="Grid-col-container">
+                <div class="Grid-col1">
+                    <a class="direct1" href="generated_recipe.html?recipe=Grilled Cheese and Tomato Sandwich">
+                        <div class="Card-root">
+                            <div class="cardSection" padding="lg" data-first="true">
+                                <div class="Image-root" style="width:100%">
+                                    <figure class="Image-figure">
+                                        <div class="imageWrapper">
+                                            <img class="imagerec" src="src/production_8e58f7b9-50d7-484c-a7c2-dce72e586e4d.png" alt="Grilled Cheese and Tomato Sandwich" style="object-fit:cover;width:100%;height:400px">
+                                        </div>
+                                    </figure>
+                                </div>
+                            </div>
+                            <div class="Card-cardSection" padding="lg" data-last="true">
+                                <div class="Group-root1">
+                                    <div class="Text-root1" class="recipe-link" data-recipe="Grilled Cheese and Tomato Sandwich">
+                                        Grilled Cheese and Tomato Sandwich
+                                    </div>
+                                </div>
+                                <div class="Text-root2">A classic lunch favorite, this grilled cheese and tomato sandwich is easy to make and delicious.</div>
+                                <div class="break3"></div>
+                                <div class="Alert-root " id="alert1" role="alert" aria-labelledby="alert1-title" aria-describedby="alert1-body">
+                                    <div class="Alert-wrapper" style="display: flex;">
+                                        <div class="Alert-body" style="flex: 1;">
+                                            <div class="Alert-title">
+                                                <span id="R98a6m-title" class="Alert-label">Prompt</span>
+                                            </div>
+                                            <div id="R98a6m" class="Alert-message">simple and easy lunch
+                                            <!-- -->
+                                            for 
+                                            <!-- -->
+                                            2
+                                            <!-- -->
+                                            people</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="break4"></div>
+                                <div class="Group-root">
+                                    <div class="Text-root">suggested</div>
+                                    <button class="buttoncreate" type="button" data-button="true">
+                                        <div class="Button-inner">
+                                            <span class="Button-label">View the full recipe</span>
+                                            <span class="Button-icon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-right" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                                    <line x1="13" y1="18" x2="19" y2="12"></line>
+                                                    <line x1="13" y1="6" x2="19" y2="12"></line>
+                                                </svg>
+                                            </span>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="Grid-col1">
+                    <a class="direct1" href="generated_recipe.html?recipe=Asparagus and Chicken with Lemon Cream Sauce">
+                        <div class="Card-root">
+                            <div class="cardSection" padding="lg" data-first="true">
+                                <div class="Image-root" style="width:100%">
+                                    <figure class="Image-figure">
+                                        <div class="imageWrapper">
+                                            <img class="imagerec" src="src/production_bf4db7e0-0438-493c-bcf2-e5e29c708f53.png" alt="Asparagus and Chicken with Lemon Cream Sauce" style="object-fit:cover;width:100%;height:400px">
+                                        </div>
+                                    </figure>
+                                </div>
+                            </div>
+                            <div class="Card-cardSection" padding="lg" data-last="true">
+                                <div class="Group-root1">
+                                    <div class="Text-root1" class="recipe-link" data-recipe="Asparagus and Chicken with Lemon Cream Sauce">
+                                        Asparagus and Chicken with Lemon Cream Sauce
+                                    </div>
+                                </div>
+                                <div class="Text-root2">This recipe is a delicious combination of asparagus, chicken, and a creamy lemon sauce.</div>
+                                <div class="break3"></div>
+                                <div class="Alert-root " id="alert1" role="alert" aria-labelledby="alert1-title" aria-describedby="alert1-body">
+                                    <div class="Alert-wrapper" style="display: flex;">
+                                        <div class="Alert-body" style="flex: 2;">
+                                            <div class="Alert-title">
+                                                <span id="R98a6m-title" class="Alert-label">Prompt</span>
+                                            </div>
+                                            <div id="R98a6m" class="Alert-message">simple and easy lunch
+                                            <!-- -->
+                                            for 
+                                            <!-- -->
+                                            2
+                                            <!-- -->
+                                            people</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="break4"></div>
+                                <div class="Group-root">
+                                    <div class="Text-root">suggested</div>
+                                    <button class="buttoncreate" type="button" data-button="true">
+                                        <div class="Button-inner">
+                                            <span class="Button-label">View the full recipe</span>
+                                            <span class="Button-icon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-right" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                                    <line x1="13" y1="18" x2="19" y2="12"></line>
+                                                    <line x1="13" y1="6" x2="19" y2="12"></line>
+                                                </svg>
+                                            </span>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="Grid-col1">
+                    <a class="direct1" href="generated_recipe.html?recipe=Creamy Pesto Chicken and Vegetable Skillet">
+                        <div class="Card-root">
+                            <div class="cardSection" padding="lg" data-first="true">
+                                <div class="Image-root" style="width:100%">
+                                    <figure class="Image-figure">
+                                        <div class="imageWrapper">
+                                            <img class="imagerec" src="src/production_aa59b8d7-c0fc-49d3-a83c-4b2cc7fa9a38.png" alt="Creamy Pesto Chicken and Vegetable Skillet" style="object-fit:cover;width:100%;height:400px">
+                                        </div>
+                                    </figure>
+                                </div>
+                            </div>
+                            <div class="Card-cardSection" padding="lg" data-last="true">
+                                <div class="Group-root1">
+                                    <div class="Text-root1" class="recipe-link" data-recipe="Creamy Pesto Chicken and Vegetable Skillet">
+                                        Creamy Pesto Chicken and Vegetable Skillet
+                                    </div>
+                                </div>
+                                <div class="Text-root2">This creamy pesto chicken and vegetable skillet is an easy, one-pan dinner that comes together in 20 minutes. It's a delicious and healthy meal that's perfect for busy weeknights!</div>
+                                <div class="break3"></div>
+                                <div class="Alert-root " id="alert1" role="alert" aria-labelledby="alert1-title" aria-describedby="alert1-body">
+                                    <div class="Alert-wrapper" style="display: flex;">
+                                        <div class="Alert-body" style="flex: 2;">
+                                            <div class="Alert-title">
+                                                <span id="R98a6m-title" class="Alert-label">Prompt</span>
+                                            </div>
+                                            <div id="R98a6m" class="Alert-message">quick and tasty dinner
+                                            <!-- -->
+                                            for 
+                                            <!-- -->
+                                            2
+                                            <!-- -->
+                                            people</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="break4"></div>
+                                <div class="Group-root">
+                                    <div class="Text-root">suggested</div>
+                                    <button class="buttoncreate" type="button" data-button="true">
+                                        <div class="Button-inner">
+                                            <span class="Button-label">View the full recipe</span>
+                                            <span class="Button-icon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-right" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                                    <line x1="13" y1="18" x2="19" y2="12"></line>
+                                                    <line x1="13" y1="6" x2="19" y2="12"></line>
+                                                </svg>
+                                            </span>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            </div>
+            <div class="footer">
+                <div class="footer-container">
+                    <div class="footer-indicator" style="
+                    padding-right: 90px;">
+                        <div class="Indicator-common">AI</div>
+                        <div class="Text-root50">NUTRINO</div>
+                    </div>
+                    <div class="Text-root40">© 2025</div>
+                    <div class="Group-root2">
+                        <a class="anchor-root " href="mailto:support@nutrinoai.com">support@Nutrinoai.com</a>
+                        <a class="anchor-root " href="file:///C:/privacy">Privacy Policy</a>
+                        <a class="anchor-root " href="file:///C:/terms">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+</body><script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("generateRecipe").addEventListener("click", function () {
+        const query = document.getElementById("rec_search").value.trim();
+        if (!query) {
+            alert("Please enter a recipe idea!");
+            return;
+        }
+        handleRecipeGeneration(query);
+    });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const userEmail = localStorage.getItem("loggedInUser");
+    const userProfilePic = localStorage.getItem("userProfilePic");
+    
+    if (userEmail) {
+        document.getElementById("user-info").style.display = "flex-end";
+        document.getElementById("user-email").textContent = userEmail;
+        document.getElementById("auth-links").style.display = "none";
+        if (userProfilePic) {
+            document.getElementById("user-profile-pic").src = userProfilePic;
+            document.getElementById("user-profile-pic").style.display = "block";
+        }
+    }
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const recipeLinks = document.querySelectorAll(".recipe-link");
+
+    recipeLinks.forEach(link => {
+        link.addEventListener("click", function (event) {
+            event.preventDefault();
+            const recipeName = this.dataset.recipe;
+            
+            // Redirect to generated_recipe.html with the recipe name
+            window.location.href = `generated_recipe.html?recipe=${encodeURIComponent(recipeName)}`;
         });
     });
+});
 </script>
 </html>
