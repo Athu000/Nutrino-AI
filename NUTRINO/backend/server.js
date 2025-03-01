@@ -6,13 +6,13 @@ import dotenv from "dotenv";
 dotenv.config(); // Load environment variables
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: "*" })); // ✅ Allow all frontend requests
 app.use(express.json());
 
 const API_KEY = process.env.API_KEY;
 const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
-// ✅ Test Route
+// ✅ Test Route to Check Backend Health
 app.get("/", (req, res) => {
     res.json({ message: "✅ Nutrino AI Backend is Running!" });
 });
@@ -25,6 +25,7 @@ app.post("/api/fetch-recipe", async (req, res) => {
             return res.status(400).json({ error: "Prompt is required" });
         }
 
+        // ✅ Fetch Recipe from Gemini API
         const response = await fetch(API_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -33,18 +34,23 @@ app.post("/api/fetch-recipe", async (req, res) => {
             }),
         });
 
+        // ✅ Handle API Response Properly
+        const data = await response.json();
         if (!response.ok) {
-            return res.status(response.status).json({ error: "API request failed" });
+            return res.status(response.status).json({ error: data.error?.message || "API request failed" });
         }
 
-        const data = await response.json();
         return res.json(data);
     } catch (error) {
         console.error("❌ Error fetching recipe:", error.message);
-        return res.status(500).json({ error: "Failed to fetch from Gemini API", details: error.message });
+        return res.status(500).json({
+            error: "Failed to fetch from Gemini API",
+            details: error.message,
+            fallback: "Try again later or check if the API key is valid."
+        });
     }
 });
 
-// ✅ Use Dynamic Port for Deployment
+// ✅ Dynamic Port for Deployment
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
