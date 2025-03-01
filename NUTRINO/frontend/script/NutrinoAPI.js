@@ -1,10 +1,13 @@
-const API_URL = "https://nutrino-ai.onrender.com/api/fetch-recipe"; // Updated API URL for deployment
+const API_URL = "https://nutrino-ai.onrender.com/api/fetch-recipe"; // API URL without config.js
 
 async function fetchRecipe(prompt) {
     try {
         const response = await fetch(API_URL, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("authToken") || ""}`
+            },
             body: JSON.stringify({ prompt })
         });
 
@@ -53,5 +56,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Function to Display Error Messages in UI
 function displayError(message) {
-    alert(message); // Replace with UI-based error display if needed
+    const errorContainer = document.getElementById("error-message");
+    if (errorContainer) {
+        errorContainer.innerText = message;
+        errorContainer.style.display = "block";
+    } else {
+        console.error("Error container not found.");
+    }
 }
