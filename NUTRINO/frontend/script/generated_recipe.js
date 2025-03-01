@@ -1,4 +1,4 @@
-const API_URL = "/api/fetch-recipe";  // Fixed API endpoint
+const API_URL = "https://nutrino-ai.onrender.com/api/fetch-recipe";  // Updated API URL for deployment
 
 async function fetchRecipe(prompt) {
     try {
@@ -10,39 +10,60 @@ async function fetchRecipe(prompt) {
 
         const data = await response.json();
         if (!response.ok) {
-            alert(`Error: ${data.error || "Unable to generate recipe"}`);
+            displayError(`Error: ${data.error || "Unable to generate recipe"}`);
             return null;
         }
 
         return data;
     } catch (error) {
         console.error("Error fetching recipe:", error);
-        alert("Failed to fetch recipe.");
+        displayError("Failed to fetch recipe. Please try again.");
         return null;
     }
 }
 
-document.getElementById("generateRecipe").addEventListener("click", async () => {
-    const query = document.getElementById("rec_search").value.trim();
-    if (!query) {
-        alert("Enter a recipe name!");
-        return;
-    }
+document.addEventListener("DOMContentLoaded", function () {
+    const generateButton = document.getElementById("generateRecipe");
+    const searchInput = document.getElementById("rec_search");
 
-    document.getElementById("generateRecipe").innerText = "Loading...";
-    const recipeData = await fetchRecipe(query);
+    if (generateButton && searchInput) {
+        generateButton.addEventListener("click", async () => {
+            const query = searchInput.value.trim();
+            if (!query) {
+                displayError("Enter a recipe name!");
+                return;
+            }
 
-    if (recipeData) {
-        window.location.href = `generated_recipe.html?data=${encodeURIComponent(JSON.stringify(recipeData))}`;
+            generateButton.innerText = "Loading...";
+            generateButton.disabled = true;
+
+            const recipeData = await fetchRecipe(query);
+
+            if (recipeData) {
+                window.location.href = `generated_recipe.html?data=${encodeURIComponent(JSON.stringify(recipeData))}`;
+            } else {
+                generateButton.innerText = "Create";
+                generateButton.disabled = false;
+            }
+        });
     } else {
-        document.getElementById("generateRecipe").innerText = "Create";
+        console.warn("Generate Recipe button or search input not found.");
     }
-});
 
-// Add recipe search links
-document.querySelectorAll(".Group-root1").forEach(item => {
-    item.addEventListener("click", function () {
-        const recipeName = this.querySelector(".Text-root1").textContent;
-        window.location.href = `generated_recipe.html?recipe=${encodeURIComponent(recipeName)}`;
+    // Add recipe search links
+    document.querySelectorAll(".Group-root1").forEach(item => {
+        item.addEventListener("click", function () {
+            const recipeName = this.querySelector(".Text-root1")?.textContent;
+            if (recipeName) {
+                window.location.href = `generated_recipe.html?recipe=${encodeURIComponent(recipeName)}`;
+            } else {
+                console.error("Recipe name not found in element.");
+            }
+        });
     });
 });
+
+// Function to Display Error Messages in UI
+function displayError(message) {
+    alert(message);  // Replace this with a UI error display if needed
+}
