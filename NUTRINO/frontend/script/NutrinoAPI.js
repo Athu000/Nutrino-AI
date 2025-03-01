@@ -1,4 +1,4 @@
-const API_URL = "/api/fetch-recipe";  // Fixed for backend API usage
+const API_URL = "https://nutrino-ai.onrender.com/api/fetch-recipe";
 
 async function fetchRecipe(prompt) {
     try {
