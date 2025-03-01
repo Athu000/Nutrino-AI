@@ -1,7 +1,6 @@
 // Google OAuth Client ID
 const GOOGLE_CLIENT_ID = "219803626569-ss8k12eljbv6fi56rpff0jmm2309hot0.apps.googleusercontent.com";
 
-// Initialize Google Authentication
 function initGoogleAuth() {
     if (!window.google || !google.accounts) {
         console.error("Google API failed to load.");
@@ -9,11 +8,11 @@ function initGoogleAuth() {
     }
 
     google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
+        client_id: GOOGLE_CLIENT_ID, // ✅ Ensure this matches your Google Cloud Client ID
         callback: handleCredentialResponse
     });
 
-    // Render Sign-in Button
+    // Render the sign-in button
     const signInButton = document.getElementById("g-signin");
     if (signInButton) {
         google.accounts.id.renderButton(signInButton, {
@@ -74,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
         initGoogleAuth();
     }
 
-    // Attach click event to Google Sign-In button
+    // Ensure Google Sign-In Button Works
     setTimeout(() => {
         const googleSignInButton = document.getElementById("google-signin-btn");
         if (googleSignInButton) {
