@@ -2,7 +2,8 @@ const express = require("express");
 const cors = require("cors");
 
 // ✅ Use node-fetch for older Node.js versions
-const fetch = require("node-fetch");
+import fetch from "node-fetch";
+
 
 const app = express();
 app.use(cors());
