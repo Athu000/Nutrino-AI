@@ -1,4 +1,7 @@
-const API_URL = "https://nutrino-ai.onrender.com/api/fetch-recipe"; // API URL
+// Use "let" only if API_URL is not already defined
+if (typeof API_URL === "undefined") {
+    var API_URL = "https://nutrino-ai.onrender.com/api/fetch-recipe"; // API URL
+}
 
 async function fetchRecipe(prompt) {
     const authToken = localStorage.getItem("authToken");
