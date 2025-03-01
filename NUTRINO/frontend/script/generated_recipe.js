@@ -1,6 +1,6 @@
-// Use "let" only if API_URL is not already defined
+// Ensure API_URL is only defined once
 if (typeof API_URL === "undefined") {
-    var API_URL = "https://nutrino-ai.onrender.com/api/fetch-recipe"; // API URL
+    var API_URL = "https://nutrino-ai.onrender.com/api/fetch-recipe";
 }
 
 async function fetchRecipe(prompt) {
@@ -15,7 +15,7 @@ async function fetchRecipe(prompt) {
     try {
         const response = await fetch(API_URL, {
             method: "POST",
-            headers: { 
+            headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${authToken}`
             },
@@ -63,18 +63,6 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
         console.warn("Generate Recipe button or search input not found.");
     }
-
-    // Add click event for predefined recipe links
-    document.querySelectorAll(".Group-root1").forEach(item => {
-        item.addEventListener("click", function () {
-            const recipeName = this.querySelector(".Text-root1")?.textContent;
-            if (recipeName) {
-                window.location.href = `generated_recipe.html?recipe=${encodeURIComponent(recipeName)}`;
-            } else {
-                console.error("Recipe name not found in element.");
-            }
-        });
-    });
 });
 
 // Function to Display Error Messages in UI
