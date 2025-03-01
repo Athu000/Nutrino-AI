@@ -14,7 +14,7 @@ async function fetchRecipe(prompt) {
     try {
         const response = await fetch(API_URL, {
             method: "POST",
-            headers: {
+            headers: { 
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${authToken}`
             },
@@ -59,18 +59,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 generateButton.disabled = false;
             }
         });
-    } else {
-        console.warn("Generate Recipe button or search input not found.");
+    }
+
+    // Function to Display Error Messages in UI
+    function displayError(message) {
+        alert(message);
     }
 });
-
-// Function to Display Error Messages in UI
-function displayError(message) {
-    const errorContainer = document.getElementById("error-message");
-    if (errorContainer) {
-        errorContainer.innerText = message;
-        errorContainer.style.display = "block";
-    } else {
-        console.error("Error container not found.");
-    }
-}
