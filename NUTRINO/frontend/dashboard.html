@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Nutrino AI</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <h2>Welcome to Nutrino</h2>
+        <p>Your personalized AI nutrition assistant.</p>
+        <div id="user-display">Loading...</div>  
+        <button id="logout-button">Logout</button>
+        <button id="continue">Continue to Nutrino</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const userEmail = localStorage.getItem("loggedInUser");
+
+            if (!userEmail) {
+                window.location.href = "login.html"; // Redirect if not logged in
+            } else {
+                const displayElement = document.getElementById("user-display");
+                if (displayElement) {
+                    displayElement.textContent = `Logged in as: ${userEmail}`;
+                }
+            }
+
+            document.getElementById("logout-button").addEventListener("click", () => {
+                localStorage.removeItem("loggedInUser");
+                window.location.href = "login.html";
+            });
+
+            document.getElementById("continue").addEventListener("click", () => {
+                window.location.href = "NUTRINOAI.html";
+            });
+        });
+    </script>
+</body>
+</html>

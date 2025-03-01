@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Nutrino AI</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login to Nutrino</h2>
+        <div id="g-signin"></div>
+        <p>Or login manually:</p>
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+        <p>Don't have an account? <a href="signup.html">Sign up</a></p>
+    </div>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="auth.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            if (localStorage.getItem("loggedInUser")) {
+                window.location.href = "dashboard.html"; // Redirect if already logged in
+            }
+
+            if (typeof initGoogleAuth === "function") {
+                initGoogleAuth();
+            } else {
+                console.error("Google Auth script failed to load.");
+            }
+        });
+
+        document.getElementById("loginForm").addEventListener("submit", (event) => {
+            event.preventDefault();
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            const storedPassword = localStorage.getItem(email);
+            if (storedPassword === password) {
+                localStorage.setItem("loggedInUser", email);
+                window.location.href = "dashboard.html";
+            } else {
+                alert("Invalid email or password!");
+            }
+        });
+    </script>
+</body>
+</html>

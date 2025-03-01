@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "nutrinoai",
+  "private_key_id": "dd97344abc5259f76000e6a8ed10edbf65fb1b37",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC11TgKFNng7INA\nk1GoK+SWaXd1Twj60dyEg/QXPLOuENf+QuS0wPefJYI3GPmICsRfoWapZ0bt3DjY\nrIuxnvacGbP4BDJ6pWogoXESHyW/dILPJaDPU6cxIsF9q/cBxlXN6KvgbpLo7gae\nxD1XHgJubstzGpwJTt014rElo1Tyq9XVy6tm2ti2J2X4BuqYni13tmcuUcncgTfI\nmOHPo47da9zXaNliFOkYz8MKuNwTlj80RZJKIyNnrvt6jgEkKkzelwrNSxSvNTdH\nDuIGE/Ezq64Q8z1I7cGjSf3bQWCO0keP/b3uKLGSNo9Nm5R7hR/5DAN4ql6aaA7v\naSQHu+EHAgMBAAECggEAA/PTGJJWWMCAslEzPfiwDlOaj3mrG00RLNGQICqDux9x\nfu6bTrvcZhJr36C552OuTb1nZ1G3DN8CCVLLR+OtPqARvJ652NcVMV7Ujgm7EKg1\nWtAEPg89ja7e8Z62Fel0+uec1bacQqwjpAiCa37qDYEizzdfaZW3memyxoLHYHvc\nRSZXc+n7ihTb23xyuBCSw7CvaoLwUxMDHl4TdsAToCmaUjzzV2lje+wTGiiwZj/Y\njyEwEogSkQdA3unw/U7To4BrnFA3a+H3sDoAW4eYwSAdHp8aT/AE1UcPAzlo7f/j\nhZ0DzEYBMlgtXrNLjSmgkTGWmfCfRQ9v6sbNcz8rwQKBgQD0bv7pIhypLN1hM0t5\nt3eqjWs16CIm50FSN+eK+RjMLbj2wPrpOay//wji0CCXbhtvSmR4nQiAqI6sgZfj\n6dsAedunCpBUwvsDKtjF9T1RNfvRT6NJdCLNKOIQIimkX1PMqku1Bort4ZkJ75ER\nTpFf8mQs15Yr7eXqEGbRx3kBJwKBgQC+b+USDTc0nc3GAmVinE+OB5CUWzAQvE1r\neieYdi7NvsDE2czMVNeyQn1P7HDK23eNTqjWE96OgGvnEqcuWtRZiGcgsti/i6fh\nfaW4rFn6c9tYzJ0eJ46x9DSj+RyUVlKysgDuapOyQXNNOLPehflUX/YMBsqzZlsx\nJwqWQCZNIQKBgQDBZmlO8OyYdqUa2Ukonx+R1J81YdxTx7oJYa5UaU9TjgHBS2O7\n0SR8LUBMpbyD1Fzkq4nfXPBzS+rHVypk7I2ZTNGc02Drj/KnyOkHiEjhzsLWFBrw\nbXFzvptPhJhKNBrL3xpTuz+FhHBgSisP9IhV0CWuzU1GqM63ag7QgPGfFQKBgCQO\nG1inl+QmXGc43OkmnwlM9VqhSSBiBmZq4kRDW+koTGb4tYWaKpxdakxPf6tokeH3\nGpAtgt2IAuXk6jIkkD/DS4MtWUwqrMZMe6vTNdXtSYIuezDSXHnkunKxH3AWR+H9\nQZ/iHcSKD8J3Edb3lpUa9gKg5o/AuVM9CQwZaScBAoGAfNbMOy8Pe0A1pn6wIeHj\nvt2d17HGwY5hMcjRgSY5HX2C6GsDN+08xEMkjiZG62PFUOH92hkky+tegpmz26Tf\nheirTU7Xz1NBU5At2F7Hiuah37sFfL4C29clO/J5r5CXwlnTjdT6G1/Qs9DjGRk/\nRi0A1uI3N3Nb5QIbU9dEvL0=\n-----END PRIVATE KEY-----\n",
+  "client_email": "nutinoai@nutrinoai.iam.gserviceaccount.com",
+  "client_id": "116277036188175765725",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/nutinoai%40nutrinoai.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
