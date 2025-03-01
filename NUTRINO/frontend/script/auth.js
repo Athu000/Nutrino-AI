@@ -13,10 +13,15 @@ function initGoogleAuth() {
         callback: handleCredentialResponse
     });
 
-    google.accounts.id.renderButton(
-        document.getElementById("g-signin"),
-        { theme: "outline", size: "large" }
-    );
+    const signInButton = document.getElementById("g-signin");
+    if (signInButton) {
+        google.accounts.id.renderButton(signInButton, {
+            theme: "outline",
+            size: "large"
+        });
+    } else {
+        console.warn("Google sign-in button element not found.");
+    }
 }
 
 // Handle Google Login Response
@@ -29,11 +34,11 @@ function handleCredentialResponse(response) {
         }
     } catch (error) {
         console.error("Error decoding token:", error);
-        alert("Google authentication failed.");
+        alert("Google authentication failed. Please try again.");
     }
 }
 
-// Check User Login Status
+// Check User Login Status on Page Load
 document.addEventListener("DOMContentLoaded", () => {
     const loggedInUser = localStorage.getItem("loggedInUser");
     const userEmailElement = document.getElementById("user-email");
@@ -51,7 +56,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (googleSignInButton) {
         googleSignInButton.addEventListener("click", (event) => {
             event.preventDefault();
-            google.accounts.id.prompt();
+            if (google.accounts.id) {
+                google.accounts.id.prompt();
+            } else {
+                console.error("Google authentication is not initialized.");
+            }
         });
+    } else {
+        console.warn("Google Sign-In button not found.");
     }
 });
