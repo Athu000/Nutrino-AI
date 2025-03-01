@@ -10,38 +10,45 @@
     <div class="dashboard-container">
         <h2>Welcome to Nutrino</h2>
         <p>Your personalized AI nutrition assistant.</p>
-        
-        <div id="user-info">
+
+        <div id="user-info" style="display: none;">
             <p><strong>Logged in as:</strong> <span id="user-email"></span></p>
         </div>
-        
-        <button id="logout-button">Logout</button>
-        <button id="continue">Continue to Nutrino</button>
+
+        <button id="logout-button" style="display: none;">Logout</button>
+        <button id="continue" style="display: none;">Continue to Nutrino</button>
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const userData = JSON.parse(localStorage.getItem("loggedInUser"));
             const authToken = localStorage.getItem("authToken");
+            const userInfo = document.getElementById("user-info");
+            const userEmailSpan = document.getElementById("user-email");
+            const logoutButton = document.getElementById("logout-button");
+            const continueButton = document.getElementById("continue");
 
+            // If user is not logged in, redirect to login page
             if (!userData || !authToken) {
-                window.location.href = "login.html"; // Redirect if not logged in
+                window.location.href = "login.html";
                 return;
             }
 
-            // Display user email
-            document.getElementById("user-email").textContent = userData.name || userData.email;
+            // Display user information
+            userInfo.style.display = "block";
+            userEmailSpan.textContent = userData.name || userData.email;
+            logoutButton.style.display = "inline-block";
+            continueButton.style.display = "inline-block";
 
-            // Store token globally for API calls
-            window.userAuthToken = authToken;
-
-            document.getElementById("logout-button").addEventListener("click", () => {
+            // Logout function
+            logoutButton.addEventListener("click", () => {
                 localStorage.removeItem("loggedInUser");
                 localStorage.removeItem("authToken");
-                window.location.href = "login.html";
+                window.location.href = "index.html";
             });
 
-            document.getElementById("continue").addEventListener("click", () => {
+            // Continue to main site
+            continueButton.addEventListener("click", () => {
                 window.location.href = "https://nutrino-ai.netlify.app/";
             });
         });
