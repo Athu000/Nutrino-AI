@@ -1,7 +1,12 @@
 // Google OAuth Client ID
 const GOOGLE_CLIENT_ID = "219803626569-ss8k12eljbv6fi56rpff0jmm2309hot0.apps.googleusercontent.com";
 
+let googleAuthInitialized = false; // Prevent multiple calls
+
 function initGoogleAuth() {
+    if (googleAuthInitialized) return; // Prevent duplicate calls
+    googleAuthInitialized = true;
+
     if (!window.google || !google.accounts) {
         console.error("Google API failed to load.");
         return;
@@ -15,21 +20,29 @@ function initGoogleAuth() {
     // Render the sign-in button
     const signInButton = document.getElementById("g-signin");
     if (signInButton) {
-        google.accounts.id.renderButton(signInButton, {
-            theme: "outline",
-            size: "large"
-        });
+        google.accounts.id.renderButton(signInButton, { theme: "outline", size: "large" });
     } else {
         console.warn("Google sign-in button element not found.");
     }
 
-    // Automatically prompt sign-in
-    google.accounts.id.prompt();
+    // Automatically prompt sign-in (Only once)
+    setTimeout(() => {
+        if (google.accounts.id) {
+            google.accounts.id.prompt();
+        }
+    }, 1000);
 }
 
 // Handle Google Login Response
 async function handleCredentialResponse(response) {
     try {
+        // Ensure jwt_decode is available
+        if (typeof jwt_decode === "undefined") {
+            console.error("jwt_decode is not defined. Ensure the library is loaded.");
+            displayError("Authentication failed. Please refresh and try again.");
+            return;
+        }
+
         const userData = jwt_decode(response.credential);
 
         if (userData.email) {
