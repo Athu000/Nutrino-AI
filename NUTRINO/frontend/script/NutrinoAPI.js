@@ -1,4 +1,4 @@
-const API_URL = "https://nutrino-ai.onrender.com/api/fetch-recipe"; // API URL
+const API_URL = "https://nutrino-ai.onrender.com/api/fetch-recipe";
 
 async function fetchRecipe(prompt) {
     const authToken = localStorage.getItem("authToken");
@@ -12,7 +12,7 @@ async function fetchRecipe(prompt) {
     try {
         const response = await fetch(API_URL, {
             method: "POST",
-            headers: {
+            headers: { 
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${authToken}`
             },
@@ -31,4 +31,9 @@ async function fetchRecipe(prompt) {
         displayError(error.message);
         return null;
     }
+}
+
+// Function to Display Error Messages in UI
+function displayError(message) {
+    alert(message); // Replace with a UI-based error display if needed
 }
