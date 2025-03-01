@@ -13,7 +13,7 @@ function initGoogleAuth() {
     }
 
     google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID, 
+        client_id: GOOGLE_CLIENT_ID,
         callback: handleCredentialResponse
     });
 
@@ -21,8 +21,6 @@ function initGoogleAuth() {
     const signInButton = document.getElementById("g-signin");
     if (signInButton) {
         google.accounts.id.renderButton(signInButton, { theme: "outline", size: "large" });
-    } else {
-        console.warn("Google sign-in button element not found.");
     }
 
     // Automatically prompt sign-in (Only once)
@@ -63,7 +61,7 @@ async function handleCredentialResponse(response) {
             localStorage.setItem("loggedInUser", JSON.stringify({
                 email: userData.email,
                 name: userData.name,
-                picture: userData.picture || "" 
+                picture: userData.picture || ""
             }));
             localStorage.setItem("authToken", response.credential);
 
@@ -76,65 +74,47 @@ async function handleCredentialResponse(response) {
     }
 }
 
-// Check User Login Status on Page Load
+// Update UI for login/logout state
 document.addEventListener("DOMContentLoaded", () => {
     const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
-    const authLinks = document.getElementById("auth-links");
-    const userInfo = document.getElementById("user-info");
+    const loginLink = document.getElementById("login-link");
+    const signupButton = document.getElementById("signup-link")?.querySelector("button");
     const userNameSpan = document.getElementById("user-name");
-    const userProfilePic = document.getElementById("user-profile-pic");
     const logoutButton = document.getElementById("logout-button");
 
     if (loggedInUser) {
-        // Hide login/signup links
-        if (authLinks) authLinks.style.display = "none";
-
-        // Show user info
-        if (userInfo) userInfo.style.display = "flex";
-        if (userNameSpan) userNameSpan.innerText = `Welcome, ${loggedInUser.name || loggedInUser.email}`;
-        
-        // Display profile picture if available
-        if (loggedInUser.picture && userProfilePic) {
-            userProfilePic.src = loggedInUser.picture;
-            userProfilePic.style.display = "block";
+        // Change Sign Up button to username
+        if (signupButton) {
+            signupButton.textContent = loggedInUser.name || loggedInUser.email;
+            signupButton.disabled = true;
         }
 
-        // Show logout button
+        // Change Login to Logout
+        if (loginLink) {
+            loginLink.textContent = "Logout";
+            loginLink.href = "#";
+            loginLink.addEventListener("click", () => logoutUser());
+        }
+
+        // Show Logout button
         if (logoutButton) {
             logoutButton.style.display = "inline-block";
-            logoutButton.addEventListener("click", function () {
-                localStorage.removeItem("loggedInUser");
-                localStorage.removeItem("authToken");
-                window.location.href = "index.html"; // Redirect after logout
-            });
+            logoutButton.addEventListener("click", () => logoutUser());
         }
-    } else {
-        // Show login/signup buttons if user is not logged in
-        if (authLinks) authLinks.style.display = "block";
-        if (userInfo) userInfo.style.display = "none";
-        
-        initGoogleAuth();
-    }
 
-    // Ensure Google Sign-In Button Works
-    setTimeout(() => {
-        const googleSignInButton = document.getElementById("google-signin-btn");
-        if (googleSignInButton) {
-            googleSignInButton.addEventListener("click", (event) => {
-                event.preventDefault();
-                if (google.accounts.id) {
-                    google.accounts.id.prompt();
-                } else {
-                    console.error("Google authentication is not initialized.");
-                }
-            });
-        } else {
-            console.warn("Google Sign-In button not found.");
-        }
-    }, 500);
+        // Display user info
+        if (userNameSpan) userNameSpan.innerText = `Welcome, ${loggedInUser.name || loggedInUser.email}`;
+    }
 });
+
+// Logout function
+function logoutUser() {
+    localStorage.removeItem("loggedInUser");
+    localStorage.removeItem("authToken");
+    window.location.href = "index.html"; // Redirect after logout
+}
 
 // Function to Display Error Messages in UI
 function displayError(message) {
-    alert(message); // Replace with a UI-based error display if needed
+    alert(message);
 }
