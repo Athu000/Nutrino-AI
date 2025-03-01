@@ -9,6 +9,8 @@
         <link rel="manifest" href="site.webmanifest">
         <link rel="icon" href="favicon.ico">
         <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jwt-decode/3.1.2/jwt-decode.min.js"></script>
+        
         <script src="https://accounts.google.com/gsi/client" async defer></script>
         <meta name="theme-color" content="#000000">
         <meta name="description" content="Use NutrinoAI to create, share, and discover delicious recipes. Leverage the limitless power of AI to turn simple ideas into full meals.">
@@ -1640,15 +1642,17 @@
                                 </div>
                             </a>
                         </div>
-                        <div class="headContainer3">
-                            <a href="login.html" class="LOGIN1" id="login-link" >Login</a>
-                            <a href="signup.html" id="signup-link">
-                            <button class="BUTTON_LOG" type="button">Sign Up</button>
-                            </a>
+                        <div class="headContainer3" id="auth-links">
+                            <a href="login.html" class="LOGIN1" id="login-link">Login</a>
+                                <a href="signup.html" id="signup-link">
+                                <button class="BUTTON_LOG" type="button">Sign Up</button>
+                                </a>
                         </div>
+
                         <div id="user-info" class="user-info" style="display: none;">
-                            <img id="user-profile-pic" src="" alt="Profile Picture" width="40" style="border-radius: 50%; display: none;">
-                            <span id="user-email" class="welcome-text"></span>
+                            <img id="user-profile-pic" src="" alt="Profile Picture" width="40" style="border-radius: 50%; display: none;">                        
+                                <span id="user-name" class="welcome-text"></span>
+                            <button id="logout-button" class="BUTTON_LOG" style="display: none;">Logout</button>
                         </div>
                     </div>
                 </div>
