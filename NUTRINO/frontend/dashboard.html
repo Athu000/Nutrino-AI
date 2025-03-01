@@ -10,26 +10,34 @@
     <div class="dashboard-container">
         <h2>Welcome to Nutrino</h2>
         <p>Your personalized AI nutrition assistant.</p>
-        <div id="user-display">Loading...</div>  
+        
+        <div id="user-info">
+            <p><strong>Logged in as:</strong> <span id="user-email"></span></p>
+        </div>
+        
         <button id="logout-button">Logout</button>
         <button id="continue">Continue to Nutrino</button>
     </div>
-    <script src="script/auth.js"></script>
+
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const userEmail = localStorage.getItem("loggedInUser");
+            const userData = JSON.parse(localStorage.getItem("loggedInUser"));
+            const authToken = localStorage.getItem("authToken");
 
-            if (!userEmail) {
+            if (!userData || !authToken) {
                 window.location.href = "login.html"; // Redirect if not logged in
-            } else {
-                const displayElement = document.getElementById("user-display");
-                if (displayElement) {
-                    displayElement.textContent = `Logged in as: ${userEmail}`;
-                }
+                return;
             }
+
+            // Display user email
+            document.getElementById("user-email").textContent = userData.name || userData.email;
+
+            // Store token globally for API calls
+            window.userAuthToken = authToken;
 
             document.getElementById("logout-button").addEventListener("click", () => {
                 localStorage.removeItem("loggedInUser");
+                localStorage.removeItem("authToken");
                 window.location.href = "login.html";
             });
 
