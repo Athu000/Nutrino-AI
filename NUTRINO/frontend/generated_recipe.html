@@ -10,9 +10,7 @@
     <div class="recipe-container">
         <h1 id="recipe-title">Loading Recipe...</h1>
         <div class="recipe-content">
-            <div class="recipe-image">
-                <img id="recipe-img" src="default-image.jpg" alt="Recipe Image">
-            </div>
+            <!-- Removed Recipe Image -->
             <div class="recipe-details">
                 <p id="recipe-desc"></p>
                 <h3>Calories: <span id="recipe-calories"></span> kcal</h3>
@@ -40,7 +38,6 @@
             }
 
             document.getElementById("recipe-title").textContent = recipeData.title || "Unnamed Recipe";
-            document.getElementById("recipe-img").src = recipeData.image || "default-image.jpg";
             document.getElementById("recipe-desc").textContent = recipeData.description || "No description available.";
             document.getElementById("recipe-calories").textContent = recipeData.calories || "Unknown";
 
