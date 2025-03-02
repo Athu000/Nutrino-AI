@@ -24,7 +24,11 @@ function displayRecipe() {
         recipeData = JSON.parse(decodeURIComponent(recipeData));
 
         // ✅ Extract relevant details
-        const recipeTitle = recipeData.candidates?.[0]?.content?.parts?.[0]?.text || "Generated Recipe";
+        const titleElement = document.getElementById("recipe-title");    
+        if (titleElement) {
+            titleElement.textContent = recipeTitle.split("\n")[0].replace("## ", "");
+        }
+
         const recipeDescription = "Delicious AI-generated recipe based on your input.";
         const calories = "Unknown"; // API response does not include calories
         const ingredients = extractSection(recipeData, "Ingredients");
