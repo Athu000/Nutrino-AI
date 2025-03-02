@@ -1,105 +1,64 @@
-// Google OAuth Client ID
-const GOOGLE_CLIENT_ID = "219803626569-ss8k12eljbv6fi56rpff0jmm2309hot0.apps.googleusercontent.com";
+import { initializeApp } from "firebase/app";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "firebase/auth";
 
-let googleAuthInitialized = false; // Prevent multiple calls
+// ✅ Firebase Configuration
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
+};
 
-function initGoogleAuth() {
-    if (googleAuthInitialized) return; // Prevent duplicate calls
-    googleAuthInitialized = true;
+// ✅ Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 
-    if (!window.google || !google.accounts) {
-        console.error("Google API failed to load.");
-        return;
-    }
+// ✅ Google Sign-In Function
+export async function signInWithGoogle() {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
 
-    google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID, 
-        callback: handleCredentialResponse
+    // Store user session data
+    localStorage.setItem("authToken", await user.getIdToken());
+    localStorage.setItem("loggedInUser", JSON.stringify({ email: user.email, name: user.displayName }));
+
+    window.location.href = "dashboard.html"; // Redirect after login
+  } catch (error) {
+    console.error("❌ Google Sign-In Error:", error.message);
+    alert("Google Sign-In failed. Please try again.");
+  }
+}
+
+// ✅ Logout Function
+export function logoutUser() {
+  signOut(auth)
+    .then(() => {
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("loggedInUser");
+      window.location.href = "index.html"; // Redirect to homepage after logout
+    })
+    .catch(error => {
+      console.error("❌ Logout Error:", error.message);
+      alert("Logout failed. Please try again.");
     });
-
-    // Render Google sign-in button
-    const signInButton = document.getElementById("g-signin");
-    if (signInButton) {
-        google.accounts.id.renderButton(signInButton, { theme: "outline", size: "large" });
-    }
-
-    // Automatically prompt sign-in (Only once)
-    setTimeout(() => {
-        if (google.accounts.id) {
-            google.accounts.id.prompt();
-        }
-    }, 1000);
 }
 
-// Handle Google Login Response
-async function handleCredentialResponse(response) {
-    try {
-        if (typeof jwt_decode === "undefined") {
-            console.error("jwt_decode is not loaded.");
-            displayError("Authentication failed. Please refresh and try again.");
-            return;
-        }
+// ✅ Auto-Check User Login Status & Update UI in index.html
+document.addEventListener("DOMContentLoaded", () => {
+  const userEmailElement = document.getElementById("user-email");
+  const authLinks = document.getElementById("auth-links");
 
-        const userData = jwt_decode(response.credential);
-
-        if (userData.email) {
-            console.log("User Data:", userData);
-
-            // Send token to backend for verification
-            const backendResponse = await fetch("https://nutrino-ai.onrender.com/auth/google", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ token: response.credential })
-            });
-
-            const result = await backendResponse.json();
-            if (!backendResponse.ok) {
-                throw new Error(result.error || "Google authentication failed.");
-            }
-
-            // Save user details in local storage
-            localStorage.setItem("loggedInUser", JSON.stringify({
-                email: userData.email,
-                name: userData.name,
-                picture: userData.picture || "" 
-            }));
-            localStorage.setItem("authToken", response.credential);
-
-            updateAuthUI();
-        }
-    } catch (error) {
-        console.error("Authentication Error:", error);
-        displayError("Google authentication failed. Please try again.");
-    }
-}
-
-// Update UI Elements Based on Login Status
-function updateAuthUI() {
-    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
-    const loginLink = document.getElementById("login-link");
-    const signupLink = document.getElementById("signup-link");
-    const userInfo = document.getElementById("user-info");
-    const userEmailSpan = document.getElementById("user-email");
-    const logoutButton = document.getElementById("logout-button");
-
-    if (loggedInUser) {
-        if (loginLink) loginLink.style.display = "none";
-        if (signupLink) signupLink.style.display = "none";
-        if (userInfo) userInfo.style.display = "flex";
-        if (userEmailSpan) userEmailSpan.textContent = loggedInUser.name || loggedInUser.email;
-        if (logoutButton) logoutButton.style.display = "inline-block";
-
-        logoutButton.addEventListener("click", function () {
-            localStorage.removeItem("loggedInUser");
-            localStorage.removeItem("authToken");
-            window.location.href = "index.html"; // Redirect after logout
-        });
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      if (userEmailElement) userEmailElement.textContent = `Logged in as: ${user.email}`;
+      if (authLinks) authLinks.style.display = "none";
     } else {
-        if (loginLink) loginLink.style.display = "block";
-        if (signupLink) signupLink.style.display = "block";
-        if (userInfo) userInfo.style.display = "none";
+      if (authLinks) authLinks.style.display = "block";
+      if (userEmailElement) userEmailElement.textContent = "";
     }
-}
-
-// Run on page load
-document.addEventListener("DOMContentLoaded", updateAuthUI);
+  });
+});
