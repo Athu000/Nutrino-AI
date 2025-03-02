@@ -90,7 +90,7 @@ if (text && typeof text === "string") {
     alert("Recipe data is missing or corrupted.");
     window.location.href = "index.html";
 }
-
+}
 
 // ✅ Extract Ingredients or Instructions
 function extractSection(text, section) {
