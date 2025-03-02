@@ -15,13 +15,19 @@
             Nutrino AI is your personal nutrition assistant. 
             Get AI-powered recommendations and insights to maintain a healthy lifestyle.  
         </p>
+
+        <!-- New Continue Button -->
+        <button id="continue-button">Continue to Nutrino</button>
         <button id="logout-button">Logout</button>
     </div>
 
     <script>
         import("./script/auth.js").then(module => {
             const logoutButton = document.getElementById("logout-button");
-            logoutButton.addEventListener("click", module.logoutUser);
+            logoutButton.addEventListener("click", () => {
+                localStorage.removeItem("loggedInUser"); // Clear stored user info
+                window.location.href = "login.html"; // Redirect to login
+            });
         });
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -29,8 +35,15 @@
 
             if (loggedInUser) {
                 document.getElementById("user-name").textContent = `Hello, ${loggedInUser.name}`;
+
+                // Store user info when clicking "Continue to Nutrino"
+                document.getElementById("continue-button").addEventListener("click", () => {
+                    localStorage.setItem("userToken", loggedInUser.token);
+                    localStorage.setItem("userName", loggedInUser.name);
+                    window.location.href = "NUTRINOAI.html"; // Redirect to main page
+                });
             } else {
-                window.location.href = "login.html";
+                window.location.href = "login.html"; // Redirect if not logged in
             }
         });
     </script>
