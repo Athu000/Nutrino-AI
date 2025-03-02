@@ -3,37 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Dashboard - Nutrino AI</title>
     <link rel="stylesheet" href="styles.css">
+    <script type="module" src="auth.js"></script>
 </head>
 <body>
-    <div class="dashboard-container">
-        <h2>Welcome to Nutrino</h2>
-        <p>Your personalized AI nutrition assistant.</p>
-        <div id="user-display">Loading...</div>
+    <div class="container">
+        <h2>Welcome to Your Dashboard</h2>
+        <p id="user-name">Loading...</p>
         <button id="logout-button">Logout</button>
-        <button id="continue" style="display: none;">Continue to Nutrino</button>
     </div>
-    
-    <script src="auth.js"></script>
+
     <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
-    
-        if (!loggedInUser) {
-            window.location.href = "login.html"; // Redirect if not logged in
-        } else {
-            document.getElementById("user-display").textContent = `Logged in as: ${loggedInUser.name || loggedInUser.email}`;
-            document.getElementById("continue").style.display = "inline-block"; // Show button only if logged in
-        }
-    
-        document.getElementById("logout-button").addEventListener("click", () => {
-            localStorage.removeItem("loggedInUser");
-            localStorage.removeItem("authToken");
-            window.location.href = "index.html";
+        import("./auth.js").then(module => {
+            const logoutButton = document.getElementById("logout-button");
+            logoutButton.addEventListener("click", module.logoutUser);
         });
-    });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const loggedInUser = localStorage.getItem("loggedInUser") ? JSON.parse(localStorage.getItem("loggedInUser")) : null;
+
+            if (loggedInUser) {
+                document.getElementById("user-name").textContent = `Hello, ${loggedInUser.name}`;
+            } else {
+                window.location.href = "login.html";
+            }
+        });
     </script>
-    
 </body>
 </html>
