@@ -75,32 +75,28 @@ function displayRecipe() {
 
     if (!recipeDataStr) {
         console.error("No recipe data found.");
-        document.getElementById("recipe-title").textContent = "Error: No Recipe Found.";
         return;
     }
 
-    let recipeData;
     try {
-        recipeData = JSON.parse(recipeDataStr);
+        const recipeData = JSON.parse(recipeDataStr);
+        const text = recipeData?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!text) {
+            console.error("Recipe text missing.");
+            return;
+        }
+
+        document.getElementById("recipe-title").textContent = extractTitle(text);
+        document.getElementById("recipe-desc").textContent = "A delicious AI-generated recipe!";
+        document.getElementById("ingredients-list").innerHTML = extractSection(text, "Ingredients");
+        document.getElementById("instructions-list").innerHTML = extractSection(text, "Instructions");
     } catch (error) {
         console.error("Error parsing recipeData:", error);
-        sessionStorage.removeItem("recipeData");
-        return;
     }
-
-    if (!recipeData?.candidates?.[0]?.content?.parts?.[0]?.text) {
-        sessionStorage.removeItem("recipeData");
-        return;
-    }
-
-    const text = recipeData.candidates[0].content.parts[0].text;
-
-    document.getElementById("recipe-title").textContent = extractTitle(text);
-    document.getElementById("recipe-desc").textContent = "A delicious AI-generated recipe!";
-    document.getElementById("recipe-calories").textContent = "Unknown";
-    document.getElementById("ingredients-list").innerHTML = extractSection(text, "Ingredients");
-    document.getElementById("instructions-list").innerHTML = extractSection(text, "Instructions");
 }
+
+window.addEventListener("DOMContentLoaded", displayRecipe);
 
 // ✅ Extract Title
 function extractTitle(text) {
