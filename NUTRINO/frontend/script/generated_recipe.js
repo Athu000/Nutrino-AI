@@ -15,7 +15,8 @@ function displayRecipe() {
 
     if (!recipeData) {
         console.error("❌ No recipe data found in URL.");
-        document.getElementById("recipe-title").textContent = "Error: Recipe Not Found";
+        alert("Error: No recipe data found. Please generate a recipe first.");
+        window.location.href = "index.html"; // Redirect to home page
         return;
     }
 
@@ -23,22 +24,23 @@ function displayRecipe() {
         recipeData = JSON.parse(decodeURIComponent(recipeData));
 
         // ✅ Extract relevant details
-        const recipeTitle = recipeData.candidates[0]?.content?.parts[0]?.text || "Generated Recipe";
+        const recipeTitle = recipeData.candidates?.[0]?.content?.parts?.[0]?.text || "Generated Recipe";
         const recipeDescription = "Delicious AI-generated recipe based on your input.";
         const calories = "Unknown"; // API response does not include calories
         const ingredients = extractSection(recipeData, "Ingredients");
         const instructions = extractSection(recipeData, "Instructions");
 
-        // ✅ Populate HTML elements
-        document.getElementById("recipe-title").textContent = recipeTitle.split("\n")[0].replace("## ", "");
-        document.getElementById("recipe-desc").textContent = recipeDescription;
-        document.getElementById("recipe-calories").textContent = calories;
-        document.getElementById("ingredients-list").innerHTML = ingredients;
-        document.getElementById("instructions-list").innerHTML = instructions;
+        // ✅ Safely update HTML elements (Check if elements exist before modifying)
+        document.getElementById("recipe-title")?.textContent = recipeTitle.split("\n")[0].replace("## ", "");
+        document.getElementById("recipe-desc")?.textContent = recipeDescription;
+        document.getElementById("recipe-calories")?.textContent = calories;
+        document.getElementById("ingredients-list")?.innerHTML = ingredients;
+        document.getElementById("instructions-list")?.innerHTML = instructions;
 
     } catch (error) {
         console.error("❌ Error parsing recipe data:", error);
-        document.getElementById("recipe-title").textContent = "Error: Invalid Recipe Data";
+        alert("Invalid Recipe Data. Redirecting...");
+        window.location.href = "index.html";
     }
 }
 
