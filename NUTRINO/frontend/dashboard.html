@@ -40,7 +40,7 @@
                 document.getElementById("continue-button").addEventListener("click", () => {
                     localStorage.setItem("userToken", loggedInUser.token);
                     localStorage.setItem("userName", loggedInUser.name);
-                    window.location.href = "NUTRINOAI.html"; // Redirect to main page
+                    window.location.href = "index.html"; // Redirect to main page
                 });
             } else {
                 window.location.href = "login.html"; // Redirect if not logged in
