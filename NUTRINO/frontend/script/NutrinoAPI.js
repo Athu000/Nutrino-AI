@@ -1,39 +1,43 @@
-const API_URL = "https://nutrino-ai.onrender.com/api/fetch-recipe";
+import { getAuth } from "firebase/auth";
+import { fetchAuthToken } from "./auth.js"; // Ensure this function is in auth.js
 
-async function fetchRecipe(prompt) {
-    const authToken = localStorage.getItem("authToken");
+const API_BASE_URL = "https://nutrino-ai.onrender.com/api";
 
-    if (!authToken) {
-        displayError("Authentication failed. Please log in again.");
-        window.location.href = "login.html";
-        return null;
-    }
+// ✅ Fetch Recipe Function
+export async function fetchRecipe(prompt) {
+  const auth = getAuth();
+  const user = auth.currentUser;
 
-    try {
-        const response = await fetch(API_URL, {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${authToken}`
-            },
-            body: JSON.stringify({ prompt })
-        });
+  if (!user) {
+    alert("Authentication required. Please log in.");
+    window.location.href = "login.html";
+    return null;
+  }
 
-        const data = await response.json();
+  const authToken = await fetchAuthToken(); // Get fresh token
+  if (!authToken) {
+    alert("Session expired. Please log in again.");
+    window.location.href = "login.html";
+    return null;
+  }
 
-        if (!response.ok) {
-            throw new Error(data?.error || "Unable to generate recipe");
-        }
+  try {
+    const response = await fetch(`${API_BASE_URL}/fetch-recipe`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${authToken}`
+      },
+      body: JSON.stringify({ prompt })
+    });
 
-        return data;
-    } catch (error) {
-        console.error("Error fetching recipe:", error);
-        displayError(error.message);
-        return null;
-    }
-}
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Recipe fetch failed");
 
-// Function to Display Error Messages in UI
-function displayError(message) {
-    alert(message); // Replace with a UI-based error display if needed
+    return data;
+  } catch (error) {
+    console.error("❌ API Error:", error.message);
+    alert("Error fetching recipe. Try again.");
+    return null;
+  }
 }
