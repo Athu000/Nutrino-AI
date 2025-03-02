@@ -27,10 +27,10 @@ async function getAuthToken() {
     return null;
 }
 
-// ✅ Fetch Recipe with Authentication (using POST)
+// ✅ Fetch Recipe with Authentication
 async function fetchRecipe(prompt) {
     let authToken = localStorage.getItem("authToken");
-    
+
     if (!authToken) {
         authToken = await getAuthToken();
         if (!authToken) return null;
@@ -39,7 +39,7 @@ async function fetchRecipe(prompt) {
     try {
         const response = await fetch(`${API_BASE_URL}/fetch-recipe`, {
             method: "POST",
-            headers: { 
+            headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${authToken}`
             },
@@ -48,14 +48,20 @@ async function fetchRecipe(prompt) {
 
         const data = await response.json();
 
-        // ✅ If token is invalid, refresh and retry once
         if (response.status === 403 && data.error?.includes("Invalid token")) {
             authToken = await getAuthToken();
             if (!authToken) return null;
             return fetchRecipe(prompt);
         }
 
-        return response.ok ? data : null;
+        if (response.ok) {
+            sessionStorage.setItem("recipeData", JSON.stringify(data));
+            window.location.href = "generated_recipe.html";
+        } else {
+            alert("Failed to fetch recipe. Try again.");
+        }
+
+        return data;
     } catch (error) {
         console.error("❌ API Error:", error);
         alert("Error fetching recipe. Try again.");
@@ -67,7 +73,11 @@ async function fetchRecipe(prompt) {
 function displayRecipe() {
     const recipeDataStr = sessionStorage.getItem("recipeData");
 
-    if (!recipeDataStr) return;
+    if (!recipeDataStr) {
+        console.error("No recipe data found.");
+        document.getElementById("recipe-title").textContent = "Error: No Recipe Found.";
+        return;
+    }
 
     let recipeData;
     try {
@@ -85,24 +95,31 @@ function displayRecipe() {
 
     const text = recipeData.candidates[0].content.parts[0].text;
 
-    document.getElementById("recipe-title").textContent = text.split("\n")[0].replace("## ", "");
-    document.getElementById("recipe-desc").textContent = "Delicious AI-generated recipe based on your input.";
+    document.getElementById("recipe-title").textContent = extractTitle(text);
+    document.getElementById("recipe-desc").textContent = "A delicious AI-generated recipe!";
     document.getElementById("recipe-calories").textContent = "Unknown";
     document.getElementById("ingredients-list").innerHTML = extractSection(text, "Ingredients");
     document.getElementById("instructions-list").innerHTML = extractSection(text, "Instructions");
 }
 
+// ✅ Extract Title
+function extractTitle(text) {
+    return text.split("\n")[0].replace("## ", "").trim() || "AI-Generated Recipe";
+}
+
 // ✅ Extract Ingredients or Instructions
 function extractSection(text, section) {
-    const match = text.match(new RegExp(`\n?\*\*${section}:\*\*([\s\S]*?)(?=\n\*\*|$)`, "i"));
-    return match 
-        ? match[1].trim().split("\n").map(line => `<li>${line.replace(/^([*-]|\d+\.)\s*/, "").trim()}</li>`).join("") 
+    const match = text.match(new RegExp(`\\*\\*${section}:\\*\\*([\\s\\S]*?)(?=\\n\\*\\*|$)`, "i"));
+    return match
+        ? match[1].trim().split("\n").map(line => `<li>${line.replace(/^([*-]|\d+\.)\s*/, "").trim()}</li>`).join("")
         : "<li>No data available.</li>";
 }
 
 // ✅ Handle navigation buttons
 window.addEventListener("DOMContentLoaded", () => {
-    displayRecipe();
+    if (window.location.pathname.includes("generated_recipe.html")) {
+        displayRecipe();
+    }
     document.getElementById("goBackBtn")?.addEventListener("click", () => window.location.href = "index.html");
     document.getElementById("generateAnotherBtn")?.addEventListener("click", () => window.location.href = "recipe_generator.html");
     loadFirebase();
