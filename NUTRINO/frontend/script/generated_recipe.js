@@ -22,20 +22,21 @@ function displayRecipe() {
 
     try {
         recipeData = JSON.parse(decodeURIComponent(recipeData));
+        console.log("✅ Received Recipe Data:", recipeData);
 
-        // ✅ Extract relevant details
-        const titleElement = document.getElementById("recipe-title");    
-        if (titleElement) {
-            titleElement.textContent = recipeTitle.split("\n")[0].replace("## ", "");
-        }
+        // ✅ Extract Recipe Details
+        const recipeTitle = recipeData.candidates?.[0]?.content?.parts?.[0]?.text || "Generated Recipe";
+        console.log("✅ Extracted Recipe Title:", recipeTitle);
 
         const recipeDescription = "Delicious AI-generated recipe based on your input.";
         const calories = "Unknown"; // API response does not include calories
         const ingredients = extractSection(recipeData, "Ingredients");
         const instructions = extractSection(recipeData, "Instructions");
 
-        // ✅ Safely update HTML elements (Check if elements exist before modifying)
-        document.getElementById("recipe-title")?.textContent = recipeTitle.split("\n")[0].replace("## ", "");
+        // ✅ Update HTML elements (Ensure elements exist before modifying)
+        const titleElement = document.getElementById("recipe-title");
+        if (titleElement) titleElement.textContent = recipeTitle.split("\n")[0].replace("## ", "");
+
         document.getElementById("recipe-desc")?.textContent = recipeDescription;
         document.getElementById("recipe-calories")?.textContent = calories;
         document.getElementById("ingredients-list")?.innerHTML = ingredients;
@@ -50,7 +51,7 @@ function displayRecipe() {
 
 // ✅ Improved function to extract Ingredients or Instructions
 function extractSection(data, sectionTitle) {
-    const text = data.candidates[0]?.content?.parts[0]?.text || "";
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     // ✅ Regex to capture everything between sections
     const sectionRegex = new RegExp(`\\*\\*${sectionTitle}:\\*\\*([\\s\\S]*?)(?=\\n\\*\\*|$)`, "i");
@@ -67,18 +68,23 @@ function extractSection(data, sectionTitle) {
     return "<li>No data available.</li>";
 }
 
-
 // ✅ Handle navigation buttons
 document.addEventListener("DOMContentLoaded", function () {
     displayRecipe(); // Load and display recipe
 
-    document.getElementById("goBackBtn").addEventListener("click", () => {
-        window.location.href = "index.html";
-    });
+    const goBackBtn = document.getElementById("goBackBtn");
+    if (goBackBtn) {
+        goBackBtn.addEventListener("click", () => {
+            window.location.href = "index.html";
+        });
+    }
 
-    document.getElementById("generateAnotherBtn").addEventListener("click", () => {
-        window.location.href = "recipe_generator.html";
-    });
+    const generateAnotherBtn = document.getElementById("generateAnotherBtn");
+    if (generateAnotherBtn) {
+        generateAnotherBtn.addEventListener("click", () => {
+            window.location.href = "recipe_generator.html";
+        });
+    }
 });
 
 // ✅ Load Firebase dynamically
