@@ -55,41 +55,47 @@ async function fetchRecipe(prompt) {
 
 // ✅ Display Recipe from sessionStorage
 function displayRecipe() {
-    const recipeData = JSON.parse(sessionStorage.getItem("recipeData"));
-    if (!recipeData) {
-        alert("No recipe data found. Redirecting...");
-        return (window.location.href = "index.html");
-    }
-
-    const text = recipeData.candidates?.[0]?.content?.parts?.[0]?.text || "Generated Recipe";
+    const recipeDataStr = sessionStorage.getItem("recipeData");
     
-    // ✅ Ensure text is properly defined before using it
-    const recipeTitleElement = document.getElementById("recipe-title");
-const recipeDescElement = document.getElementById("recipe-desc");
-const recipeCaloriesElement = document.getElementById("recipe-calories");
-const ingredientsListElement = document.getElementById("ingredients-list");
-const instructionsListElement = document.getElementById("instructions-list");
+    console.log("Recipe Data in Storage:", recipeDataStr);
+    
+    if (!recipeDataStr) {
+        alert("No recipe data found. Redirecting...");
+        window.location.href = "index.html";
+        return;
+    }
 
-if (text && typeof text === "string") {
-    if (recipeTitleElement) {
-        recipeTitleElement.textContent = text.split("\n")[0].replace("## ", "");
+    let recipeData;
+    try {
+        recipeData = JSON.parse(recipeDataStr);
+    } catch (error) {
+        console.error("Error parsing recipeData:", error);
+        alert("Recipe data is corrupted.");
+        sessionStorage.removeItem("recipeData"); // Clear invalid data
+        window.location.href = "index.html";
+        return;
     }
-    if (recipeDescElement) {
-        recipeDescElement.textContent = "Delicious AI-generated recipe based on your input.";
+
+    if (!recipeData?.candidates?.[0]?.content?.parts?.[0]?.text) {
+        alert("Recipe data is incomplete. Redirecting...");
+        sessionStorage.removeItem("recipeData"); // Prevent looping
+        window.location.href = "index.html";
+        return;
     }
-    if (recipeCaloriesElement) {
-        recipeCaloriesElement.textContent = "Unknown";
-    }
-    if (ingredientsListElement) {
-        ingredientsListElement.innerHTML = extractSection(text, "Ingredients");
-    }
-    if (instructionsListElement) {
-        instructionsListElement.innerHTML = extractSection(text, "Instructions");
-    }
-} else {
-    alert("Recipe data is missing or corrupted.");
-    window.location.href = "index.html";
-}
+
+    const text = recipeData.candidates[0].content.parts[0].text;
+
+    const recipeTitleElement = document.getElementById("recipe-title");
+    const recipeDescElement = document.getElementById("recipe-desc");
+    const recipeCaloriesElement = document.getElementById("recipe-calories");
+    const ingredientsListElement = document.getElementById("ingredients-list");
+    const instructionsListElement = document.getElementById("instructions-list");
+
+    recipeTitleElement.textContent = text.split("\n")[0].replace("## ", "");
+    recipeDescElement.textContent = "Delicious AI-generated recipe based on your input.";
+    recipeCaloriesElement.textContent = "Unknown";
+    ingredientsListElement.innerHTML = extractSection(text, "Ingredients");
+    instructionsListElement.innerHTML = extractSection(text, "Instructions");
 }
 
 // ✅ Extract Ingredients or Instructions
