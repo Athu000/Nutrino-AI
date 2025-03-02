@@ -1642,7 +1642,7 @@ padding-bottom: 24px;
                         <a href="NUTRINOAI.html">
                             <div class="LOGONAME" style="padding-right: 88px;">
                                 <div class="AILOGO">AI</div>
-                                <div class="NUTRINOspell">NUTRINO</div>
+                            <div class="NUTRINOspell">NUTRINO</div>
                             </div>
                         </a>
                     </div>
@@ -1652,14 +1652,31 @@ padding-bottom: 24px;
                             <button class="BUTTON_LOG" type="button">Sign Up</button>
                         </a>
                     </div>
-
                     <div id="user-info" class="user-info" style="display: none;">
                         <img id="user-profile-pic" src="" alt="Profile Picture" width="40" style="border-radius: 50%; display: none;">
                         <span id="user-email" class="welcome-text"></span>
-                        <button id="logout-button" style="display: none;">Logout</button>
-                    </div>                    
+                        <button id="logout-button">Logout</button>
+                    </div>
                 </div>
             </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const userInfo = document.getElementById("user-info");
+                const authLinks = document.getElementById("auth-links");
+                const userEmail = document.getElementById("user-email");
+                const logoutButton = document.getElementById("logout-button");
+            const loggedInUser = localStorage.getItem("userName");
+            if (loggedInUser) {
+                userEmail.textContent = `Hello, ${loggedInUser}`; // Display user name
+                userInfo.style.display = "flex";  // Show user info
+                authLinks.style.display = "none"; // Hide login/signup links
+            }
+            logoutButton.addEventListener("click", () => {
+                localStorage.clear(); // Remove stored user data
+                location.reload(); // Refresh page
+                });
+            });
+        </script>
         </div>
         <div class="break"></div>
 
