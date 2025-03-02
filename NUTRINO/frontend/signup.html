@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - Nutrino AI</title>
     <link rel="stylesheet" href="styles.css">
-    <script type="module" src="./script/auth.js"></script>
+    <script defer src="./script/auth.js"></script> <!-- Load auth.js without module -->
 </head>
 <body>
     <div class="container">
@@ -16,7 +16,11 @@
 
     <script>
         document.getElementById("google-signup-btn").addEventListener("click", () => {
-            import("./script/auth.js").then(module => module.signInWithGoogle());
+            if (typeof signInWithGoogle === "function") {
+                signInWithGoogle();
+            } else {
+                console.error("signInWithGoogle is not available. Ensure auth.js is loaded correctly.");
+            }
         });
     </script>
 </body>
