@@ -24,21 +24,20 @@ async function loadFirebase() {
     const provider = new GoogleAuthProvider();
 
     // ✅ Google Sign-In Function
-   export async function signInWithGoogle() {
-  try {
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
+  window.signInWithGoogle = async function () {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
 
-    // Store user session data
-    localStorage.setItem("authToken", await user.getIdToken());
-    localStorage.setItem("loggedInUser", JSON.stringify({ email: user.email, name: user.displayName }));
+        localStorage.setItem("authToken", await user.getIdToken());
+        localStorage.setItem("loggedInUser", JSON.stringify({ email: user.email, name: user.displayName }));
 
-    window.location.href = "dashboard.html"; // Redirect after login
-  } catch (error) {
-    console.error("❌ Google Sign-In Error:", error.message);
-    alert("Google Sign-In failed. Please try again.");
-  }
-}
+        window.location.href = "dashboard.html";
+      } catch (error) {
+        console.error("❌ Google Sign-In Error:", error.message);
+        alert("Google Sign-In failed. Please try again.");
+      }
+    };
 
 
     // ✅ Logout Function
