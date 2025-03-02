@@ -10,19 +10,10 @@ async function loadFirebase() {
       if (generateButton) {
         generateButton.addEventListener("click", async () => {
           try {
-            const auth = getAuth();
-            const user = auth.currentUser;
+            const authToken = localStorage.getItem("authToken");
 
-            if (!user) {
-              alert("You must be logged in to generate recipes!");
-              window.location.href = "login.html";
-              return;
-            }
-
-            // ✅ Fetch authentication token dynamically
-            const authToken = await user.getIdToken();
             if (!authToken) {
-              alert("Authentication failed. Please log in again.");
+              alert("You must be logged in to generate recipes!");
               window.location.href = "login.html";
               return;
             }
