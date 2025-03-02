@@ -59,11 +59,10 @@ export async function fetchRecipe(prompt) {
 // ✅ Display Recipe from sessionStorage
 function displayRecipe() {
     const recipeDataStr = sessionStorage.getItem("recipeData");
-    
+
     console.log("📌 Recipe Data in Storage:", recipeDataStr);
-    
+
     if (!recipeDataStr) {
-        alert("No recipe data found. Redirecting...");
         sessionStorage.removeItem("recipeData"); // Clear bad session data
         window.location.href = "index.html";
         return;
@@ -74,7 +73,6 @@ function displayRecipe() {
         recipeData = JSON.parse(recipeDataStr);
     } catch (error) {
         console.error("❌ Error parsing recipeData:", error);
-        alert("Recipe data is corrupted.");
         sessionStorage.removeItem("recipeData"); // Prevent loop
         window.location.href = "index.html";
         return;
@@ -83,7 +81,6 @@ function displayRecipe() {
     const text = recipeData?.candidates?.[0]?.content?.parts?.[0]?.text;
     
     if (!text) {
-        alert("Recipe data is incomplete. Redirecting...");
         sessionStorage.removeItem("recipeData"); // Prevent looping
         window.location.href = "index.html";
         return;
