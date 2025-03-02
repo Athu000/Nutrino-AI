@@ -65,22 +65,32 @@ function displayRecipe() {
     
     // ✅ Ensure text is properly defined before using it
     const recipeTitleElement = document.getElementById("recipe-title");
-    const recipeDescElement = document.getElementById("recipe-desc");
-    const recipeCaloriesElement = document.getElementById("recipe-calories");
-    const ingredientsListElement = document.getElementById("ingredients-list");
-    const instructionsListElement = document.getElementById("instructions-list");
+const recipeDescElement = document.getElementById("recipe-desc");
+const recipeCaloriesElement = document.getElementById("recipe-calories");
+const ingredientsListElement = document.getElementById("ingredients-list");
+const instructionsListElement = document.getElementById("instructions-list");
 
-    if (text && typeof text === "string") {
-        recipeTitleElement?.textContent = text.split("\n")[0].replace("## ", "");
-        recipeDescElement?.textContent = "Delicious AI-generated recipe based on your input.";
-        recipeCaloriesElement?.textContent = "Unknown";
-        ingredientsListElement?.innerHTML = extractSection(text, "Ingredients");
-        instructionsListElement?.innerHTML = extractSection(text, "Instructions");
-    } else {
-        alert("Recipe data is missing or corrupted.");
-        window.location.href = "index.html";
+if (text && typeof text === "string") {
+    if (recipeTitleElement) {
+        recipeTitleElement.textContent = text.split("\n")[0].replace("## ", "");
     }
+    if (recipeDescElement) {
+        recipeDescElement.textContent = "Delicious AI-generated recipe based on your input.";
+    }
+    if (recipeCaloriesElement) {
+        recipeCaloriesElement.textContent = "Unknown";
+    }
+    if (ingredientsListElement) {
+        ingredientsListElement.innerHTML = extractSection(text, "Ingredients");
+    }
+    if (instructionsListElement) {
+        instructionsListElement.innerHTML = extractSection(text, "Instructions");
+    }
+} else {
+    alert("Recipe data is missing or corrupted.");
+    window.location.href = "index.html";
 }
+
 
 // ✅ Extract Ingredients or Instructions
 function extractSection(text, section) {
