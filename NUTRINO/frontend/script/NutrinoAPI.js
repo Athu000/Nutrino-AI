@@ -38,7 +38,7 @@ async function fetchRecipe(prompt) {
 
     try {
         const response = await fetch(`${API_BASE_URL}/fetch-recipe`, {
-            method: "POST",  // ✅ Ensuring POST is used
+            method: "POST",
             headers: { 
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${authToken}`
@@ -52,7 +52,7 @@ async function fetchRecipe(prompt) {
         if (response.status === 403 && data.error?.includes("Invalid token")) {
             authToken = await getAuthToken();
             if (!authToken) return null;
-            return fetchRecipe(prompt); // Retry with new token
+            return fetchRecipe(prompt);
         }
 
         return response.ok ? data : null;
@@ -67,19 +67,19 @@ async function fetchRecipe(prompt) {
 function displayRecipe() {
     const recipeDataStr = sessionStorage.getItem("recipeData");
 
-    if (!recipeDataStr) return; // ❌ Removed alert and redirection loop
+    if (!recipeDataStr) return;
 
     let recipeData;
     try {
         recipeData = JSON.parse(recipeDataStr);
     } catch (error) {
         console.error("Error parsing recipeData:", error);
-        sessionStorage.removeItem("recipeData"); // Clear invalid data
+        sessionStorage.removeItem("recipeData");
         return;
     }
 
     if (!recipeData?.candidates?.[0]?.content?.parts?.[0]?.text) {
-        sessionStorage.removeItem("recipeData"); // Prevent looping
+        sessionStorage.removeItem("recipeData");
         return;
     }
 
@@ -108,5 +108,5 @@ window.addEventListener("DOMContentLoaded", () => {
     loadFirebase();
 });
 
-// ✅ Make function globally accessible (since we removed export)
+// ✅ Make function globally accessible
 window.fetchRecipe = fetchRecipe;
