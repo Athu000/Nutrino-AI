@@ -33,14 +33,21 @@ function displayRecipe() {
         const ingredients = extractSection(recipeData, "Ingredients");
         const instructions = extractSection(recipeData, "Instructions");
 
-        // ✅ Update HTML elements (Ensure elements exist before modifying)
+        // ✅ Update HTML elements (Check if elements exist before modifying)
         const titleElement = document.getElementById("recipe-title");
         if (titleElement) titleElement.textContent = recipeTitle.split("\n")[0].replace("## ", "");
 
-        document.getElementById("recipe-desc")?.textContent = recipeDescription;
-        document.getElementById("recipe-calories")?.textContent = calories;
-        document.getElementById("ingredients-list")?.innerHTML = ingredients;
-        document.getElementById("instructions-list")?.innerHTML = instructions;
+        const descElement = document.getElementById("recipe-desc");
+        if (descElement) descElement.textContent = recipeDescription;
+
+        const caloriesElement = document.getElementById("recipe-calories");
+        if (caloriesElement) caloriesElement.textContent = calories;
+
+        const ingredientsList = document.getElementById("ingredients-list");
+        if (ingredientsList) ingredientsList.innerHTML = ingredients;
+
+        const instructionsList = document.getElementById("instructions-list");
+        if (instructionsList) instructionsList.innerHTML = instructions;
 
     } catch (error) {
         console.error("❌ Error parsing recipe data:", error);
