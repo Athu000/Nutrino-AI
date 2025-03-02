@@ -42,21 +42,25 @@ function displayRecipe() {
     }
 }
 
-// ✅ Function to extract ingredients or instructions
+// ✅ Improved function to extract Ingredients or Instructions
 function extractSection(data, sectionTitle) {
     const text = data.candidates[0]?.content?.parts[0]?.text || "";
+
+    // ✅ Regex to capture everything between sections
     const sectionRegex = new RegExp(`\\*\\*${sectionTitle}:\\*\\*([\\s\\S]*?)(?=\\n\\*\\*|$)`, "i");
     const match = text.match(sectionRegex);
 
     if (match && match[1]) {
         return match[1]
+            .trim()
             .split("\n")
-            .filter(line => line.trim().startsWith("*"))
-            .map(line => `<li>${line.replace("*", "").trim()}</li>`)
+            .filter(line => line.trim() !== "")
+            .map(line => `<li>${line.replace(/^(\*|\d+\.)\s*/, "").trim()}</li>`)
             .join("") || "<li>No data available.</li>";
     }
     return "<li>No data available.</li>";
 }
+
 
 // ✅ Handle navigation buttons
 document.addEventListener("DOMContentLoaded", function () {
