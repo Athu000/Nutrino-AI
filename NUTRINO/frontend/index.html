@@ -1691,12 +1691,13 @@ padding-bottom: 24px;
                     document.addEventListener("DOMContentLoaded", () => {
                         const googleSignInButton = document.getElementById("google-signin-btn");
                         if (googleSignInButton) {
-                            googleSignInButton.addEventListener("click", (event) => {
-                                event.preventDefault();
-                                google.accounts.id.prompt();
-                            });
-                        }
-                    });
+                        googleSignInButton.addEventListener("click", async (event) => {
+                        event.preventDefault();
+                        import("./auth.js").then(module => module.signInWithGoogle());
+                        });
+                    }
+                });
+
                 </script>
                 
                 <div class="break2"></div>
@@ -2049,35 +2050,7 @@ padding-bottom: 24px;
         </div>
     </div>
 
-</body><script>
-document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("generateRecipe").addEventListener("click", function () {
-        const query = document.getElementById("rec_search").value.trim();
-        if (!query) {
-            alert("Please enter a recipe idea!");
-            return;
-        }
-        handleRecipeGeneration(query);
-    });
-});
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const userEmail = localStorage.getItem("loggedInUser");
-    const userProfilePic = localStorage.getItem("userProfilePic");
-    
-    if (userEmail) {
-        document.getElementById("user-info").style.display = "flex-end";
-        document.getElementById("user-email").textContent = userEmail;
-        document.getElementById("auth-links").style.display = "none";
-        if (userProfilePic) {
-            document.getElementById("user-profile-pic").src = userProfilePic;
-            document.getElementById("user-profile-pic").style.display = "block";
-        }
-    }
-});
-</script>
+</body>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const recipeLinks = document.querySelectorAll(".recipe-link");
