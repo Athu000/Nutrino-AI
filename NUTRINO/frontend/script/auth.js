@@ -5,14 +5,14 @@ async function loadFirebase() {
     const { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } = 
       await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js");
 
-    // ✅ Firebase Configuration (Replace with your actual Firebase credentials)
+    // ✅ Firebase Configuration
     const firebaseConfig = {
-      apiKey: "YOUR_FIREBASE_API_KEY",
-      authDomain: "YOUR_FIREBASE_AUTH_DOMAIN",
-      projectId: "YOUR_FIREBASE_PROJECT_ID",
-      storageBucket: "YOUR_FIREBASE_STORAGE_BUCKET",
-      messagingSenderId: "YOUR_FIREBASE_MESSAGING_SENDER_ID",
-      appId: "YOUR_FIREBASE_APP_ID"
+      apiKey: "AIzaSyARqmUW_Upyh5IRllM0LEpfU9GqziM3Cqs",
+      authDomain: "nutrino-ai.firebaseapp.com",
+      projectId: "nutrino-ai",
+      storageBucket: "nutrino-ai.firebasestorage.app",
+      messagingSenderId: "1005323663654",
+      appId: "1:1005323663654:web:3ecf92fde57fbc9c7da9e7"
     };
 
     // ✅ Initialize Firebase
@@ -68,7 +68,6 @@ async function loadFirebase() {
     });
 
     console.log("✅ Firebase Auth Loaded Successfully!");
-
   } catch (error) {
     console.error("❌ Firebase Load Error:", error);
   }
