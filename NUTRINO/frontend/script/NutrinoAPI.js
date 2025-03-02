@@ -108,12 +108,23 @@ function extractTitle(text) {
 }
 
 // ✅ Extract Ingredients or Instructions
+// ✅ Extract Ingredients or Instructions Properly
 function extractSection(text, section) {
-    const match = text.match(new RegExp(`\\*\\*${section}:\\*\\*([\\s\\S]*?)(?=\\n\\*\\*|$)`, "i"));
-    return match
-        ? match[1].trim().split("\n").map(line => `<li>${line.replace(/^([*-]|\d+\.)\s*/, "").trim()}</li>`).join("")
-        : "<li>No data available.</li>";
+    const regex = new RegExp(`\\*\\*${section}:\\*\\*([\\s\\S]*?)(?=\\n\\*\\*|$)`, "i");
+    const match = text.match(regex);
+
+    if (match) {
+        return match[1]
+            .trim()
+            .split("\n")
+            .filter(line => line.trim() !== "")
+            .map(line => `<li>${line.replace(/^(\*|-|\d+\.)\s*/, "").trim()}</li>`)
+            .join("");
+    } else {
+        return "<li>No data available.</li>";
+    }
 }
+
 
 // ✅ Handle navigation buttons
 window.addEventListener("DOMContentLoaded", () => {
