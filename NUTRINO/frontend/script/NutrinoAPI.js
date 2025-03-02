@@ -40,7 +40,7 @@ async function fetchRecipe(prompt) {
         });
 
         const data = await response.json();
-        if (response.status === 403 && data.error.includes("Invalid token")) {
+        if (response.status === 403 && data.error?.includes("Invalid token")) {
             authToken = await getAuthToken();
             if (!authToken) return null;
             return fetchRecipe(prompt);
@@ -62,16 +62,29 @@ function displayRecipe() {
     }
 
     const text = recipeData.candidates?.[0]?.content?.parts?.[0]?.text || "Generated Recipe";
-    document.getElementById("recipe-title")?.textContent = text.split("\n")[0].replace("## ", "");
-    document.getElementById("recipe-desc")?.textContent = "Delicious AI-generated recipe based on your input.";
-    document.getElementById("recipe-calories")?.textContent = "Unknown";
-    document.getElementById("ingredients-list")?.innerHTML = extractSection(text, "Ingredients");
-    document.getElementById("instructions-list")?.innerHTML = extractSection(text, "Instructions");
+    
+    // ✅ Ensure text is properly defined before using it
+    const recipeTitleElement = document.getElementById("recipe-title");
+    const recipeDescElement = document.getElementById("recipe-desc");
+    const recipeCaloriesElement = document.getElementById("recipe-calories");
+    const ingredientsListElement = document.getElementById("ingredients-list");
+    const instructionsListElement = document.getElementById("instructions-list");
+
+    if (text && typeof text === "string") {
+        recipeTitleElement?.textContent = text.split("\n")[0].replace("## ", "");
+        recipeDescElement?.textContent = "Delicious AI-generated recipe based on your input.";
+        recipeCaloriesElement?.textContent = "Unknown";
+        ingredientsListElement?.innerHTML = extractSection(text, "Ingredients");
+        instructionsListElement?.innerHTML = extractSection(text, "Instructions");
+    } else {
+        alert("Recipe data is missing or corrupted.");
+        window.location.href = "index.html";
+    }
 }
 
 // ✅ Extract Ingredients or Instructions
 function extractSection(text, section) {
-    const match = text.match(new RegExp(`\*\*${section}:\*\*([\s\S]*?)(?=\n\*\*|$)`, "i"));
+    const match = text.match(new RegExp(`\n?\*\*${section}:\*\*([\s\S]*?)(?=\n\*\*|$)`, "i"));
     return match ? match[1].trim().split("\n").map(line => `<li>${line.replace(/^([*-]|\d+\.)\s*/, "").trim()}</li>`).join("") : "<li>No data available.</li>";
 }
 
