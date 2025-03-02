@@ -15,7 +15,7 @@
     </div>
 
     <script>
-        import("./auth.js").then(module => {
+        import("./script/auth.js").then(module => {
             const logoutButton = document.getElementById("logout-button");
             logoutButton.addEventListener("click", module.logoutUser);
         });
