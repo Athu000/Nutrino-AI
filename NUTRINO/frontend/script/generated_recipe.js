@@ -8,89 +8,67 @@ async function loadFirebase() {
     }
 }
 
-// ✅ Function to validate user authentication
-function checkAuthToken() {
-    const authToken = localStorage.getItem("authToken");
-    if (!authToken) {
-        alert("You must be logged in to generate recipes!");
-        window.location.href = "login.html";
-        return null;
+// ✅ Function to parse and display the recipe
+function displayRecipe() {
+    const urlParams = new URLSearchParams(window.location.search);
+    let recipeData = urlParams.get("data");
+
+    if (!recipeData) {
+        console.error("❌ No recipe data found in URL.");
+        document.getElementById("recipe-title").textContent = "Error: Recipe Not Found";
+        return;
     }
-    return authToken;
-}
 
-// ✅ Function to update UI during recipe generation
-function updateUI(state, message = "") {
-    const generateButton = document.getElementById("generate-recipe-btn");
-    const recipeOutput = document.getElementById("recipe-output");
-
-    if (state === "loading") {
-        generateButton.textContent = "Generating...";
-        generateButton.disabled = true;
-        recipeOutput.innerHTML = "<p>Generating recipe...</p>";
-    } else if (state === "error") {
-        recipeOutput.innerHTML = `<p style="color: red;">${message}</p>`;
-        alert(message);
-    } else if (state === "reset") {
-        generateButton.textContent = "Generate Recipe";
-        generateButton.disabled = false;
-    }
-}
-
-// ✅ Function to fetch and display the recipe
-async function fetchRecipe() {
     try {
-        const authToken = checkAuthToken();
-        if (!authToken) return;
+        recipeData = JSON.parse(decodeURIComponent(recipeData));
 
-        const promptInput = document.getElementById("recipe-input");
-        const prompt = promptInput?.value.trim();
-        if (!prompt) {
-            alert("Please enter a recipe prompt!");
-            promptInput.focus();
-            return;
-        }
+        // ✅ Extract relevant details
+        const recipeTitle = recipeData.candidates[0]?.content?.parts[0]?.text || "Generated Recipe";
+        const recipeDescription = "Delicious AI-generated recipe based on your input.";
+        const calories = "Unknown"; // API response does not include calories
+        const ingredients = extractSection(recipeData, "Ingredients");
+        const instructions = extractSection(recipeData, "Instructions");
 
-        updateUI("loading");
-
-        const response = await fetch("https://nutrino-ai.onrender.com/api/fetch-recipe", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${authToken}`
-            },
-            body: JSON.stringify({ prompt })
-        });
-
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "Failed to fetch recipe");
-
-        // ✅ Display the fetched recipe
-        document.getElementById("recipe-output").innerHTML = `
-            <h2>${data.title || "Generated Recipe"}</h2>
-            <img src="${data.image || 'default-image.jpg'}" alt="Recipe Image" style="max-width: 100%; height: auto;">
-            <p><strong>Description:</strong> ${data.description || "No description available."}</p>
-            <h3>Calories: ${data.calories || "Unknown"} kcal</h3>
-            <h3>Ingredients:</h3>
-            <ul>${data.ingredients ? data.ingredients.map(ing => `<li>${ing}</li>`).join('') : "<li>No ingredients listed.</li>"}</ul>
-            <h3>Instructions:</h3>
-            <ul>${data.instructions ? data.instructions.map(step => `<li>${step}</li>`).join('') : "<li>No instructions provided.</li>"}</ul>
-        `;
+        // ✅ Populate HTML elements
+        document.getElementById("recipe-title").textContent = recipeTitle.split("\n")[0].replace("## ", "");
+        document.getElementById("recipe-desc").textContent = recipeDescription;
+        document.getElementById("recipe-calories").textContent = calories;
+        document.getElementById("ingredients-list").innerHTML = ingredients;
+        document.getElementById("instructions-list").innerHTML = instructions;
 
     } catch (error) {
-        console.error("❌ Error fetching recipe:", error.message);
-        updateUI("error", "Failed to generate recipe. Please try again.");
-    } finally {
-        updateUI("reset");
+        console.error("❌ Error parsing recipe data:", error);
+        document.getElementById("recipe-title").textContent = "Error: Invalid Recipe Data";
     }
 }
 
-// ✅ Attach event listeners once DOM is loaded
-document.addEventListener("DOMContentLoaded", function () {
-    const generateButton = document.getElementById("generate-recipe-btn");
-    if (generateButton) {
-        generateButton.addEventListener("click", fetchRecipe);
+// ✅ Function to extract ingredients or instructions
+function extractSection(data, sectionTitle) {
+    const text = data.candidates[0]?.content?.parts[0]?.text || "";
+    const sectionRegex = new RegExp(`\\*\\*${sectionTitle}:\\*\\*([\\s\\S]*?)(?=\\n\\*\\*|$)`, "i");
+    const match = text.match(sectionRegex);
+
+    if (match && match[1]) {
+        return match[1]
+            .split("\n")
+            .filter(line => line.trim().startsWith("*"))
+            .map(line => `<li>${line.replace("*", "").trim()}</li>`)
+            .join("") || "<li>No data available.</li>";
     }
+    return "<li>No data available.</li>";
+}
+
+// ✅ Handle navigation buttons
+document.addEventListener("DOMContentLoaded", function () {
+    displayRecipe(); // Load and display recipe
+
+    document.getElementById("goBackBtn").addEventListener("click", () => {
+        window.location.href = "index.html";
+    });
+
+    document.getElementById("generateAnotherBtn").addEventListener("click", () => {
+        window.location.href = "recipe_generator.html";
+    });
 });
 
 // ✅ Load Firebase dynamically
