@@ -60,11 +60,9 @@ export async function fetchRecipe(prompt) {
 function displayRecipe() {
     const recipeDataStr = sessionStorage.getItem("recipeData");
 
-    console.log("📌 Recipe Data in Storage:", recipeDataStr);
-
     if (!recipeDataStr) {
-        sessionStorage.removeItem("recipeData"); // Clear bad session data
-        window.location.href = "index.html";
+        console.warn("No recipe data found in sessionStorage.");
+        // Optionally, display a message to the user or provide default content
         return;
     }
 
@@ -72,33 +70,30 @@ function displayRecipe() {
     try {
         recipeData = JSON.parse(recipeDataStr);
     } catch (error) {
-        console.error("❌ Error parsing recipeData:", error);
-        sessionStorage.removeItem("recipeData"); // Prevent loop
-        window.location.href = "index.html";
+        console.error("Error parsing recipeData:", error);
+        // Optionally, display an error message to the user
         return;
     }
 
-    const text = recipeData?.candidates?.[0]?.content?.parts?.[0]?.text;
-    
-    if (!text) {
-        sessionStorage.removeItem("recipeData"); // Prevent looping
-        window.location.href = "index.html";
+    if (!recipeData?.candidates?.[0]?.content?.parts?.[0]?.text) {
+        console.warn("Recipe data is incomplete.");
+        // Optionally, display a message to the user or provide default content
         return;
     }
 
-    // ✅ Select elements safely
+    const text = recipeData.candidates[0].content.parts[0].text;
+
     const recipeTitleElement = document.getElementById("recipe-title");
     const recipeDescElement = document.getElementById("recipe-desc");
     const recipeCaloriesElement = document.getElementById("recipe-calories");
     const ingredientsListElement = document.getElementById("ingredients-list");
     const instructionsListElement = document.getElementById("instructions-list");
 
-    // ✅ Check if elements exist before updating
-    if (recipeTitleElement) recipeTitleElement.textContent = text.split("\n")[0].replace("## ", "");
-    if (recipeDescElement) recipeDescElement.textContent = "Delicious AI-generated recipe based on your input.";
-    if (recipeCaloriesElement) recipeCaloriesElement.textContent = "Unknown";
-    if (ingredientsListElement) ingredientsListElement.innerHTML = extractSection(text, "Ingredients");
-    if (instructionsListElement) instructionsListElement.innerHTML = extractSection(text, "Instructions");
+    recipeTitleElement.textContent = text.split("\n")[0].replace("## ", "");
+    recipeDescElement.textContent = "Delicious AI-generated recipe based on your input.";
+    recipeCaloriesElement.textContent = "Unknown";
+    ingredientsListElement.innerHTML = extractSection(text, "Ingredients");
+    instructionsListElement.innerHTML = extractSection(text, "Instructions");
 }
 
 // ✅ Extract Ingredients or Instructions
