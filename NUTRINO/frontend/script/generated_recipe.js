@@ -10,19 +10,18 @@ async function loadFirebase() {
 
 // ✅ Function to parse and display the recipe
 function displayRecipe() {
-    const urlParams = new URLSearchParams(window.location.search);
-    let recipeData = urlParams.get("data");
+    let recipeData = sessionStorage.getItem("recipeData");
 
     if (!recipeData) {
-        console.error("❌ No recipe data found in URL.");
+        console.error("❌ No recipe data found.");
         alert("Error: No recipe data found. Please generate a recipe first.");
-        window.location.href = "index.html"; // Redirect to home page
+        window.location.href = "index.html";
         return;
     }
 
     try {
-        recipeData = JSON.parse(decodeURIComponent(recipeData));
-        console.log("✅ Received Recipe Data:", recipeData);
+        recipeData = JSON.parse(recipeData);
+        console.log("✅ Loaded Recipe Data:", recipeData);
 
         // ✅ Extract Recipe Details
         const recipeTitle = recipeData.candidates?.[0]?.content?.parts?.[0]?.text || "Generated Recipe";
@@ -34,20 +33,11 @@ function displayRecipe() {
         const instructions = extractSection(recipeData, "Instructions");
 
         // ✅ Update HTML elements (Check if elements exist before modifying)
-        const titleElement = document.getElementById("recipe-title");
-        if (titleElement) titleElement.textContent = recipeTitle.split("\n")[0].replace("## ", "");
-
-        const descElement = document.getElementById("recipe-desc");
-        if (descElement) descElement.textContent = recipeDescription;
-
-        const caloriesElement = document.getElementById("recipe-calories");
-        if (caloriesElement) caloriesElement.textContent = calories;
-
-        const ingredientsList = document.getElementById("ingredients-list");
-        if (ingredientsList) ingredientsList.innerHTML = ingredients;
-
-        const instructionsList = document.getElementById("instructions-list");
-        if (instructionsList) instructionsList.innerHTML = instructions;
+        document.getElementById("recipe-title")?.textContent = recipeTitle.split("\n")[0].replace("## ", "");
+        document.getElementById("recipe-desc")?.textContent = recipeDescription;
+        document.getElementById("recipe-calories")?.textContent = calories;
+        document.getElementById("ingredients-list")?.innerHTML = ingredients;
+        document.getElementById("instructions-list")?.innerHTML = instructions;
 
     } catch (error) {
         console.error("❌ Error parsing recipe data:", error);
@@ -56,7 +46,7 @@ function displayRecipe() {
     }
 }
 
-// ✅ Improved function to extract Ingredients or Instructions
+// ✅ Function to extract Ingredients or Instructions
 function extractSection(data, sectionTitle) {
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
@@ -79,19 +69,13 @@ function extractSection(data, sectionTitle) {
 document.addEventListener("DOMContentLoaded", function () {
     displayRecipe(); // Load and display recipe
 
-    const goBackBtn = document.getElementById("goBackBtn");
-    if (goBackBtn) {
-        goBackBtn.addEventListener("click", () => {
-            window.location.href = "index.html";
-        });
-    }
+    document.getElementById("goBackBtn")?.addEventListener("click", () => {
+        window.location.href = "index.html";
+    });
 
-    const generateAnotherBtn = document.getElementById("generateAnotherBtn");
-    if (generateAnotherBtn) {
-        generateAnotherBtn.addEventListener("click", () => {
-            window.location.href = "recipe_generator.html";
-        });
-    }
+    document.getElementById("generateAnotherBtn")?.addEventListener("click", () => {
+        window.location.href = "recipe_generator.html";
+    });
 });
 
 // ✅ Load Firebase dynamically
