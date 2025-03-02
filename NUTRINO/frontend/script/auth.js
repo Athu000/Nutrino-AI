@@ -5,7 +5,7 @@ async function loadFirebase() {
     const { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } = 
       await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js");
 
-    // ✅ Firebase Configuration (Manually replace with values for Netlify)
+    // ✅ Firebase Configuration (Replace with your actual Firebase credentials)
     const firebaseConfig = {
       apiKey: "YOUR_FIREBASE_API_KEY",
       authDomain: "YOUR_FIREBASE_AUTH_DOMAIN",
