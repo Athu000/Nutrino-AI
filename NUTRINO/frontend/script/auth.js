@@ -1,3 +1,6 @@
+// Ensure the script is treated as a module
+export {};
+
 async function loadFirebase() {
   try {
     // ✅ Load Firebase modules dynamically from Google's CDN
