@@ -13,6 +13,9 @@ async function loadFirebase() {
 // ✅ Get or Refresh Firebase Auth Token
 async function getAuthToken() {
     try {
+        if (!firebase?.auth) {
+            await loadFirebase(); // Ensure Firebase is loaded
+        }
         const user = firebase.auth().currentUser;
         if (user) {
             const token = await user.getIdToken(true);
@@ -28,7 +31,7 @@ async function getAuthToken() {
 }
 
 // ✅ Fetch Recipe with Authentication
-async function fetchRecipe(prompt) {
+export async function fetchRecipe(prompt) {
     let authToken = localStorage.getItem("authToken") || await getAuthToken();
     if (!authToken) return null;
 
@@ -57,10 +60,11 @@ async function fetchRecipe(prompt) {
 function displayRecipe() {
     const recipeDataStr = sessionStorage.getItem("recipeData");
     
-    console.log("Recipe Data in Storage:", recipeDataStr);
+    console.log("📌 Recipe Data in Storage:", recipeDataStr);
     
     if (!recipeDataStr) {
         alert("No recipe data found. Redirecting...");
+        sessionStorage.removeItem("recipeData"); // Clear bad session data
         window.location.href = "index.html";
         return;
     }
@@ -69,33 +73,35 @@ function displayRecipe() {
     try {
         recipeData = JSON.parse(recipeDataStr);
     } catch (error) {
-        console.error("Error parsing recipeData:", error);
+        console.error("❌ Error parsing recipeData:", error);
         alert("Recipe data is corrupted.");
-        sessionStorage.removeItem("recipeData"); // Clear invalid data
+        sessionStorage.removeItem("recipeData"); // Prevent loop
         window.location.href = "index.html";
         return;
     }
 
-    if (!recipeData?.candidates?.[0]?.content?.parts?.[0]?.text) {
+    const text = recipeData?.candidates?.[0]?.content?.parts?.[0]?.text;
+    
+    if (!text) {
         alert("Recipe data is incomplete. Redirecting...");
         sessionStorage.removeItem("recipeData"); // Prevent looping
         window.location.href = "index.html";
         return;
     }
 
-    const text = recipeData.candidates[0].content.parts[0].text;
-
+    // ✅ Select elements safely
     const recipeTitleElement = document.getElementById("recipe-title");
     const recipeDescElement = document.getElementById("recipe-desc");
     const recipeCaloriesElement = document.getElementById("recipe-calories");
     const ingredientsListElement = document.getElementById("ingredients-list");
     const instructionsListElement = document.getElementById("instructions-list");
 
-    recipeTitleElement.textContent = text.split("\n")[0].replace("## ", "");
-    recipeDescElement.textContent = "Delicious AI-generated recipe based on your input.";
-    recipeCaloriesElement.textContent = "Unknown";
-    ingredientsListElement.innerHTML = extractSection(text, "Ingredients");
-    instructionsListElement.innerHTML = extractSection(text, "Instructions");
+    // ✅ Check if elements exist before updating
+    if (recipeTitleElement) recipeTitleElement.textContent = text.split("\n")[0].replace("## ", "");
+    if (recipeDescElement) recipeDescElement.textContent = "Delicious AI-generated recipe based on your input.";
+    if (recipeCaloriesElement) recipeCaloriesElement.textContent = "Unknown";
+    if (ingredientsListElement) ingredientsListElement.innerHTML = extractSection(text, "Ingredients");
+    if (instructionsListElement) instructionsListElement.innerHTML = extractSection(text, "Instructions");
 }
 
 // ✅ Extract Ingredients or Instructions
@@ -104,10 +110,10 @@ function extractSection(text, section) {
     return match ? match[1].trim().split("\n").map(line => `<li>${line.replace(/^([*-]|\d+\.)\s*/, "").trim()}</li>`).join("") : "<li>No data available.</li>";
 }
 
-// ✅ Handle navigation buttons
-window.addEventListener("DOMContentLoaded", () => {
+// ✅ Handle navigation buttons & initial load
+window.addEventListener("DOMContentLoaded", async () => {
+    await loadFirebase(); // Ensure Firebase is loaded
     displayRecipe();
     document.getElementById("goBackBtn")?.addEventListener("click", () => window.location.href = "index.html");
     document.getElementById("generateAnotherBtn")?.addEventListener("click", () => window.location.href = "recipe_generator.html");
-    loadFirebase();
 });
