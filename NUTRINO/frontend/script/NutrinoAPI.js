@@ -1,13 +1,32 @@
 const API_BASE_URL = "https://nutrino-ai.onrender.com/api";
 
-// ✅ Fetch Recipe Function
-export async function fetchRecipe(prompt) {
-    const authToken = localStorage.getItem("authToken");
-
-    if (!authToken) {
-        alert("Authentication required. Please log in.");
+// ✅ Function to get a fresh Firebase authentication token
+async function getFreshAuthToken() {
+    try {
+        const user = firebase.auth().currentUser;
+        if (user) {
+            const newToken = await user.getIdToken(true); // Force refresh
+            localStorage.setItem("authToken", newToken);
+            console.log("✅ Token refreshed successfully");
+            return newToken;
+        } else {
+            throw new Error("User not logged in");
+        }
+    } catch (error) {
+        console.error("❌ Token Refresh Error:", error);
+        alert("Session expired. Please log in again.");
         window.location.href = "login.html";
         return null;
+    }
+}
+
+// ✅ Fetch Recipe with refreshed token
+export async function fetchRecipe(prompt) {
+    let authToken = localStorage.getItem("authToken");
+
+    if (!authToken) {
+        authToken = await getFreshAuthToken(); // Refresh token if missing
+        if (!authToken) return null; // Stop if token refresh failed
     }
 
     try {
@@ -21,38 +40,22 @@ export async function fetchRecipe(prompt) {
         });
 
         const data = await response.json();
-        console.log("✅ API Response:", data); // Debugging
+        console.log("✅ API Response:", data);
+
+        if (response.status === 403 && data.error.includes("Invalid token")) {
+            console.warn("🔄 Token expired. Refreshing...");
+            authToken = await getFreshAuthToken(); // Try refreshing token
+            if (!authToken) return null; // Stop if token refresh failed
+
+            // Retry request with new token
+            return fetchRecipe(prompt);
+        }
 
         if (!response.ok) throw new Error(data.error || "Recipe fetch failed");
-
         return data;
     } catch (error) {
         console.error("❌ API Error:", error.message);
         alert("Error fetching recipe. Try again.");
         return null;
     }
-}
-
-// ✅ Generate Recipe and Store it in sessionStorage
-export async function generateRecipe() {
-    const userPrompt = document.getElementById("recipe-input").value;
-    if (!userPrompt.trim()) {
-        alert("Please enter a recipe idea.");
-        return;
-    }
-
-    const recipeData = await fetchRecipe(userPrompt);
-
-    if (!recipeData) {
-        alert("Error: Could not generate recipe.");
-        return;
-    }
-
-    console.log("✅ Storing Recipe Data:", recipeData);
-
-    // ✅ Store in sessionStorage instead of passing via URL
-    sessionStorage.setItem("recipeData", JSON.stringify(recipeData));
-
-    // ✅ Redirect to recipe display page
-    window.location.href = "generated_recipe.html";
 }
