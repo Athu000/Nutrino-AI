@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Nutrino AI</title>
     <link rel="stylesheet" href="styles.css">
-    <script type="module" defer src="./script/auth.js"></script>
+    <script defer src="./script/auth.js"></script> <!-- No module, just defer -->
 </head>
 <body>
     <div class="container">
@@ -14,14 +14,12 @@
         <p>Don't have an account? <a href="signup.html">Sign up here</a></p>
     </div>
 
-    <script type="module">
-        import { signInWithGoogle } from "./script/auth.js";
-
-        document.getElementById("google-signin-btn").addEventListener("click", async () => {
-            try {
-                await signInWithGoogle();
-            } catch (error) {
-                console.error("Google Sign-In Error:", error);
+    <script>
+        document.getElementById("google-signin-btn").addEventListener("click", () => {
+            if (typeof signInWithGoogle === "function") {
+                signInWithGoogle();
+            } else {
+                console.error("signInWithGoogle is not available. Ensure auth.js is loaded properly.");
             }
         });
     </script>
