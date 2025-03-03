@@ -1,7 +1,6 @@
-// ✅ Import Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, setDoc, doc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // ✅ Firebase Configuration
 const firebaseConfig = {
@@ -18,9 +17,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 const db = getFirestore(app);
-
-// ✅ Export auth & db so other scripts can use them
-export { auth, db, provider };
 
 // ✅ Google Sign-In Function
 window.signInWithGoogle = async function () {
@@ -69,6 +65,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (user) {
       if (userEmailElement) userEmailElement.textContent = `Logged in as: ${user.email}`;
       if (authLinks) authLinks.style.display = "none";
+
+      // ✅ If on generated_recipe.html, fetch and display recipe
+      if (window.location.pathname.includes("generated_recipe.html")) {
+        displayRecipeFromFirestore(user.uid);
+      }
     } else {
       if (authLinks) authLinks.style.display = "block";
       if (userEmailElement) userEmailElement.textContent = "";
@@ -76,4 +77,37 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-console.log("✅ Firebase Auth & Firestore Loaded Successfully!");
+// ✅ Fetch and Display Recipe from Firestore
+async function displayRecipeFromFirestore(userId) {
+  try {
+    const recipesRef = collection(db, "recipes");
+    const q = query(recipesRef, where("userId", "==", userId));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      console.error("❌ No recipes found in Firestore.");
+      document.getElementById("recipe-title").textContent = "No recipes found!";
+      return;
+    }
+
+    // Get the latest recipe
+    let latestRecipe;
+    querySnapshot.forEach((doc) => {
+      latestRecipe = doc.data().content;
+    });
+
+    // Display recipe
+    document.getElementById("recipe-container").innerHTML = formatRecipeHTML(latestRecipe);
+    console.log("✅ Recipe fetched from Firestore:", latestRecipe);
+  } catch (error) {
+    console.error("❌ Firestore Fetch Error:", error);
+  }
+}
+
+// ✅ Format Recipe for Display
+function formatRecipeHTML(recipeText) {
+  return recipeText.replace(/\n/g, "<br>"); // Convert new lines to HTML line breaks
+}
+
+// ✅ Export auth & db for other scripts
+export { auth, db, provider };
