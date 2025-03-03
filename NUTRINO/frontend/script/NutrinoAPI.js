@@ -49,7 +49,7 @@ async function fetchRecipe(prompt) {
             return;
         }
 
-        const recipeText = data.candidates[0].content.parts[0].text;
+        let recipeText = data.candidates[0].content.parts[0].text;
         console.log("✅ Extracted Recipe Text:", recipeText);
 
         // ✅ Save Recipe to Firestore
@@ -95,10 +95,10 @@ async function displayRecipe() {
         console.log("✅ Loaded Latest Recipe:", latestRecipe);
 
         document.getElementById("recipe-title").textContent = extractTitle(latestRecipe);
-        document.getElementById("recipe-desc").textContent = "A delicious AI-generated recipe!";
+        document.getElementById("recipe-desc").textContent = "A delicious AI-generated recipe! 😋";
         document.getElementById("recipe-calories").textContent = extractCalories(latestRecipe);
-        document.getElementById("ingredients-list").innerHTML = extractSection(latestRecipe, "Ingredients");
-        document.getElementById("instructions-list").innerHTML = extractSection(latestRecipe, "Instructions");
+        document.getElementById("ingredients-list").innerHTML = extractSection(latestRecipe, "Ingredients", "🛒");
+        document.getElementById("instructions-list").innerHTML = extractSection(latestRecipe, "Instructions", "👨‍🍳");
     } catch (error) {
         console.error("❌ Error displaying recipe:", error);
     }
@@ -115,11 +115,11 @@ function extractTitle(text) {
 // ✅ Extract Calories Properly
 function extractCalories(text) {
     const match = text.match(/Estimated Calories per Serving:\s*([\d-]+)/i);
-    return match ? `${match[1]} kcal` : "N/A";
+    return match ? `🔥 ${match[1]} kcal` : "N/A";
 }
 
-// ✅ Extract Ingredients or Instructions Properly
-function extractSection(text, section) {
+// ✅ Extract Ingredients or Instructions Properly with Emojis
+function extractSection(text, section, emoji) {
     const regex = new RegExp(`\\*\\*${section}:\\*\\*\\s*([\\s\\S]*?)(?=\\n\\*\\*|$)`, "i");
     const match = text.match(regex);
 
@@ -128,12 +128,13 @@ function extractSection(text, section) {
             .trim()
             .split("\n")
             .filter(line => line.trim() !== "")
-            .map(line => `<li>${line.replace(/^([*\-\d]+\.?)\s*/, "").trim()}</li>`)
+            .map(line => `<li>${emoji} ${line.replace(/^([*\-\d]+\.?)\s*/, "").trim()}</li>`)
             .join("");
     } else {
-        return "<li>No data available.</li>";
+        return `<li>${emoji} No data available.</li>`;
     }
 }
+
 export { displayRecipe };
 
 // ✅ Make function globally accessible
