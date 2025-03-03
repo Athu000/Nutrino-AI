@@ -19,7 +19,7 @@ if (!API_KEY) {
     process.exit(1); // Stop the server if API_KEY is missing
 }
 
-// ✅ Initialize Firebase Admin SDK (Improved Error Handling)
+// ✅ Initialize Firebase Admin SDK
 let serviceAccount;
 try {
     serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -29,7 +29,7 @@ try {
     console.log("✅ Firebase Admin SDK initialized.");
 } catch (error) {
     console.error("❌ ERROR: Failed to initialize Firebase Admin SDK:", error.message);
-    process.exit(1); // Stop the server if Firebase is not configured correctly
+    process.exit(1);
 }
 
 // ✅ Health Check Route
@@ -37,7 +37,7 @@ app.get("/", (req, res) => {
     res.json({ message: "✅ Nutrino AI Backend is Running!" });
 });
 
-// ✅ Middleware for Authentication Verification (Improved)
+// ✅ Middleware for Authentication Verification
 async function verifyAuthToken(req, res, next) {
     try {
         const authHeader = req.headers.authorization;
@@ -59,7 +59,7 @@ async function verifyAuthToken(req, res, next) {
     }
 }
 
-// ✅ Recipe Fetching API Route (Improved Error Handling)
+// ✅ Recipe Fetching API Route
 app.post("/api/fetch-recipe", verifyAuthToken, async (req, res) => {
     try {
         console.log("📩 Received Request:", req.body);
@@ -89,14 +89,29 @@ app.post("/api/fetch-recipe", verifyAuthToken, async (req, res) => {
         }
 
         // ✅ Ensure valid recipe data structure
-        if (!data || !data.candidates || !data.candidates[0]?.content) {
+        if (!data || !data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
             return res.status(500).json({
                 error: "❌ Invalid recipe response format",
                 solution: "Try again later or check the API response structure."
             });
         }
 
-        return res.json(data);
+        const recipe = data.candidates[0].content.parts[0].text;
+
+        // ✅ Convert structured JSON to formatted text
+        const formattedRecipe = `## ${recipe.recipeName || "Generated Recipe"}\n
+**Cuisine:** ${recipe.cuisine || "Unknown"}\n
+**Prep Time:** ${recipe.prepTime || "N/A"} | **Cook Time:** ${recipe.cookTime || "N/A"} | **Total Time:** ${recipe.totalTime || "N/A"}\n
+**Servings:** ${recipe.servings || "N/A"} | **Calories:** ${recipe.nutritionInfo?.calories || "N/A"}\n
+\n
+**Ingredients:**\n${recipe.ingredients?.map(i => `- ${i}`).join("\n") || "No ingredients provided"}\n
+\n
+**Instructions:**\n${recipe.instructions?.map((step, index) => `${index + 1}. ${step}`).join("\n") || "No instructions provided"}\n
+\n
+**Tips & Variations:**\n${recipe.tipsAndVariations?.map(t => `- ${t}`).join("\n") || "No additional tips available"}\n`;
+
+        return res.json({ candidates: [{ content: { parts: [{ text: formattedRecipe }] } }] });
+
     } catch (error) {
         console.error("❌ Error fetching recipe:", error.message);
         return res.status(500).json({
