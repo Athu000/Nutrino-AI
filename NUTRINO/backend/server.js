@@ -32,6 +32,8 @@ try {
     process.exit(1);
 }
 
+const db = admin.firestore(); // Firestore database instance
+
 // ✅ Health Check Route
 app.get("/", (req, res) => {
     res.json({ message: "✅ Nutrino AI Backend is Running!" });
@@ -97,19 +99,26 @@ app.post("/api/fetch-recipe", verifyAuthToken, async (req, res) => {
         }
 
         const recipe = data.candidates[0].content.parts[0].text;
-
+        
         // ✅ Convert structured JSON to formatted text
         const formattedRecipe = `## ${recipe.recipeName || "Generated Recipe"}\n
 **Cuisine:** ${recipe.cuisine || "Unknown"}\n
 **Prep Time:** ${recipe.prepTime || "N/A"} | **Cook Time:** ${recipe.cookTime || "N/A"} | **Total Time:** ${recipe.totalTime || "N/A"}\n
 **Servings:** ${recipe.servings || "N/A"} | **Calories (per serving):** ${recipe.nutritionInfo?.calories || "N/A"} kcal\n
-\n
-**Ingredients:**\n${recipe.ingredients?.map(i => `- ${i}`).join("\n") || "No ingredients provided"}\n
-\n
-**Instructions:**\n${recipe.instructions?.map((step, index) => `${index + 1}. ${step}`).join("\n") || "No instructions provided"}\n
-\n
-**Tips & Variations:**\n${recipe.tipsAndVariations?.map(t => `- ${t}`).join("\n") || "No additional tips available"}\n`;
-return res.json({ candidates: [{ content: { parts: [{ text: formattedRecipe }] } }] });
+\n**Ingredients:**\n${recipe.ingredients?.map(i => `- ${i}`).join("\n") || "No ingredients provided"}\n
+\n**Instructions:**\n${recipe.instructions?.map((step, index) => `${index + 1}. ${step}`).join("\n") || "No instructions provided"}\n
+\n**Tips & Variations:**\n${recipe.tipsAndVariations?.map(t => `- ${t}`).join("\n") || "No additional tips available"}`;
+
+        // ✅ Store in Firestore
+        const newRecipeRef = db.collection("recipes").doc();
+        await newRecipeRef.set({
+            userId: req.user.uid,
+            content: formattedRecipe,
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+        console.log("✅ Recipe stored in Firestore with ID:", newRecipeRef.id);
+
+        return res.json({ candidates: [{ content: { parts: [{ text: formattedRecipe }] } }] });
 
     } catch (error) {
         console.error("❌ Error fetching recipe:", error.message);
