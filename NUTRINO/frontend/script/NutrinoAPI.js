@@ -8,9 +8,7 @@ async function getAuthToken() {
     try {
         const user = auth.currentUser;
         if (user) {
-            const token = await user.getIdToken(true);
-            localStorage.setItem("authToken", token);
-            return token;
+            return await user.getIdToken(true);
         }
     } catch (error) {
         console.error("❌ Auth Token Error:", error);
@@ -22,12 +20,8 @@ async function getAuthToken() {
 
 // ✅ Fetch Recipe & Save to Firestore
 async function fetchRecipe(prompt) {
-    let authToken = localStorage.getItem("authToken");
-
-    if (!authToken) {
-        authToken = await getAuthToken();
-        if (!authToken) return null;
-    }
+    let authToken = await getAuthToken();
+    if (!authToken) return;
 
     try {
         console.log("📤 Sending request to API:", API_BASE_URL);
@@ -43,7 +37,7 @@ async function fetchRecipe(prompt) {
         if (!response.ok) {
             console.error("❌ API Request Failed:", response.status, response.statusText);
             alert("Failed to fetch recipe. Try again.");
-            return null;
+            return;
         }
 
         const data = await response.json();
@@ -52,7 +46,7 @@ async function fetchRecipe(prompt) {
         if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
             console.error("❌ API Response is malformed:", data);
             alert("Received an invalid recipe response.");
-            return null;
+            return;
         }
 
         const recipeText = data.candidates[0].content.parts[0].text;
@@ -67,18 +61,17 @@ async function fetchRecipe(prompt) {
                 createdAt: new Date()
             });
             console.log("✅ Recipe saved to Firestore");
-        }
 
-        sessionStorage.setItem("recipeData", JSON.stringify(data));
-        window.location.href = "generated_recipe.html";
+            // Redirect to the recipe display page after saving
+            window.location.href = "generated_recipe.html";
+        }
     } catch (error) {
         console.error("❌ API Error:", error);
         alert("Error fetching recipe. Try again.");
     }
-    return null;
 }
 
-// ✅ Display Recipe from Firestore (NOT from sessionStorage)
+// ✅ Display Recipe from Firestore
 async function displayRecipe() {
     try {
         const user = auth.currentUser;
@@ -97,6 +90,7 @@ async function displayRecipe() {
             return;
         }
 
+        // Get the latest recipe
         const latestRecipe = querySnapshot.docs[querySnapshot.docs.length - 1].data().recipe;
         console.log("✅ Loaded Latest Recipe:", latestRecipe);
 
