@@ -1,10 +1,11 @@
-
 async function loadFirebase() {
   try {
     // ✅ Load Firebase modules dynamically from Google's CDN
     const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js");
     const { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } = 
       await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js");
+    const { getFirestore, collection, setDoc, doc } = 
+      await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
 
     // ✅ Firebase Configuration
     const firebaseConfig = {
@@ -20,9 +21,10 @@ async function loadFirebase() {
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
+    const db = getFirestore(app);
 
     // ✅ Google Sign-In Function
-  window.signInWithGoogle = async function () {
+    window.signInWithGoogle = async function () {
       try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
@@ -30,13 +32,20 @@ async function loadFirebase() {
         localStorage.setItem("authToken", await user.getIdToken());
         localStorage.setItem("loggedInUser", JSON.stringify({ email: user.email, name: user.displayName }));
 
+        // ✅ Store user details in Firestore
+        await setDoc(doc(db, "users", user.uid), {
+          name: user.displayName,
+          email: user.email,
+          uid: user.uid,
+          lastLogin: new Date()
+        });
+
         window.location.href = "dashboard.html";
       } catch (error) {
         console.error("❌ Google Sign-In Error:", error.message);
         alert("Google Sign-In failed. Please try again.");
       }
     };
-
 
     // ✅ Logout Function
     window.logoutUser = function () {
@@ -68,7 +77,7 @@ async function loadFirebase() {
       });
     });
 
-    console.log("✅ Firebase Auth Loaded Successfully!");
+    console.log("✅ Firebase Auth & Firestore Loaded Successfully!");
   } catch (error) {
     console.error("❌ Firebase Load Error:", error);
   }
