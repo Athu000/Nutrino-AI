@@ -70,7 +70,6 @@ async function fetchRecipe(prompt) {
 }
 
 // ✅ Display Recipe from sessionStorage
-// ✅ Display Recipe from sessionStorage
 function displayRecipe() {
     const recipeDataStr = sessionStorage.getItem("recipeData");
 
@@ -90,7 +89,7 @@ function displayRecipe() {
 
         document.getElementById("recipe-title").textContent = extractTitle(text);
         document.getElementById("recipe-desc").textContent = "A delicious AI-generated recipe!";
-        document.getElementById("calories-info").textContent = `Calories: ${extractCalories(text)}`;
+        document.getElementById("recipe-calories").textContent = extractCalories(text);
         document.getElementById("ingredients-list").innerHTML = extractSection(text, "Ingredients");
         document.getElementById("instructions-list").innerHTML = extractSection(text, "Instructions");
     } catch (error) {
@@ -114,7 +113,7 @@ function extractTitle(text) {
 
 // ✅ Extract Ingredients or Instructions Properly
 function extractSection(text, section) {
-    const regex = new RegExp(`\\*\\*${section}:\\*\\*([\\s\\S]*?)(?=\\n\\*\\*|$)`, "i");
+    const regex = new RegExp(`\*\*${section}:\*\*([\s\S]*?)(?=\n\*\*|$)`, "i");
     const match = text.match(regex);
 
     if (match) {
