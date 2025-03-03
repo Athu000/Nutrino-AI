@@ -27,5 +27,38 @@
 
     <script type="module" src="./script/NutrinoAPI.js"></script>
         <script type="module" src="./script/auth.js"></script>
+        <script>
+    // Function to clear previous recipe from session storage and UI
+    function clearPreviousRecipe() {
+        sessionStorage.removeItem("latestRecipe"); // Remove cached recipe
+        document.getElementById("recipe-desc").innerHTML = ""; // Clear displayed recipe
+    }
+
+    // "Go Back" Button - Clears session and redirects to home
+    document.getElementById("goBackBtn").addEventListener("click", function () {
+        clearPreviousRecipe();
+        window.location.href = "index.html"; // Redirect to home page
+    });
+
+    // "Generate Another Recipe" Button - Clears session and reloads page
+    document.getElementById("nutrinoBtn").addEventListener("click", function () {
+        clearPreviousRecipe();
+        window.location.reload(); // Reloads page to fetch a new recipe
+    });
+
+    // Ensure the latest recipe is stored in sessionStorage
+    function storeRecipeInSession(recipe) {
+        sessionStorage.setItem("latestRecipe", JSON.stringify(recipe));
+    }
+
+    // Load Recipe on Page Load
+    document.addEventListener("DOMContentLoaded", function () {
+        let storedRecipe = sessionStorage.getItem("latestRecipe");
+        if (storedRecipe) {
+            document.getElementById("recipe-desc").innerHTML = JSON.parse(storedRecipe);
+        }
+    });
+</script>
+
 </body>
 </html>
