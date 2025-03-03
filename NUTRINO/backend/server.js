@@ -74,7 +74,7 @@ app.post("/api/fetch-recipe", verifyAuthToken, async (req, res) => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: `Generate a structured recipe for: ${prompt}` }] }]
+                contents: [{ parts: [{ text: `Generate a structured recipe for: ${prompt}. Include the name, cuisine type, prep time, cook time, total time, number of servings, a list of ingredients, step-by-step cooking instructions, and an estimated calorie count per serving.` }] }]
             }),
         });
 
@@ -102,15 +102,14 @@ app.post("/api/fetch-recipe", verifyAuthToken, async (req, res) => {
         const formattedRecipe = `## ${recipe.recipeName || "Generated Recipe"}\n
 **Cuisine:** ${recipe.cuisine || "Unknown"}\n
 **Prep Time:** ${recipe.prepTime || "N/A"} | **Cook Time:** ${recipe.cookTime || "N/A"} | **Total Time:** ${recipe.totalTime || "N/A"}\n
-**Servings:** ${recipe.servings || "N/A"} | **Calories:** ${recipe.nutritionInfo?.calories || "N/A"}\n
+**Servings:** ${recipe.servings || "N/A"} | **Calories (per serving):** ${recipe.nutritionInfo?.calories || "N/A"} kcal\n
 \n
 **Ingredients:**\n${recipe.ingredients?.map(i => `- ${i}`).join("\n") || "No ingredients provided"}\n
 \n
 **Instructions:**\n${recipe.instructions?.map((step, index) => `${index + 1}. ${step}`).join("\n") || "No instructions provided"}\n
 \n
 **Tips & Variations:**\n${recipe.tipsAndVariations?.map(t => `- ${t}`).join("\n") || "No additional tips available"}\n`;
-
-        return res.json({ candidates: [{ content: { parts: [{ text: formattedRecipe }] } }] });
+return res.json({ candidates: [{ content: { parts: [{ text: formattedRecipe }] } }] });
 
     } catch (error) {
         console.error("❌ Error fetching recipe:", error.message);
