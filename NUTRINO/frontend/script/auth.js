@@ -24,9 +24,6 @@ window.signInWithGoogle = async function () {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
 
-    localStorage.setItem("authToken", await user.getIdToken());
-    localStorage.setItem("loggedInUser", JSON.stringify({ email: user.email, name: user.displayName }));
-
     // ✅ Store user details in Firestore
     await setDoc(doc(db, "users", user.uid), {
       name: user.displayName,
@@ -46,8 +43,6 @@ window.signInWithGoogle = async function () {
 window.logoutUser = function () {
   signOut(auth)
     .then(() => {
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("loggedInUser");
       window.location.href = "index.html"; // Redirect to homepage after logout
     })
     .catch(error => {
@@ -58,56 +53,14 @@ window.logoutUser = function () {
 
 // ✅ Auto-Check User Login Status & Update UI
 document.addEventListener("DOMContentLoaded", () => {
-  const userEmailElement = document.getElementById("user-email");
-  const authLinks = document.getElementById("auth-links");
-
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      if (userEmailElement) userEmailElement.textContent = `Logged in as: ${user.email}`;
-      if (authLinks) authLinks.style.display = "none";
-
-      // ✅ If on generated_recipe.html, fetch and display recipe
       if (window.location.pathname.includes("generated_recipe.html")) {
-        displayRecipeFromFirestore(user.uid);
+        displayRecipe();
       }
-    } else {
-      if (authLinks) authLinks.style.display = "block";
-      if (userEmailElement) userEmailElement.textContent = "";
     }
   });
 });
-
-// ✅ Fetch and Display Recipe from Firestore
-async function displayRecipeFromFirestore(userId) {
-  try {
-    const recipesRef = collection(db, "recipes");
-    const q = query(recipesRef, where("userId", "==", userId));
-    const querySnapshot = await getDocs(q);
-
-    if (querySnapshot.empty) {
-      console.error("❌ No recipes found in Firestore.");
-      document.getElementById("recipe-title").textContent = "No recipes found!";
-      return;
-    }
-
-    // Get the latest recipe
-    let latestRecipe;
-    querySnapshot.forEach((doc) => {
-      latestRecipe = doc.data().content;
-    });
-
-    // Display recipe
-    document.getElementById("recipe-container").innerHTML = formatRecipeHTML(latestRecipe);
-    console.log("✅ Recipe fetched from Firestore:", latestRecipe);
-  } catch (error) {
-    console.error("❌ Firestore Fetch Error:", error);
-  }
-}
-
-// ✅ Format Recipe for Display
-function formatRecipeHTML(recipeText) {
-  return recipeText.replace(/\n/g, "<br>"); // Convert new lines to HTML line breaks
-}
 
 // ✅ Export auth & db for other scripts
 export { auth, db, provider };
