@@ -30,32 +30,33 @@
         <script>
     // Function to clear previous recipe from session storage and UI
     function clearPreviousRecipe() {
-        sessionStorage.removeItem("latestRecipe"); // Remove cached recipe
-        document.getElementById("recipe-desc").innerHTML = ""; // Clear displayed recipe
+        sessionStorage.removeItem("latestRecipe"); // Remove stored recipe
+        localStorage.removeItem("latestRecipe"); // Clear in case localStorage was used
+        document.getElementById("recipe-desc").innerHTML = ""; // Clear UI
+    }
+
+    // Function to reload page and fetch new recipe
+    function reloadNewRecipe() {
+        clearPreviousRecipe();
+        window.location.href = window.location.pathname + "?new"; // Ensure fresh load
     }
 
     // "Go Back" Button - Clears session and redirects to home
     document.getElementById("goBackBtn").addEventListener("click", function () {
         clearPreviousRecipe();
-        window.location.href = "index.html"; // Redirect to home page
+        window.location.href = "index.html"; // Redirect to home
     });
 
-    // "Generate Another Recipe" Button - Clears session and reloads page
+    // "Generate Another Recipe" Button - Clears session and reloads new recipe
     document.getElementById("nutrinoBtn").addEventListener("click", function () {
-        clearPreviousRecipe();
-        window.location.reload(); // Reloads page to fetch a new recipe
+        reloadNewRecipe();
     });
 
-    // Ensure the latest recipe is stored in sessionStorage
-    function storeRecipeInSession(recipe) {
-        sessionStorage.setItem("latestRecipe", JSON.stringify(recipe));
-    }
-
-    // Load Recipe on Page Load
+    // Ensure fresh recipe on new load
     document.addEventListener("DOMContentLoaded", function () {
-        let storedRecipe = sessionStorage.getItem("latestRecipe");
-        if (storedRecipe) {
-            document.getElementById("recipe-desc").innerHTML = JSON.parse(storedRecipe);
+        let urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has("new")) {
+            clearPreviousRecipe(); // Force clear if "new" parameter exists
         }
     });
 </script>
