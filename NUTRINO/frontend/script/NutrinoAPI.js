@@ -1,27 +1,13 @@
+// ✅ Import Firebase Auth & Firestore from auth.js
+import { auth, db } from "./auth.js";
+import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 const API_BASE_URL = "https://nutrino-ai.onrender.com/api";
-
-// ✅ Load Firebase dynamically
-async function loadFirebase() {
-    try {
-        await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js");
-        await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
-        console.log("✅ Firebase Auth & Firestore Loaded");
-    } catch (error) {
-        console.error("❌ Firebase Load Error:", error);
-    }
-}
-
-// ✅ Initialize Firestore
-async function getFirestoreDB() {
-    const { getFirestore, collection, addDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
-    const db = getFirestore();
-    return { db, collection, addDoc };
-}
 
 // ✅ Get or Refresh Firebase Auth Token
 async function getAuthToken() {
     try {
-        const user = firebase.auth().currentUser;
+        const user = auth.currentUser;  // ✅ Use 'auth.currentUser' instead of 'firebase.auth().currentUser'
         if (user) {
             const token = await user.getIdToken(true);
             localStorage.setItem("authToken", token);
@@ -35,7 +21,7 @@ async function getAuthToken() {
     return null;
 }
 
-// ✅ Fetch Recipe with Authentication & Save to Firestore
+// ✅ Fetch Recipe & Save to Firestore
 async function fetchRecipe(prompt) {
     let authToken = localStorage.getItem("authToken");
 
@@ -66,9 +52,7 @@ async function fetchRecipe(prompt) {
             sessionStorage.setItem("recipeData", JSON.stringify(data));
 
             // ✅ Save Recipe to Firestore
-            const { db, collection, addDoc } = await getFirestoreDB();
-            const user = firebase.auth().currentUser;
-
+            const user = auth.currentUser;
             if (user) {
                 await addDoc(collection(db, "recipes"), {
                     userId: user.uid,
@@ -90,9 +74,6 @@ async function fetchRecipe(prompt) {
     }
     return null;
 }
-
-// ✅ Load Firebase when script runs
-loadFirebase();
 
 // ✅ Make function globally accessible
 window.fetchRecipe = fetchRecipe;
