@@ -128,6 +128,7 @@ async function displayRecipe() {
 }
 
 window.addEventListener("DOMContentLoaded", displayRecipe);
+
 // ✅ Extract Title
 function extractTitle(text) {
     if (!text) return "AI-Generated Recipe";
@@ -145,7 +146,7 @@ function extractCalories(text) {
 // ✅ Extract Ingredients or Instructions Properly with Emojis
 function extractSection(text, section) {
     if (!text) return `<li>⚠️ No data available.</li>`;
-    const regex = new RegExp(`\*\*${section}:?\*\*?\s*([\s\S]*?)(?=\n\*\*|$)`, "i");
+    const regex = new RegExp(`\\*\\*${section}:?\\*\\*?\\s*([\\s\\S]*?)(?=\n\\*\\*|$)`, "i");
     const match = text.match(regex);
 
     if (match) {
