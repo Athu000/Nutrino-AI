@@ -74,13 +74,22 @@ app.post("/api/fetch-recipe", verifyAuthToken, async (req, res) => {
         }
 
         // Fetch Recipe from Gemini API
-        const response = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: `Provide a detailed recipe for ${prompt}, including ingredients, instructions, and nutrition facts.` }] }]
+        const response = await fetch(API_URL, { 
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            contents: [{
+                parts: [{
+                    text: `Provide a detailed, structured recipe for ${prompt}. 
+                    - Include a title, ingredients, step-by-step instructions, and nutritional facts.
+                    - Specify the number of calories in a clear format.
+                    - Use appropriate food-related emojis to make the recipe visually engaging.
+                    - Format steps in a numbered list, removing any unnecessary symbols like "**".`
+                    }]
+                }]
             }),
         });
+
 
         const data = await response.json();
         console.log("🔹 API Response:", JSON.stringify(data, null, 2));
