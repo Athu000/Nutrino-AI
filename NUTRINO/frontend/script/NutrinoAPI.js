@@ -70,11 +70,12 @@ async function fetchRecipe(prompt) {
 }
 
 // ✅ Display Recipe from sessionStorage
+// ✅ Display Recipe from sessionStorage
 function displayRecipe() {
     const recipeDataStr = sessionStorage.getItem("recipeData");
 
     if (!recipeDataStr) {
-        console.error("No recipe data found.");
+        console.error("❌ No recipe data found.");
         return;
     }
 
@@ -83,17 +84,17 @@ function displayRecipe() {
         const text = recipeData?.candidates?.[0]?.content?.parts?.[0]?.text;
 
         if (!text) {
-            console.error("Recipe text missing.");
+            console.error("❌ Recipe text missing.");
             return;
         }
 
         document.getElementById("recipe-title").textContent = extractTitle(text);
         document.getElementById("recipe-desc").textContent = "A delicious AI-generated recipe!";
+        document.getElementById("recipe-calories").textContent = extractCalories(text);
         document.getElementById("ingredients-list").innerHTML = extractSection(text, "Ingredients");
         document.getElementById("instructions-list").innerHTML = extractSection(text, "Instructions");
-        document.getElementById("recipe-meta").innerHTML = extractMeta(text);
     } catch (error) {
-        console.error("Error parsing recipeData:", error);
+        console.error("❌ Error parsing recipeData:", error);
     }
 }
 
@@ -103,6 +104,12 @@ window.addEventListener("DOMContentLoaded", displayRecipe);
 function extractTitle(text) {
     const match = text.match(/^##\s*(.+)/);
     return match ? match[1].trim() : "AI-Generated Recipe";
+}
+
+// ✅ Extract Calories
+function extractCalories(text) {
+    const match = text.match(/\*\*Calories \(per serving\):\*\*\s*(\d+)/i);
+    return match ? `${match[1]} kcal` : "N/A";
 }
 
 // ✅ Extract Ingredients or Instructions Properly
@@ -121,7 +128,6 @@ function extractSection(text, section) {
         return "<li>No data available.</li>";
     }
 }
-
 // ✅ Extract Additional Metadata (Cuisine, Prep Time, Servings, etc.)
 function extractMeta(text) {
     const metaRegex = /\*\*Cuisine:\*\* (.+?)\n\*\*Prep Time:\*\* (.+?) \| \*\*Cook Time:\*\* (.+?) \| \*\*Total Time:\*\* (.+?)\n\*\*Servings:\*\* (.+?) \| \*\*Calories:\*\* (.+?)\n/;
