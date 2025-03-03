@@ -91,6 +91,7 @@ function displayRecipe() {
         document.getElementById("recipe-desc").textContent = "A delicious AI-generated recipe!";
         document.getElementById("ingredients-list").innerHTML = extractSection(text, "Ingredients");
         document.getElementById("instructions-list").innerHTML = extractSection(text, "Instructions");
+        document.getElementById("recipe-meta").innerHTML = extractMeta(text);
     } catch (error) {
         console.error("Error parsing recipeData:", error);
     }
@@ -100,10 +101,10 @@ window.addEventListener("DOMContentLoaded", displayRecipe);
 
 // ✅ Extract Title
 function extractTitle(text) {
-    return text.split("\n")[0].replace("## ", "").trim() || "AI-Generated Recipe";
+    const match = text.match(/^##\s*(.+)/);
+    return match ? match[1].trim() : "AI-Generated Recipe";
 }
 
-// ✅ Extract Ingredients or Instructions
 // ✅ Extract Ingredients or Instructions Properly
 function extractSection(text, section) {
     const regex = new RegExp(`\\*\\*${section}:\\*\\*([\\s\\S]*?)(?=\\n\\*\\*|$)`, "i");
@@ -121,6 +122,23 @@ function extractSection(text, section) {
     }
 }
 
+// ✅ Extract Additional Metadata (Cuisine, Prep Time, Servings, etc.)
+function extractMeta(text) {
+    const metaRegex = /\*\*Cuisine:\*\* (.+?)\n\*\*Prep Time:\*\* (.+?) \| \*\*Cook Time:\*\* (.+?) \| \*\*Total Time:\*\* (.+?)\n\*\*Servings:\*\* (.+?) \| \*\*Calories:\*\* (.+?)\n/;
+    const match = text.match(metaRegex);
+
+    if (match) {
+        return `
+            <p><strong>Cuisine:</strong> ${match[1]}</p>
+            <p><strong>Prep Time:</strong> ${match[2]}</p>
+            <p><strong>Cook Time:</strong> ${match[3]}</p>
+            <p><strong>Total Time:</strong> ${match[4]}</p>
+            <p><strong>Servings:</strong> ${match[5]}</p>
+            <p><strong>Calories:</strong> ${match[6]}</p>
+        `;
+    }
+    return "<p>No metadata available.</p>";
+}
 
 // ✅ Handle navigation buttons
 window.addEventListener("DOMContentLoaded", () => {
