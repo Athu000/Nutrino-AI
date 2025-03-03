@@ -119,8 +119,8 @@ function extractCalories(text) {
 }
 
 // ✅ Extract Ingredients or Instructions Properly with Emojis
-function extractSection(text, section, emoji) {
-    const regex = new RegExp(`\\*\\*${section}:\\*\\*\\s*([\\s\\S]*?)(?=\\n\\*\\*|$)`, "i");
+function extractSection(text, section) {
+    const regex = new RegExp(`\\*\\*${section}:?\\*\\*?\\s*([\\s\\S]*?)(?=\\n\\*\\*|$)`, "i");
     const match = text.match(regex);
 
     if (match) {
@@ -128,13 +128,31 @@ function extractSection(text, section, emoji) {
             .trim()
             .split("\n")
             .filter(line => line.trim() !== "")
-            .map(line => `<li>${emoji} ${line.replace(/^([*\-\d]+\.?)\s*/, "").trim()}</li>`)
+            .map(line => {
+                let cleanedLine = line.replace(/^([*\-\d]+\.?)\s*|\*\*/g, "").trim(); // Remove unwanted symbols
+                
+                // 🎨 Apply emoji replacements based on keywords
+                cleanedLine = cleanedLine
+                    .replace(/Preheat/g, '🔥 Preheat')
+                    .replace(/Mix/g, '🥣 Mix')
+                    .replace(/Stir/g, '🌀 Stir')
+                    .replace(/Bake/g, '🔥 Bake')
+                    .replace(/Serve/g, '🍽️ Serve')
+                    .replace(/Cool/g, '❄️ Cool')
+                    .replace(/Whisk/g, '🥄 Whisk')
+                    .replace(/Cream/g, '🧈 Cream')
+                    .replace(/Fold/g, '🎭 Fold')
+                    .replace(/Grease/g, '🛢️ Grease')
+                    .replace(/Beat/g, '🥊 Beat')
+                    .replace(/Sprinkle/g, '✨ Sprinkle');
+
+                return `<li>${cleanedLine}</li>`; // Wrap cleaned text in <li>
+            })
             .join("");
     } else {
-        return `<li>${emoji} No data available.</li>`;
+        return `<li>⚠️ No data available.</li>`;
     }
 }
-
 export { displayRecipe };
 
 // ✅ Make function globally accessible
