@@ -98,7 +98,17 @@ app.post("/api/fetch-recipe", verifyAuthToken, async (req, res) => {
             });
         }
 
-        const recipe = data.candidates[0].content.parts[0].text;
+        const recipeText = data.candidates[0].content.parts[0].text;
+        console.log("🔹 Raw Recipe Response:", recipeText); // Debugging: Check the raw API response
+
+        let recipe;
+        try {
+        recipe = JSON.parse(recipeText); // Try parsing as JSON
+        } catch (e) {
+        console.error("❌ Error parsing API response:", e.message);
+        return res.status(500).json({ error: "Invalid API response format", details: e.message });
+        }
+
         
         // ✅ Convert structured JSON to formatted text
         const formattedRecipe = `## ${recipe.recipeName || "Generated Recipe"}\n
