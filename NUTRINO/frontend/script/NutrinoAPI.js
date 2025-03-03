@@ -128,22 +128,24 @@ async function displayRecipe() {
 }
 
 window.addEventListener("DOMContentLoaded", displayRecipe);
-
 // ✅ Extract Title
 function extractTitle(text) {
+    if (!text) return "AI-Generated Recipe";
     const match = text.match(/^##\s*(.+)/);
     return match ? match[1].trim() : "AI-Generated Recipe";
 }
 
 // ✅ Extract Calories Properly
 function extractCalories(text) {
+    if (!text) return "N/A";
     const match = text.match(/Estimated Calories per Serving:\s*([\d-]+)/i);
     return match ? `🔥 ${match[1]} kcal` : "N/A";
 }
 
 // ✅ Extract Ingredients or Instructions Properly with Emojis
 function extractSection(text, section) {
-    const regex = new RegExp(`\\*\\*${section}:?\\*\\*?\\s*([\\s\\S]*?)(?=\\n\\*\\*|$)`, "i");
+    if (!text) return `<li>⚠️ No data available.</li>`;
+    const regex = new RegExp(`\*\*${section}:?\*\*?\s*([\s\S]*?)(?=\n\*\*|$)`, "i");
     const match = text.match(regex);
 
     if (match) {
@@ -152,7 +154,7 @@ function extractSection(text, section) {
             .split("\n")
             .filter(line => line.trim() !== "")
             .map(line => {
-                let cleanedLine = line.replace(/^([*\-\d]+\.?)\s*|\*\*/g, "").trim(); // Remove unwanted symbols
+                let cleanedLine = line.replace(/^([*-\d]+\.?)\s*|\*\*/g, "").trim(); // Remove unwanted symbols
                 
                 // 🎨 Apply emoji replacements based on keywords
                 cleanedLine = cleanedLine
@@ -176,6 +178,7 @@ function extractSection(text, section) {
         return `<li>⚠️ No data available.</li>`;
     }
 }
+
 export { displayRecipe };
 
 // ✅ Make function globally accessible
