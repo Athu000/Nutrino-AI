@@ -1,5 +1,5 @@
 import { auth, db } from "./auth.js";
-import { collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { collection, addDoc, getDocs, query, where, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const API_BASE_URL = "https://nutrino-ai.onrender.com/api";
 
@@ -18,7 +18,27 @@ async function getAuthToken() {
     return null;
 }
 
-// ✅ Fetch Recipe & Save to Firestore
+// ✅ Delete Old Recipe from Firestore
+async function deleteOldRecipe() {
+    try {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const recipesRef = collection(db, "recipes");
+        const q = query(recipesRef, where("userId", "==", user.uid));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+            await deleteDoc(doc(db, "recipes", lastDoc.id));
+            console.log("✅ Old recipe deleted from Firestore.");
+        }
+    } catch (error) {
+        console.error("❌ Error deleting old recipe:", error);
+    }
+}
+
+// ✅ Fetch Recipe & Save to Firestore (after deleting old recipe)
 async function fetchRecipe(prompt) {
     let authToken = await getAuthToken();
     if (!authToken) return;
@@ -52,7 +72,10 @@ async function fetchRecipe(prompt) {
         let recipeText = data.candidates[0].content.parts[0].text;
         console.log("✅ Extracted Recipe Text:", recipeText);
 
-        // ✅ Save Recipe to Firestore
+        // ✅ Delete old recipe first before saving new one
+        await deleteOldRecipe();
+
+        // ✅ Save new Recipe to Firestore
         const user = auth.currentUser;
         if (user) {
             await addDoc(collection(db, "recipes"), {
@@ -60,7 +83,7 @@ async function fetchRecipe(prompt) {
                 recipe: recipeText,
                 createdAt: new Date()
             });
-            console.log("✅ Recipe saved to Firestore");
+            console.log("✅ New recipe saved to Firestore");
 
             // Redirect to the recipe display page after saving
             window.location.href = "generated_recipe.html";
