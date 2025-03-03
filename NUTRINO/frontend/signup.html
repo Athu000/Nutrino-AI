@@ -14,14 +14,22 @@
         <p>Already have an account? <a href="login.html">Login here</a></p>
     </div>
 
-    <script>
-        document.getElementById("google-signup-btn").addEventListener("click", () => {
-            if (typeof signInWithGoogle === "function") {
-                signInWithGoogle();
-            } else {
-                console.error("signInWithGoogle is not available. Ensure auth.js is loaded correctly.");
-            }
-        });
-    </script>
+    <script type="module">
+    import { signInWithGoogle } from "./auth.js";
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const googleSignupBtn = document.getElementById("google-signup-btn");
+
+        if (googleSignupBtn) {
+            googleSignupBtn.addEventListener("click", async () => {
+                console.log("🔹 Google Sign-Up button clicked");
+                await signInWithGoogle();
+            });
+        } else {
+            console.error("❌ Google Sign-Up button not found.");
+        }
+    });
+</script>
+
 </body>
 </html>
