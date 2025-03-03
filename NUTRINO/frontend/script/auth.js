@@ -1,7 +1,10 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, setDoc, doc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { displayRecipe } from "./NutrinoAPI.js";
+import { 
+    getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { 
+    getFirestore, collection, setDoc, doc, query, where, getDocs 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // ✅ Firebase Configuration
 const firebaseConfig = {
@@ -20,7 +23,7 @@ const provider = new GoogleAuthProvider();
 const db = getFirestore(app);
 
 // ✅ Google Sign-In Function
-window.signInWithGoogle = async function () {
+export async function signInWithGoogle() {
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
@@ -33,35 +36,45 @@ window.signInWithGoogle = async function () {
       lastLogin: new Date()
     });
 
+    // ✅ Store user details in localStorage for persistence
+    localStorage.setItem("authToken", await user.getIdToken());
+    localStorage.setItem("loggedInUser", JSON.stringify({ email: user.email, name: user.displayName }));
+
     window.location.href = "dashboard.html";
   } catch (error) {
     console.error("❌ Google Sign-In Error:", error.message);
     alert("Google Sign-In failed. Please try again.");
   }
-};
+}
 
 // ✅ Logout Function
-window.logoutUser = function () {
+export function logoutUser() {
   signOut(auth)
     .then(() => {
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("loggedInUser");
       window.location.href = "index.html"; // Redirect to homepage after logout
     })
     .catch(error => {
       console.error("❌ Logout Error:", error.message);
       alert("Logout failed. Please try again.");
     });
-};
+}
 
-// ✅ Auto-Check User Login Status & Update UI
-document.addEventListener("DOMContentLoaded", () => {
-  onAuthStateChanged(auth, (user) => {
+// ✅ Auto-Check User Login Status & Trigger Recipe Display
+document.addEventListener("DOMContentLoaded", async () => {
+  onAuthStateChanged(auth, async (user) => {
     if (user) {
+      console.log(`✅ User Logged In: ${user.email}`);
       if (window.location.pathname.includes("generated_recipe.html")) {
+        const { displayRecipe } = await import("./NutrinoAPI.js"); 
         displayRecipe();
       }
+    } else {
+      console.log("⚠️ User not logged in.");
     }
   });
 });
 
-// ✅ Export auth & db for other scripts
+// ✅ Export Firebase Auth & Firestore for other scripts
 export { auth, db, provider };
