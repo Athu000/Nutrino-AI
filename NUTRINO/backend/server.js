@@ -16,7 +16,7 @@ const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-
 // ✅ Check if API Key is available
 if (!API_KEY) {
     console.error("❌ ERROR: Missing API_KEY in environment variables.");
-    process.exit(1); // Stop the server if API_KEY is missing
+    process.exit(1);
 }
 
 // ✅ Initialize Firebase Admin SDK
@@ -48,6 +48,8 @@ async function verifyAuthToken(req, res, next) {
         }
 
         const idToken = authHeader.split("Bearer ")[1];
+        console.log("🔑 Received Auth Token:", idToken);
+        
         const decodedToken = await admin.auth().verifyIdToken(idToken);
         req.user = decodedToken;
         console.log(`🔑 Authenticated User: ${decodedToken.email}`);
@@ -76,7 +78,7 @@ app.post("/api/fetch-recipe", verifyAuthToken, async (req, res) => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: `Generate a structured recipe for: ${prompt}. Include the name, cuisine type, prep time, cook time, total time, number of servings, a list of ingredients, step-by-step cooking instructions, and an estimated calorie count per serving.` }] }]
+                contents: [{ parts: [{ text: `Provide a detailed recipe for ${prompt}, including ingredients, instructions, and nutrition facts.` }] }]
             }),
         });
 
@@ -99,36 +101,21 @@ app.post("/api/fetch-recipe", verifyAuthToken, async (req, res) => {
         }
 
         const recipeText = data.candidates[0].content.parts[0].text;
-        console.log("🔹 Raw Recipe Response:", recipeText); // Debugging: Check the raw API response
-
-        let recipe;
-        try {
-        recipe = JSON.parse(recipeText); // Try parsing as JSON
-        } catch (e) {
-        console.error("❌ Error parsing API response:", e.message);
-        return res.status(500).json({ error: "Invalid API response format", details: e.message });
-        }
-
-        
-        // ✅ Convert structured JSON to formatted text
-        const formattedRecipe = `## ${recipe.recipeName || "Generated Recipe"}\n
-**Cuisine:** ${recipe.cuisine || "Unknown"}\n
-**Prep Time:** ${recipe.prepTime || "N/A"} | **Cook Time:** ${recipe.cookTime || "N/A"} | **Total Time:** ${recipe.totalTime || "N/A"}\n
-**Servings:** ${recipe.servings || "N/A"} | **Calories (per serving):** ${recipe.nutritionInfo?.calories || "N/A"} kcal\n
-\n**Ingredients:**\n${recipe.ingredients?.map(i => `- ${i}`).join("\n") || "No ingredients provided"}\n
-\n**Instructions:**\n${recipe.instructions?.map((step, index) => `${index + 1}. ${step}`).join("\n") || "No instructions provided"}\n
-\n**Tips & Variations:**\n${recipe.tipsAndVariations?.map(t => `- ${t}`).join("\n") || "No additional tips available"}`;
+        console.log("🔹 Extracted Recipe:", recipeText);
 
         // ✅ Store in Firestore
         const newRecipeRef = db.collection("recipes").doc();
         await newRecipeRef.set({
             userId: req.user.uid,
-            content: formattedRecipe,
+            content: recipeText,
             createdAt: admin.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+            console.log(`✅ Recipe stored successfully in Firestore: ${newRecipeRef.id}`);
+        }).catch(error => {
+            console.error("❌ Firestore Write Error:", error.message);
         });
-        console.log("✅ Recipe stored in Firestore with ID:", newRecipeRef.id);
 
-        return res.json({ candidates: [{ content: { parts: [{ text: formattedRecipe }] } }] });
+        return res.json({ candidates: [{ content: { parts: [{ text: recipeText }] } }] });
 
     } catch (error) {
         console.error("❌ Error fetching recipe:", error.message);
