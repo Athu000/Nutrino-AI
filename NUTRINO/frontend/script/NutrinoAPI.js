@@ -134,6 +134,7 @@ function extractSection(text, section) {
         return "<li>No data available.</li>";
     }
 }
+export { displayRecipe };
 
 // ✅ Make function globally accessible
 window.fetchRecipe = fetchRecipe;
