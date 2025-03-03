@@ -3,7 +3,7 @@ import {
     getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { 
-    getFirestore, collection, setDoc, doc, query, where, getDocs 
+    getFirestore, collection, setDoc, doc 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // ✅ Firebase Configuration
@@ -27,6 +27,8 @@ export async function signInWithGoogle() {
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
+
+    console.log(`✅ Signed in as: ${user.email}`);
 
     // ✅ Store user details in Firestore
     await setDoc(doc(db, "users", user.uid), {
@@ -53,6 +55,8 @@ export function logoutUser() {
     .then(() => {
       localStorage.removeItem("authToken");
       localStorage.removeItem("loggedInUser");
+
+      console.log("✅ User logged out successfully.");
       window.location.href = "index.html"; // Redirect to homepage after logout
     })
     .catch(error => {
@@ -66,9 +70,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       console.log(`✅ User Logged In: ${user.email}`);
+
+      // ✅ Load the recipe display only if the user is on the correct page
       if (window.location.pathname.includes("generated_recipe.html")) {
-        const { displayRecipe } = await import("./NutrinoAPI.js"); 
-        displayRecipe();
+        try {
+          const { displayRecipe } = await import("./NutrinoAPI.js");
+          displayRecipe();
+        } catch (error) {
+          console.error("❌ Error loading recipe display function:", error);
+        }
       }
     } else {
       console.log("⚠️ User not logged in.");
@@ -78,3 +88,4 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // ✅ Export Firebase Auth & Firestore for other scripts
 export { auth, db, provider };
+
