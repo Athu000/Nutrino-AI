@@ -122,10 +122,14 @@ async function displayRecipe() {
 
         document.getElementById("recipe-title").textContent = extractTitle(latestRecipe);
         document.getElementById("recipe-desc").textContent = "A delicious AI-generated recipe! 😋";
+        console.log("✅ Extracting Ingredients...");
         document.getElementById("ingredients-list").innerHTML = extractSection(latestRecipe, "Ingredients");
+        
+        console.log("✅ Extracting Instructions...");
         document.getElementById("instructions-list").innerHTML = extractSection(latestRecipe, "Instructions");
-        document.getElementById("nutrition-list").innerHTML = extractSection(latestRecipe, "Nutrition Information");
-    } catch (error) {
+        
+        console.log("✅ Extracting Nutrition...");
+        document.getElementById("nutrition-list").innerHTML = extractSection(latestRecipe, "Nutritional Information");} catch (error) {
         console.error("❌ Error displaying recipe:", error);
     }
 }
@@ -140,26 +144,33 @@ function extractTitle(text) {
 // ✅ Extract Ingredients, Instructions & Nutrition (Keep emojis, remove ** and extra symbols)
 function extractSection(text, section) {
     if (!text) return `<li>⚠️ No data available.</li>`;
-    const regex = new RegExp(`\\*\\*${section}:?\\*\\*?\\s*([\\s\\S]*?)(?=\n\\*\\*|$)`, "i");
+
+    console.log(`🔎 Searching for section: ${section} in text...`); // Debugging
+
+    // Updated regex to handle Firestore formatting
+    const regex = new RegExp(`\\*\\*${section}:\\*\\*\\s*([\\s\\S]*?)(?=\\n\\n|$)`, "i");
     const match = text.match(regex);
 
-    if (match) {
-        return match[1]
-            .trim()
-            .split("\n")
-            .filter(line => line.trim() !== "")
-            .map(line => `<li>${cleanText(line.trim())}</li>`)
-            .join("");
-    } else {
+    if (!match) {
+        console.warn(`⚠️ Section '${section}' not found in text.`);
         return `<li>⚠️ No data available.</li>`;
     }
+
+    console.log(`✅ Found Section: ${section}`, match[1]); // Debugging
+
+    return match[1]
+        .trim()
+        .split("\n")
+        .filter(line => line.trim() !== "")
+        .map(line => `<li>${cleanText(line.trim())}</li>`)
+        .join("");
 }
 
 // ✅ Remove Extra Symbols (Keep Emojis)
 function cleanText(text) {
-    return text
-        .replace(/\*\*/g, "") // Remove **bold** markers
-        .replace(/^[-*•] /, "") // Remove list markers (but keep emoji)
+     return text
+        .replace(/\*\*/g, "") // Remove **bold**
+        .replace(/^[-*•]\s*/g, "") // Remove bullet points but keep emojis
         .trim();
     cleanedLine = cleanedLine
         .replace(/Preheat/g, '🔥 Preheat')
