@@ -73,11 +73,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // ✅ Load the recipe display only if the user is on the correct page
       if (window.location.pathname.includes("generated_recipe.html")) {
-        try {
-          const { displayRecipe } = await import("./NutrinoAPI.js");
-          displayRecipe();
-        } catch (error) {
-          console.error("❌ Error loading recipe display function:", error);
+        if (window.displayRecipe) { 
+            window.displayRecipe(); 
+            } else { 
+            console.error("❌ displayRecipe is not defined globally."); 
         }
       }
     } else {
