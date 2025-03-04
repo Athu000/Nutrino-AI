@@ -147,8 +147,8 @@ function extractSection(text, section) {
 
     console.log(`🔎 Searching for section: ${section} in text...`); // Debugging
 
-    // Updated regex to handle Firestore formatting
-    const regex = new RegExp(`\\*\\*${section}:\\*\\*\\s*([\\s\\S]*?)(?=\\n\\n|$)`, "i");
+    // Updated regex to handle extra text after the section name
+    const regex = new RegExp(`\\*\\*${section}.*?\\*\\*\\s*([\\s\\S]*?)(?=\\n\\*\\*|$)`, "i");
     const match = text.match(regex);
 
     if (!match) {
@@ -165,6 +165,7 @@ function extractSection(text, section) {
         .map(line => `<li>${cleanText(line.trim())}</li>`)
         .join("");
 }
+
 
 // ✅ Remove Extra Symbols (Keep Emojis)
 function cleanText(text) {
