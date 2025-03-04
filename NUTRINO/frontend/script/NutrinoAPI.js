@@ -125,6 +125,13 @@ async function displayRecipe() {
         document.getElementById("ingredients-list").innerHTML = extractSection(latestRecipe, "Ingredients");
         document.getElementById("instructions-list").innerHTML = extractSection(latestRecipe, "Instructions");
         document.getElementById("nutrition-list").innerHTML = extractSection(latestRecipe, "Nutrition Information");
+        if (latestRecipe.includes("Nutritional Information")) {
+            console.log("✅ 'Nutritional Information' found in recipe.");
+            document.getElementById("nutrition-list").innerHTML = extractSection(latestRecipe, "Nutritional Information");
+        } else {
+            console.log("⚠️ No 'Nutritional Information' found.");
+            document.getElementById("nutrition-list").innerHTML = `<li>⚠️ No nutrition data available.</li>`;
+        }
     } catch (error) {
         console.error("❌ Error displaying recipe:", error);
     }
