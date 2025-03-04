@@ -38,7 +38,7 @@ async function deleteOldRecipe() {
     }
 }
 
-// ✅ Fetch Recipe & Save to Firestore (after deleting old recipe)
+// ✅ Fetch Recipe & Save to Firestore
 async function fetchRecipe(prompt) {
     let authToken = await getAuthToken();
     if (!authToken) return;
@@ -119,31 +119,22 @@ async function displayRecipe() {
 
         document.getElementById("recipe-title").textContent = extractTitle(latestRecipe);
         document.getElementById("recipe-desc").textContent = "A delicious AI-generated recipe! 😋";
-        document.getElementById("recipe-calories").textContent = extractCalories(latestRecipe);
-        document.getElementById("ingredients-list").innerHTML = extractSection(latestRecipe, "Ingredients", "🛒");
-        document.getElementById("instructions-list").innerHTML = extractSection(latestRecipe, "Instructions", "👨‍🍳");
+        document.getElementById("ingredients-list").innerHTML = extractSection(latestRecipe, "Ingredients");
+        document.getElementById("instructions-list").innerHTML = extractSection(latestRecipe, "Instructions");
+        document.getElementById("nutrition-list").innerHTML = extractSection(latestRecipe, "Nutrition Information");
     } catch (error) {
         console.error("❌ Error displaying recipe:", error);
     }
 }
 
-window.addEventListener("DOMContentLoaded", displayRecipe);
-
-// ✅ Extract Title
+// ✅ Extract Title (Keep emojis)
 function extractTitle(text) {
     if (!text) return "AI-Generated Recipe";
     const match = text.match(/^##\s*(.+)/);
-    return match ? match[1].trim() : "AI-Generated Recipe";
+    return match ? cleanText(match[1].trim()) : "AI-Generated Recipe";
 }
 
-// ✅ Extract Calories Properly
-function extractCalories(text) {
-    if (!text) return "N/A";
-    const match = text.match(/Estimated Calories per Serving:\s*([\d-]+)/i);
-    return match ? `🔥 ${match[1]} kcal` : "N/A";
-}
-
-// ✅ Extract Ingredients or Instructions Properly with Emojis
+// ✅ Extract Ingredients, Instructions & Nutrition (Keep emojis, remove ** and extra symbols)
 function extractSection(text, section) {
     if (!text) return `<li>⚠️ No data available.</li>`;
     const regex = new RegExp(`\\*\\*${section}:?\\*\\*?\\s*([\\s\\S]*?)(?=\n\\*\\*|$)`, "i");
@@ -154,33 +145,67 @@ function extractSection(text, section) {
             .trim()
             .split("\n")
             .filter(line => line.trim() !== "")
-            .map(line => {
-                let cleanedLine = line.replace(/^([*-\d]+\.?)\s*|\*\*/g, "").trim(); // Remove unwanted symbols
-                
-                // 🎨 Apply emoji replacements based on keywords
-                cleanedLine = cleanedLine
-                    .replace(/Preheat/g, '🔥 Preheat')
-                    .replace(/Mix/g, '🥣 Mix')
-                    .replace(/Stir/g, '🌀 Stir')
-                    .replace(/Bake/g, '🔥 Bake')
-                    .replace(/Serve/g, '🍽️ Serve')
-                    .replace(/Cool/g, '❄️ Cool')
-                    .replace(/Whisk/g, '🥄 Whisk')
-                    .replace(/Cream/g, '🧈 Cream')
-                    .replace(/Fold/g, '🎭 Fold')
-                    .replace(/Grease/g, '🛢️ Grease')
-                    .replace(/Beat/g, '🥊 Beat')
-                    .replace(/Sprinkle/g, '✨ Sprinkle');
-
-                return `<li>${cleanedLine}</li>`; // Wrap cleaned text in <li>
-            })
+            .map(line => `<li>${cleanText(line.trim())}</li>`)
             .join("");
     } else {
         return `<li>⚠️ No data available.</li>`;
     }
 }
 
-export { displayRecipe };
+// ✅ Remove Extra Symbols (Keep Emojis)
+function cleanText(text) {
+    return text
+        .replace(/\*\*/g, "") // Remove **bold** markers
+        .replace(/^[-*•] /, "") // Remove list markers (but keep emoji)
+        .trim();
+    cleanedLine = cleanedLine
+        .replace(/Preheat/g, '🔥 Preheat')
+        .replace(/Mix/g, '🥣 Mix')
+        .replace(/Stir/g, '🌀 Stir')
+        .replace(/Bake/g, '🔥 Bake')
+        .replace(/Serve/g, '🍽️ Serve')
+        .replace(/Cool/g, '❄️ Cool')
+        .replace(/Whisk/g, '🥄 Whisk')
+        .replace(/Cream/g, '🧈 Cream')
+        .replace(/Fold/g, '🎭 Fold')
+        .replace(/Grease/g, '🛢️ Grease')
+        .replace(/Beat/g, '🥊 Beat')
+        .replace(/Sprinkle/g, '✨ Sprinkle');
+
+    return cleanedLine;
+}
+
+// ✅ Handle UI Actions & Buttons
+function clearPreviousRecipe() {
+    sessionStorage.removeItem("latestRecipe");
+    localStorage.removeItem("latestRecipe");
+    document.getElementById("recipe-desc").innerHTML = "";
+}
+
+function reloadNewRecipe() {
+    clearPreviousRecipe();
+    window.location.href = window.location.pathname + "?new";
+}
+
+// ✅ Event Listeners for Buttons
+document.addEventListener("DOMContentLoaded", function () {
+    let urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has("new")) {
+        clearPreviousRecipe();
+    }
+
+    document.getElementById("goBackBtn").addEventListener("click", function () {
+        clearPreviousRecipe();
+        window.location.href = "index.html";
+    });
+
+    document.getElementById("generateAnotherBtn").addEventListener("click", function () {
+        reloadNewRecipe();
+    });
+
+    displayRecipe();
+});
 
 // ✅ Make function globally accessible
 window.fetchRecipe = fetchRecipe;
+window.displayRecipe = displayRecipe;
