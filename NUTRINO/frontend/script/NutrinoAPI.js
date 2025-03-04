@@ -25,13 +25,15 @@ async function deleteOldRecipe() {
         if (!user) return;
 
         const recipesRef = collection(db, "recipes");
-        const q = query(recipesRef, where("userId", "==", user.uid));
+        const q = query(recipesRef, where("userId", "==", user.uid), orderBy("createdAt", "asc")); // Order by oldest first
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
-            const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
-            await deleteDoc(doc(db, "recipes", lastDoc.id));
+            const oldestDoc = querySnapshot.docs[0]; // Delete the first (oldest) recipe
+            await deleteDoc(doc(db, "recipes", oldestDoc.id));
             console.log("✅ Old recipe deleted from Firestore.");
+        } else {
+            console.log("⚠️ No old recipes found to delete.");
         }
     } catch (error) {
         console.error("❌ Error deleting old recipe:", error);
@@ -44,6 +46,9 @@ async function fetchRecipe(prompt) {
     if (!authToken) return;
 
     try {
+        console.log("🗑️ Deleting old recipe before fetching a new one...");
+        await deleteOldRecipe(); // ✅ Moved deletion before API call
+
         console.log("📤 Sending request to API:", API_BASE_URL);
         const response = await fetch(`${API_BASE_URL}/fetch-recipe`, {
             method: "POST",
@@ -72,20 +77,18 @@ async function fetchRecipe(prompt) {
         let recipeText = data.candidates[0].content.parts[0].text;
         console.log("✅ Extracted Recipe Text:", recipeText);
 
-        // ✅ Delete old recipe first before saving new one
-        await deleteOldRecipe();
-
         // ✅ Save new Recipe to Firestore
         const user = auth.currentUser;
         if (user) {
-            await addDoc(collection(db, "recipes"), {
+            const docRef = await addDoc(collection(db, "recipes"), {
                 userId: user.uid,
                 recipe: recipeText,
                 createdAt: new Date()
             });
-            console.log("✅ New recipe saved to Firestore");
+            console.log(`✅ New recipe saved to Firestore (ID: ${docRef.id})`);
 
-            // Redirect to the recipe display page after saving
+            // ✅ Ensure the page updates instead of a full reload
+            sessionStorage.setItem("latestRecipe", JSON.stringify({ id: docRef.id, recipeText }));
             window.location.href = "generated_recipe.html";
         }
     } catch (error) {
