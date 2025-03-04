@@ -124,12 +124,9 @@ async function displayRecipe() {
         document.getElementById("recipe-desc").textContent = "A delicious AI-generated recipe! 😋";
         document.getElementById("ingredients-list").innerHTML = extractSection(latestRecipe, "Ingredients");
         document.getElementById("instructions-list").innerHTML = extractSection(latestRecipe, "Instructions");
-        document.getElementById("nutrition-list").innerHTML = extractSection(latestRecipe, "Nutrition Information");
-        if (latestRecipe.includes("Nutritional Information")) {
-            console.log("✅ 'Nutritional Information' found in recipe.");
+ if (latestRecipe.toLowerCase().includes("nutritional information")) {
             document.getElementById("nutrition-list").innerHTML = extractSection(latestRecipe, "Nutritional Information");
         } else {
-            console.log("⚠️ No 'Nutritional Information' found.");
             document.getElementById("nutrition-list").innerHTML = `<li>⚠️ No nutrition data available.</li>`;
         }
     } catch (error) {
@@ -146,6 +143,11 @@ function extractTitle(text) {
 
 // ✅ Extract Ingredients, Instructions & Nutrition (Keep emojis, remove ** and extra symbols)
 function extractSection(text, section) {
+    
+     if (section === "Nutritional Information") {
+        section = "(Nutritional Information|Nutrition Facts)";
+    }
+
     if (!text) return `<li>⚠️ No data available.</li>`;
     const regex = new RegExp(`\\*\\*${section}:?\\*\\*?\\s*([\\s\\S]*?)(?=\n\\*\\*|$)`, "i");
     const match = text.match(regex);
