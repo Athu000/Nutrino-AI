@@ -124,11 +124,11 @@ async function displayRecipe() {
         document.getElementById("recipe-desc").textContent = "A delicious AI-generated recipe! 😋";
         document.getElementById("ingredients-list").innerHTML = extractSection(latestRecipe, "Ingredients");
         document.getElementById("instructions-list").innerHTML = extractSection(latestRecipe, "Instructions");
-        document.getElementById("nutrition-list").innerHTML = extractSection(latestRecipe, "Nutritional Information");    
-        } catch (error) {
-            console.error("❌ Error displaying recipe:", error);
-        }
+        document.getElementById("nutrition-list").innerHTML = extractSection(latestRecipe, "Nutrition Information");
+    } catch (error) {
+        console.error("❌ Error displaying recipe:", error);
     }
+}
 
 // ✅ Extract Title (Keep emojis)
 function extractTitle(text) {
@@ -139,8 +139,6 @@ function extractTitle(text) {
 
 // ✅ Extract Ingredients, Instructions & Nutrition (Keep emojis, remove ** and extra symbols)
 function extractSection(text, section) {
-    
-
     if (!text) return `<li>⚠️ No data available.</li>`;
     const regex = new RegExp(`\\*\\*${section}:?\\*\\*?\\s*([\\s\\S]*?)(?=\n\\*\\*|$)`, "i");
     const match = text.match(regex);
