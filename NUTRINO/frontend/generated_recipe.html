@@ -12,11 +12,15 @@
         <div class="recipe-content">
             <div class="recipe-details">
                 <p id="recipe-desc"></p>
-                <h3>Calories: <span id="recipe-calories"></span> kcal</h3>
+                
                 <h3>Ingredients:</h3>
                 <ul id="ingredients-list"></ul>
+
                 <h3>Instructions:</h3>
                 <ul id="instructions-list"></ul>
+
+                <h3>Nutrition Information:</h3>
+                <ul id="nutrition-list"></ul>
             </div>
         </div>
         <div class="button-container">
@@ -26,40 +30,6 @@
     </div>
 
     <script type="module" src="./script/NutrinoAPI.js"></script>
-        <script type="module" src="./script/auth.js"></script>
-        <script>
-    // Function to clear previous recipe from session storage and UI
-    function clearPreviousRecipe() {
-        sessionStorage.removeItem("latestRecipe"); // Remove stored recipe
-        localStorage.removeItem("latestRecipe"); // Clear in case localStorage was used
-        document.getElementById("recipe-desc").innerHTML = ""; // Clear UI
-    }
-
-    // Function to reload page and fetch new recipe
-    function reloadNewRecipe() {
-        clearPreviousRecipe();
-        window.location.href = window.location.pathname + "?new"; // Ensure fresh load
-    }
-
-    // "Go Back" Button - Clears session and redirects to home
-    document.getElementById("goBackBtn").addEventListener("click", function () {
-        clearPreviousRecipe();
-        window.location.href = "index.html"; // Redirect to home
-    });
-
-    // "Generate Another Recipe" Button - Clears session and reloads new recipe
-    document.getElementById("nutrinoBtn").addEventListener("click", function () {
-        reloadNewRecipe();
-    });
-
-    // Ensure fresh recipe on new load
-    document.addEventListener("DOMContentLoaded", function () {
-        let urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has("new")) {
-            clearPreviousRecipe(); // Force clear if "new" parameter exists
-        }
-    });
-</script>
-
+    <script type="module" src="./script/auth.js"></script>
 </body>
 </html>
