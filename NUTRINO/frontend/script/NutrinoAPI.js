@@ -25,7 +25,10 @@ async function deleteOldRecipe() {
         if (!user) return;
 
         const recipesRef = collection(db, "recipes");
-        const q = query(recipesRef, where("userId", "==", user.uid), orderBy("createdAt", "asc")); // Order by oldest first
+        const q = query(recipesRef, where("userId", "==", user.uid), orderBy("createdAt", "asc"),
+            orderBy("createdAt", "asc"), 
+            limit(1)
+        ); // Order by oldest first
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
@@ -107,8 +110,11 @@ async function displayRecipe() {
         }
 
         const recipesRef = collection(db, "recipes");
-        const q = query(recipesRef, where("userId", "==", user.uid));
-        const querySnapshot = await getDocs(q);
+        const q = query(recipesRef, where("userId", "==", user.uid),
+            orderBy("createdAt", "asc"),             
+            limit(1)
+        );
+        const querySnapshot = await getDocs(q, { source: "server" });
 
         if (querySnapshot.empty) {
             console.log("⚠️ No recipes found.");
