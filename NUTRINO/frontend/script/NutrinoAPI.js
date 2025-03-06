@@ -96,6 +96,9 @@ async function fetchRecipe(prompt) {
             // ✅ Ensure the page updates instead of a full reload
             sessionStorage.setItem("latestRecipe", JSON.stringify({ id: docRef.id, recipeText }));
             window.location.href = "generated_recipe.html";
+            setTimeout(() => {
+                window.location.href = "generated_recipe.html"; // Redirect after a short delay
+            }, 1500);
         }
     } catch (error) {
         console.error("❌ API Error:", error);
@@ -120,7 +123,16 @@ async function displayRecipe() {
             limit(1) // ✅ Only fetch the latest recipe
         );
 
-        const querySnapshot = await getDocs(q, { source: "server" });
+        let querySnapshot;
+        let retries = 3; // 🔹 **NEW: Retry logic in case Firestore is slow**
+
+        while (retries > 0) { // 🔹 **NEW: Retries if Firestore returns empty**
+            querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) break;
+            console.warn("⏳ Waiting for Firestore to save the recipe...");
+            await new Promise(resolve => setTimeout(resolve, 1000)); // 🔹 **Wait 1 second before retrying**
+            retries--;
+        }
 
         if (querySnapshot.empty) {
             console.warn("⚠️ No recipes found.");
