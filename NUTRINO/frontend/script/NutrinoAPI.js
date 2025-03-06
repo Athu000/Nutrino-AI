@@ -25,16 +25,19 @@ async function deleteOldRecipe() {
         if (!user) return;
 
         const recipesRef = collection(db, "recipes");
-        const q = query(recipesRef, where("userId", "==", user.uid), orderBy("createdAt", "asc"),
-            orderBy("createdAt", "asc"), 
-            limit(1)
-        ); // Order by oldest first
+        const q = query(
+            recipesRef,
+            where("userId", "==", user.uid),
+            orderBy("createdAt", "asc"), // ✅ Only one orderBy
+            limit(1) // ✅ Only delete the oldest recipe
+        );
+
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
-            const oldestDoc = querySnapshot.docs[0]; // Delete the first (oldest) recipe
+            const oldestDoc = querySnapshot.docs[0]; // Get the oldest recipe
             await deleteDoc(doc(db, "recipes", oldestDoc.id));
-            console.log("✅ Old recipe deleted from Firestore.");
+            console.log("✅ Old recipe deleted from Firestore:", oldestDoc.id);
         } else {
             console.log("⚠️ No old recipes found to delete.");
         }
@@ -110,36 +113,39 @@ async function displayRecipe() {
         }
 
         const recipesRef = collection(db, "recipes");
-        const q = query(recipesRef, where("userId", "==", user.uid),
-            orderBy("createdAt", "asc"),             
-            limit(1)
+        const q = query(
+            recipesRef,
+            where("userId", "==", user.uid),
+            orderBy("createdAt", "desc"), // ✅ Ensures we fetch the LATEST recipe
+            limit(1) // ✅ Only fetch the latest recipe
         );
+
         const querySnapshot = await getDocs(q, { source: "server" });
 
         if (querySnapshot.empty) {
-            console.log("⚠️ No recipes found.");
+            console.warn("⚠️ No recipes found.");
             document.getElementById("recipe-title").textContent = "No recipes found.";
             return;
         }
 
-        // Get the latest recipe
-        const latestRecipe = querySnapshot.docs[querySnapshot.docs.length - 1].data().recipe;
+        const latestRecipe = querySnapshot.docs[0].data().recipe;
         console.log("✅ Loaded Latest Recipe:", latestRecipe);
 
         document.getElementById("recipe-title").textContent = extractTitle(latestRecipe);
         document.getElementById("recipe-desc").textContent = "A delicious AI-generated recipe! 😋";
         console.log("✅ Extracting Ingredients...");
         document.getElementById("ingredients-list").innerHTML = extractSection(latestRecipe, "Ingredients");
-        
+
         console.log("✅ Extracting Instructions...");
         document.getElementById("instructions-list").innerHTML = extractSection(latestRecipe, "Instructions");
-        
+
         console.log("✅ Extracting Nutrition...");
-        document.getElementById("nutrition-list").innerHTML = extractSection(latestRecipe, "Nutritional Information");} catch (error) {
+        document.getElementById("nutrition-list").innerHTML = extractSection(latestRecipe, "Nutritional Information");
+
+    } catch (error) {
         console.error("❌ Error displaying recipe:", error);
     }
 }
-
 // ✅ Extract Title (Keep emojis)
 function extractTitle(text) {
     if (!text) return "AI-Generated Recipe";
