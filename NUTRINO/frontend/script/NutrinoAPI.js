@@ -115,13 +115,13 @@ async function displayRecipe() {
             return;
         }
 
-        console.log("✅ Logged-in User ID:", user.uid); // Debugging
+        console.log("✅ Logged-in User ID:", user.uid);
 
         const recipesRef = collection(db, "recipes");
         const q = query(
             recipesRef,
-            where("userId", "==", user.uid), 
-            orderBy("createdAt", "desc"), 
+            where("userId", "==", user.uid),
+            orderBy("createdAt", "desc"),
             limit(1)
         );
 
@@ -130,7 +130,7 @@ async function displayRecipe() {
 
         while (retries > 0) {
             querySnapshot = await getDocs(q);
-            console.log("🔍 Firestore Query Result:", querySnapshot.docs.map(doc => doc.data())); // Debugging
+            console.log("🔍 Firestore Query Result:", querySnapshot.docs.map(doc => doc.data()));
 
             if (!querySnapshot.empty) break;
 
@@ -146,15 +146,16 @@ async function displayRecipe() {
         }
 
         const latestDoc = querySnapshot.docs[0].data();
-        console.log("✅ Latest Recipe Document:", latestDoc); // Debugging
+        console.log("✅ Latest Recipe Document:", latestDoc);
 
-        if (!latestDoc.recipe) {
+        // ✅ Fetching the correct field (content) instead of recipe
+        const latestRecipe = latestDoc.content || latestDoc.recipe;
+
+        if (!latestRecipe) {
             console.error("❌ Recipe field is missing in Firestore document!");
             document.getElementById("recipe-title").textContent = "No valid recipe found.";
             return;
         }
-
-        const latestRecipe = latestDoc.recipe;
 
         // ✅ Update UI Elements
         document.getElementById("recipe-title").textContent = extractTitle(latestRecipe);
@@ -172,6 +173,7 @@ async function displayRecipe() {
         console.error("❌ Error displaying recipe:", error);
     }
 }
+
 
 // ✅ Extract Title (Keep emojis)
 function extractTitle(text) {
