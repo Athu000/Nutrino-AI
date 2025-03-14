@@ -105,6 +105,18 @@ async function fetchRecipe(prompt) {
         alert("Error fetching recipe. Try again.");
     }
 }
+document.addEventListener("DOMContentLoaded", function () {
+    const recipeCards = document.querySelectorAll(".Grid-col1"); // Select all recipe cards
+    const recipeInput = document.getElementById("recipe-input"); // Input field
+
+    // ✅ When a recipe card is clicked, set its name in the input box
+    recipeCards.forEach(card => {
+        card.addEventListener("click", function () {
+            const recipeName = card.querySelector(".recipe-link").getAttribute("data-recipe");
+            recipeInput.value = recipeName; // Set recipe name in the input field
+        });
+    });
+});
 
 // ✅ Display Recipe from Firestore
 async function displayRecipe() {
