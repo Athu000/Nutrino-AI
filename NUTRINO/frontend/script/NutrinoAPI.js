@@ -107,16 +107,26 @@ async function fetchRecipe(prompt) {
 }
 document.addEventListener("DOMContentLoaded", function () {
     const recipeCards = document.querySelectorAll(".Grid-col1"); // Select all recipe cards
-    const recipeInput = document.getElementById("recipe-input"); // Input field
+    const recipeInput = document.getElementById("rec_search"); // Recipe input box
 
-    // ✅ When a recipe card is clicked, set its name in the input box
+    // ✅ When a recipe card is clicked, set its name in the input box and scroll up
     recipeCards.forEach(card => {
-        card.addEventListener("click", function () {
-            const recipeName = card.querySelector(".recipe-link").getAttribute("data-recipe");
-            recipeInput.value = recipeName; // Set recipe name in the input field
+        card.addEventListener("click", function (event) {
+            event.preventDefault(); // ⛔ Prevent redirection
+
+            const recipeName = card.querySelector(".Text-root1")?.textContent.trim(); // Get recipe name
+            if (recipeName) {
+                recipeInput.value = recipeName; // Set recipe name in input box
+
+                // ✅ Scroll smoothly to the input box
+                recipeInput.scrollIntoView({ behavior: "smooth", block: "center" });
+            } else {
+                console.warn("⚠️ Recipe name not found inside the card:", card);
+            }
         });
     });
 });
+
 
 // ✅ Display Recipe from Firestore
 async function displayRecipe() {
