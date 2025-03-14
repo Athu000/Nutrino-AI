@@ -129,22 +129,32 @@ async function displayRecipe() {
         while (retries > 0) { // 🔹 **NEW: Retries if Firestore returns empty**
             querySnapshot = await getDocs(q);
             if (!querySnapshot.empty) break;
-            console.warn("⏳ Waiting for Firestore to save the recipe...");
+            console.warn(`⏳ Firestore delay... Retrying (${4 - retries}/3)`);
             await new Promise(resolve => setTimeout(resolve, 1000)); // 🔹 **Wait 1 second before retrying**
             retries--;
         }
 
-        if (querySnapshot.empty) {
-            console.warn("⚠️ No recipes found.");
-            document.getElementById("recipe-title").textContent = "No recipes found.";
-            return;
+        let latestRecipe;
+        if (!querySnapshot.empty) {
+            latestRecipe = querySnapshot.docs[0].data().recipe;
+            console.log("✅ Loaded Latest Recipe from Firestore:", latestRecipe);
+        } else {
+            console.warn("⚠️ No recipes found in Firestore. Checking localStorage...");
+            const storedRecipe = localStorage.getItem("latestRecipe");
+            if (storedRecipe) {
+                latestRecipe = JSON.parse(storedRecipe).recipeText;
+                console.log("✅ Loaded Latest Recipe from localStorage:", latestRecipe);
+            } else {
+                console.error("❌ No recipe available in Firestore or localStorage.");
+                document.getElementById("recipe-title").textContent = "No recipes found.";
+                return;
+            }
         }
 
-        const latestRecipe = querySnapshot.docs[0].data().recipe;
-        console.log("✅ Loaded Latest Recipe:", latestRecipe);
-
+        // ✅ Update UI Elements
         document.getElementById("recipe-title").textContent = extractTitle(latestRecipe);
         document.getElementById("recipe-desc").textContent = "A delicious AI-generated recipe! 😋";
+
         console.log("✅ Extracting Ingredients...");
         document.getElementById("ingredients-list").innerHTML = extractSection(latestRecipe, "Ingredients");
 
@@ -158,6 +168,7 @@ async function displayRecipe() {
         console.error("❌ Error displaying recipe:", error);
     }
 }
+
 // ✅ Extract Title (Keep emojis)
 function extractTitle(text) {
     if (!text) return "AI-Generated Recipe";
