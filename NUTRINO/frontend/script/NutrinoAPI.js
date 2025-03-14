@@ -115,46 +115,50 @@ async function displayRecipe() {
             return;
         }
 
+        console.log("✅ Logged-in User ID:", user.uid); // Debugging
+
         const recipesRef = collection(db, "recipes");
         const q = query(
             recipesRef,
-            where("userId", "==", user.uid),
-            orderBy("createdAt", "desc"), // ✅ Ensures we fetch the LATEST recipe
-            limit(1) // ✅ Only fetch the latest recipe
+            where("userId", "==", user.uid), 
+            orderBy("createdAt", "desc"), 
+            limit(1)
         );
 
         let querySnapshot;
-        let retries = 3; // 🔹 **NEW: Retry logic in case Firestore is slow**
+        let retries = 3;
 
-        while (retries > 0) { // 🔹 **NEW: Retries if Firestore returns empty**
+        while (retries > 0) {
             querySnapshot = await getDocs(q);
+            console.log("🔍 Firestore Query Result:", querySnapshot.docs.map(doc => doc.data())); // Debugging
+
             if (!querySnapshot.empty) break;
+
             console.warn(`⏳ Firestore delay... Retrying (${4 - retries}/3)`);
-            await new Promise(resolve => setTimeout(resolve, 1000)); // 🔹 **Wait 1 second before retrying**
+            await new Promise(resolve => setTimeout(resolve, 1000));
             retries--;
         }
 
-        let latestRecipe;
-        if (!querySnapshot.empty) {
-            latestRecipe = querySnapshot.docs[0].data().recipe;
-            console.log("✅ Loaded Latest Recipe from Firestore:", latestRecipe);
-        } else {
-            console.warn("⚠️ No recipes found in Firestore. Checking localStorage...");
-            const storedRecipe = localStorage.getItem("latestRecipe");
-            if (storedRecipe) {
-                latestRecipe = JSON.parse(storedRecipe).recipeText;
-                console.log("✅ Loaded Latest Recipe from localStorage:", latestRecipe);
-            } else {
-                console.error("❌ No recipe available in Firestore or localStorage.");
-                document.getElementById("recipe-title").textContent = "No recipes found.";
-                return;
-            }
+        if (querySnapshot.empty) {
+            console.warn("⚠️ No recipes found.");
+            document.getElementById("recipe-title").textContent = "No recipes found.";
+            return;
         }
+
+        const latestDoc = querySnapshot.docs[0].data();
+        console.log("✅ Latest Recipe Document:", latestDoc); // Debugging
+
+        if (!latestDoc.recipe) {
+            console.error("❌ Recipe field is missing in Firestore document!");
+            document.getElementById("recipe-title").textContent = "No valid recipe found.";
+            return;
+        }
+
+        const latestRecipe = latestDoc.recipe;
 
         // ✅ Update UI Elements
         document.getElementById("recipe-title").textContent = extractTitle(latestRecipe);
         document.getElementById("recipe-desc").textContent = "A delicious AI-generated recipe! 😋";
-
         console.log("✅ Extracting Ingredients...");
         document.getElementById("ingredients-list").innerHTML = extractSection(latestRecipe, "Ingredients");
 
