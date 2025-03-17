@@ -198,7 +198,6 @@ async function displayRecipe() {
 
 
 // ✅ Extract Title (Keep emojis)
-// ✅ Extract Recipe Title
 function extractTitle(text) {
     if (!text) return "AI-Generated Recipe";
     const match = text.match(/^##\s*(.+)/);
@@ -211,8 +210,11 @@ function extractSection(text, section) {
 
     console.log(`🔎 Searching for section: ${section} in text...`);
 
-    // Improved regex to handle more flexible section formatting
-    const regex = new RegExp(`\\*{0,2}\\s*${section}\\s*:?\\s*\\*{0,2}\\s*([\\s\\S]*?)(?=\\n\\s*\\*{0,2}[A-Z]|$)`, "i");
+    // Improved regex to handle flexible section formatting
+    const regex = new RegExp(
+        `\\*{0,2}\\s*${section}\\s*:?\\s*\\*{0,2}\\s*([\\s\\S]*?)(?=\\n\\s*\\*{0,2}[A-Z]|$)`,
+        "i"
+    );
     const match = text.match(regex);
 
     if (!match) {
@@ -230,11 +232,11 @@ function extractSection(text, section) {
         .join("");
 }
 
-// ✅ Remove Extra Symbols (Keep Emojis)
+// ✅ Improved Text Cleaner with Bullet Point Handling
 function cleanText(text) {
     let cleanedLine = text
         .replace(/\*\*/g, "") // Remove **bold**
-        .replace(/^[-*•]\s*/g, "") // Remove bullet points but keep emojis
+        .replace(/^[-*•]\s*(?=\w)/g, "• ") // Keep bullet points
         .trim();
 
     // 🍽️ Add Meaningful Cooking Emojis
