@@ -198,20 +198,21 @@ async function displayRecipe() {
 
 
 // ✅ Extract Title (Keep emojis)
+// ✅ Extract Recipe Title
 function extractTitle(text) {
     if (!text) return "AI-Generated Recipe";
     const match = text.match(/^##\s*(.+)/);
     return match ? cleanText(match[1].trim()) : "AI-Generated Recipe";
 }
 
-// ✅ Extract Ingredients, Instructions & Nutrition (Keep emojis, remove ** and extra symbols)
+// ✅ Extract Ingredients, Instructions & Nutrition
 function extractSection(text, section) {
     if (!text) return `<li>⚠️ No data available.</li>`;
 
-    console.log(`🔎 Searching for section: ${section} in text...`); // Debugging
+    console.log(`🔎 Searching for section: ${section} in text...`);
 
-    // Updated regex to handle extra text after the section name
-    const regex = new RegExp(`\\*\\*${section}.*?\\*\\*\\s*([\\s\\S]*?)(?=\\n\\*\\*|$)`, "i");
+    // More flexible regex to handle spaces & variations
+    const regex = new RegExp(`\\*\\*\\s*${section}\\s*\\*\\*\\s*([\\s\\S]*?)(?=\\n\\*\\*|$)`, "i");
     const match = text.match(regex);
 
     if (!match) {
@@ -219,7 +220,7 @@ function extractSection(text, section) {
         return `<li>⚠️ No data available.</li>`;
     }
 
-    console.log(`✅ Found Section: ${section}`, match[1]); // Debugging
+    console.log(`✅ Found Section: ${section}`, match[1]);
 
     return match[1]
         .trim()
@@ -229,26 +230,27 @@ function extractSection(text, section) {
         .join("");
 }
 
-
 // ✅ Remove Extra Symbols (Keep Emojis)
 function cleanText(text) {
-     return text
+    let cleanedLine = text
         .replace(/\*\*/g, "") // Remove **bold**
         .replace(/^[-*•]\s*/g, "") // Remove bullet points but keep emojis
         .trim();
+
+    // 🍽️ Add Meaningful Cooking Emojis
     cleanedLine = cleanedLine
-        .replace(/Preheat/g, '🔥 Preheat')
-        .replace(/Mix/g, '🥣 Mix')
-        .replace(/Stir/g, '🌀 Stir')
-        .replace(/Bake/g, '🔥 Bake')
-        .replace(/Serve/g, '🍽️ Serve')
-        .replace(/Cool/g, '❄️ Cool')
-        .replace(/Whisk/g, '🥄 Whisk')
-        .replace(/Cream/g, '🧈 Cream')
-        .replace(/Fold/g, '🎭 Fold')
-        .replace(/Grease/g, '🛢️ Grease')
-        .replace(/Beat/g, '🥊 Beat')
-        .replace(/Sprinkle/g, '✨ Sprinkle');
+        .replace(/\bPreheat\b/g, '🔥 Preheat')
+        .replace(/\bMix\b/g, '🥣 Mix')
+        .replace(/\bStir\b/g, '🌀 Stir')
+        .replace(/\bBake\b/g, '🔥 Bake')
+        .replace(/\bServe\b/g, '🍽️ Serve')
+        .replace(/\bCool\b/g, '❄️ Cool')
+        .replace(/\bWhisk\b/g, '🥄 Whisk')
+        .replace(/\bCream\b/g, '🧈 Cream')
+        .replace(/\bFold\b/g, '🎭 Fold')
+        .replace(/\bGrease\b/g, '🛢️ Grease')
+        .replace(/\bBeat\b/g, '🥊 Beat')
+        .replace(/\bSprinkle\b/g, '✨ Sprinkle');
 
     return cleanedLine;
 }
