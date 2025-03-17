@@ -211,8 +211,8 @@ function extractSection(text, section) {
 
     console.log(`🔎 Searching for section: ${section} in text...`);
 
-    // More flexible regex to handle spaces & variations
-    const regex = new RegExp(`\\*\\*\\s*${section}\\s*\\*\\*\\s*([\\s\\S]*?)(?=\\n\\*\\*|$)`, "i");
+    // Improved regex to handle more flexible section formatting
+    const regex = new RegExp(`\\*{0,2}\\s*${section}\\s*:?\\s*\\*{0,2}\\s*([\\s\\S]*?)(?=\\n\\s*\\*{0,2}[A-Z]|$)`, "i");
     const match = text.match(regex);
 
     if (!match) {
