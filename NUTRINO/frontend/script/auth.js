@@ -137,6 +137,85 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
   });
+
+  // ✅ Inject Profile Page CSS Dynamically
+  if (window.location.pathname.includes("profile.html")) {
+    const style = document.createElement("style");
+    style.innerHTML = `
+      body {
+          font-family: 'Poppins', sans-serif;
+          background-color: #f4f4f4;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          margin: 0;
+      }
+      
+      .profile-container {
+          display: flex;
+          gap: 20px;
+          background: white;
+          padding: 30px;
+          border-radius: 10px;
+          box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+          max-width: 800px;
+          width: 100%;
+      }
+
+      .profile-card {
+          flex: 1;
+          padding: 20px;
+          background: #f8f9fa;
+          border-radius: 10px;
+          text-align: center;
+      }
+
+      .avatar-container img {
+          width: 120px;
+          height: 120px;
+          border-radius: 50%;
+          margin: 10px;
+          border: 3px solid #007bff;
+      }
+
+      #change-avatar {
+          margin-top: 10px;
+          padding: 8px 12px;
+          border: none;
+          background: #007bff;
+          color: white;
+          border-radius: 5px;
+          cursor: pointer;
+      }
+
+      .stats-container {
+          flex: 2;
+          padding: 20px;
+      }
+
+      .chart-container {
+          width: 100%;
+          height: 250px;
+      }
+
+      .achievements ul {
+          list-style: none;
+          padding: 0;
+      }
+
+      .achievements li {
+          background: #ffdd57;
+          padding: 8px;
+          margin: 5px 0;
+          border-radius: 5px;
+          font-weight: bold;
+      }
+    `;
+    document.head.appendChild(style);
+    console.log("✅ Profile Page Styles Injected!");
+  }
+
 });
 
 // ✅ Export Firebase Auth & Firestore for other scripts
