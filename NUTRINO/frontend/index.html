@@ -1686,6 +1686,117 @@ padding-bottom: 24px;
                 text-decoration:underline;
             }
         }
+        /* Preserve existing styles */
+
+
+
+        .header1 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 50px;
+            background: #000;
+            border-bottom: 2px solid #333;
+        }
+        
+        .LOGONAME {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #00bfff;
+            text-transform: uppercase;
+        }
+        
+        .AILOGO {
+            font-size: 18px;
+            background: #00bfff;
+            color: #fff;
+            border-radius: 50%;
+            padding: 5px 10px;
+            margin-left: 8px;
+        }
+        
+        .NUTRINOspell {
+            font-weight: bold;
+            color: #00bfff;
+        }
+        
+        /* Navigation Links */
+        .header1 a {
+            color: #b3b3b3;
+            text-decoration: none;
+            font-size: 16px;
+            margin: 0 15px;
+            transition: color 0.3s ease-in-out;
+        }
+        
+        .header1 a:hover {
+            color: #00bfff;
+        }
+        
+        .logout-button {
+            background-color: #00bfff;
+            color: #000;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .logout-button:hover {
+            background-color: #008cff;
+        }
+        
+        
+        .dark-mode-toggle {
+            background: none;
+            border: 2px solid #00bfff;
+            color: #00bfff;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .dark-mode-toggle:hover {
+            background: #00bfff;
+            color: #000;
+        }
+        
+        .ai-meal-planner, .grocery-list {
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            width: 80%;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 191, 255, 0.2);
+        }
+        
+        .ai-meal-planner h2, .grocery-list h2 {
+            color: #00bfff;
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+        
+        .grocery-list input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header1, .ai-meal-planner, .grocery-list {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        
 
     </style>
     <!-- Add this script before </body> -->
