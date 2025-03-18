@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (window.location.pathname.includes("generated_recipe.html")) {
         if (window.displayRecipe) { 
             window.displayRecipe(); 
-            } else { 
+        } else { 
             console.error("❌ displayRecipe is not defined globally."); 
         }
       }
@@ -83,8 +83,61 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.log("⚠️ User not logged in.");
     }
   });
+
+  // ✅ Dark Mode Toggle
+  const darkModeToggle = document.getElementById("darkModeToggle");
+  const body = document.body;
+
+  if (localStorage.getItem("darkMode") === "enabled") {
+      body.classList.add("dark-mode");
+  }
+
+  darkModeToggle.addEventListener("click", () => {
+      body.classList.toggle("dark-mode");
+
+      if (body.classList.contains("dark-mode")) {
+          localStorage.setItem("darkMode", "enabled");
+          darkModeToggle.textContent = "☀️"; // Light mode icon
+      } else {
+          localStorage.setItem("darkMode", "disabled");
+          darkModeToggle.textContent = "🌙"; // Dark mode icon
+      }
+  });
+
+  // ✅ Grocery List Functionality
+  const groceryButton = document.getElementById("generate-grocery-list");
+  if (groceryButton) {
+    groceryButton.addEventListener("click", generateGroceryList);
+  }
+
+  function generateGroceryList() {
+    const checkedIngredients = [];
+    document.querySelectorAll(".ingredient-checkbox:checked").forEach(checkbox => {
+      checkedIngredients.push(checkbox.value);
+    });
+
+    localStorage.setItem("groceryList", JSON.stringify(checkedIngredients));
+    alert("🛒 Grocery List Saved!");
+  }
+
+  // ✅ Likes Feature
+  document.querySelectorAll(".like-button").forEach(button => {
+    button.addEventListener("click", () => {
+      const recipeId = button.dataset.recipeId;
+      let likedRecipes = JSON.parse(localStorage.getItem("likedRecipes") || "[]");
+
+      if (!likedRecipes.includes(recipeId)) {
+        likedRecipes.push(recipeId);
+        localStorage.setItem("likedRecipes", JSON.stringify(likedRecipes));
+        button.textContent = "❤️ Liked!";
+      } else {
+        likedRecipes = likedRecipes.filter(id => id !== recipeId);
+        localStorage.setItem("likedRecipes", JSON.stringify(likedRecipes));
+        button.textContent = "♡ Like";
+      }
+    });
+  });
 });
 
 // ✅ Export Firebase Auth & Firestore for other scripts
 export { auth, db, provider };
-
