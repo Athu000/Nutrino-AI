@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Meal Planner</title>
-    <styles>
-        .body {
+    <style>
+        body {
             font-family: 'Poppins', sans-serif;
             background-color: #f4f4f4;
             display: flex;
@@ -65,13 +65,13 @@
             font-size: 16px;
             cursor: pointer;
             transition: 0.3s ease;
+            border: none;
         }
         
         button:hover {
             background: #0056b3;
         }
-
-    </styles>
+    </style>
 </head>
 <body>
     <div class="container">
@@ -93,19 +93,17 @@
             <!-- Dietary Restrictions -->
             <fieldset>
                 <legend>Dietary Restrictions:</legend>
-                <input type="checkbox" id="gluten-free" name="dietary" value="gluten-free">
-                <label for="gluten-free">Gluten-Free</label>
-                <input type="checkbox" id="vegan" name="dietary" value="vegan">
-                <label for="vegan">Vegan</label>
-                <input type="checkbox" id="vegetarian" name="dietary" value="vegetarian">
-                <label for="vegetarian">Vegetarian</label>
-                <input type="checkbox" id="dairy-free" name="dietary" value="dairy-free">
-                <label for="dairy-free">Dairy-Free</label>
-                <input type="checkbox" id="keto" name="dietary" value="keto">
-                <label for="keto">Keto</label>
-                <input type="checkbox" id="other-diet" name="dietary" value="other">
-                <label for="other-diet">Other</label>
-                <input type="text" id="other-diet-text" name="other-diet-text" placeholder="Specify Other" disabled>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" id="gluten-free" name="dietary" value="gluten-free"> Gluten-Free</label>
+                    <label><input type="checkbox" id="vegan" name="dietary" value="vegan"> Vegan</label>
+                    <label><input type="checkbox" id="vegetarian" name="dietary" value="vegetarian"> Vegetarian</label>
+                    <label><input type="checkbox" id="dairy-free" name="dietary" value="dairy-free"> Dairy-Free</label>
+                    <label><input type="checkbox" id="keto" name="dietary" value="keto"> Keto</label>
+                    <label>
+                        <input type="checkbox" id="other-diet" name="dietary" value="other"> Other
+                    </label>
+                    <input type="text" id="other-diet-text" name="other-diet-text" placeholder="Specify Other" disabled>
+                </div>
             </fieldset>
             
             <!-- Create Meal Plan Button -->
