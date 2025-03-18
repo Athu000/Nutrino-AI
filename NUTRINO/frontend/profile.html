@@ -6,6 +6,77 @@
     <title>User Profile | Nutrino AI</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module" src="auth.js"></script>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .profile-container {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 90%;
+            max-width: 800px;
+            margin: 20px;
+        }
+        .profile-card, .stats-container {
+            padding: 20px;
+        }
+        h2, h3, h4 {
+            color: #333;
+        }
+        p {
+            color: #555;
+        }
+        /* Avatar Styles */
+        .avatar-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .avatar-container img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+        }
+        .avatar-container button {
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .avatar-container button:hover {
+            background-color: #0056b3;
+        }
+        /* Chart Styles */
+        .chart-container {
+            width: 100%;
+            margin: 20px 0;
+        }
+        /* Achievements Styles */
+        .achievements {
+            list-style: none;
+            padding: 0;
+        }
+        .achievements li {
+            background-color: #e9ecef;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
     <div class="profile-container">
@@ -67,3 +138,4 @@
     </script>
 </body>
 </html>
+
