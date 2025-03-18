@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile | Nutrino AI</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="auth.js"></script>
+</head>
+<body>
+    <div class="profile-container">
+        <!-- Avatar & User Info -->
+        <div class="profile-card">
+            <h2>User Profile</h2>
+            <div class="avatar-container">
+                <img id="avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=default" alt="User Avatar">
+                <button id="change-avatar">Change Avatar</button>
+            </div>
+            <p><strong>Name:</strong> <span id="user-name">Loading...</span></p>
+            <p><strong>Email:</strong> <span id="user-email">Loading...</span></p>
+            <p><strong>Searches:</strong> <span id="search-count">0</span></p>
+        </div>
+
+        <!-- Stats & Charts -->
+        <div class="stats-container">
+            <h3>Cooking Score & Achievements</h3>
+            <div class="chart-container">
+                <canvas id="cookingChart"></canvas>
+            </div>
+            <h4>Achievements</h4>
+            <ul class="achievements">
+                <li>🥇 First Recipe Created</li>
+                <li>🔥 10+ Meals Cooked</li>
+                <li>🌟 Nutrino Pro User</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // ✅ Load User Data
+        document.addEventListener("DOMContentLoaded", () => {
+            const userData = JSON.parse(localStorage.getItem("loggedInUser"));
+            if (userData) {
+                document.getElementById("user-name").textContent = userData.name || "Unknown";
+                document.getElementById("user-email").textContent = userData.email || "Not Available";
+            }
+
+            // ✅ Generate Random Cooking Score Data
+            const ctx = document.getElementById("cookingChart").getContext("2d");
+            new Chart(ctx, {
+                type: "pie",
+                data: {
+                    labels: ["Beginner", "Intermediate", "Advanced"],
+                    datasets: [{
+                        data: [40, 35, 25], // Sample data
+                        backgroundColor: ["#ff6384", "#36a2eb", "#ffcc56"]
+                    }]
+                }
+            });
+
+            // ✅ Change Avatar Randomly
+            document.getElementById("change-avatar").addEventListener("click", () => {
+                const randomSeed = Math.random().toString(36).substring(7);
+                document.getElementById("avatar").src = `https://api.dicebear.com/7.x/adventurer/svg?seed=${randomSeed}`;
+            });
+        });
+    </script>
+</body>
+</html>
