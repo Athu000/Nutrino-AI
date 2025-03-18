@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Meal Planner</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+</head>
+<body>
+    <div class="container">
+        <h2>AI Meal Planner</h2>
+        <form id="meal-planner-form">
+            
+            <!-- Ingredients Input -->
+            <label for="ingredients">Ingredients (comma-separated):</label>
+            <input type="text" id="ingredients" name="ingredients" placeholder="E.g., chicken, rice, broccoli">
+            
+            <!-- Number of Meals Per Day -->
+            <label for="meals">Number of Meals Per Day:</label>
+            <input type="number" id="meals" name="meals" min="1" max="10" value="3">
+            
+            <!-- Number of Servings -->
+            <label for="servings">How Many Servings?</label>
+            <input type="number" id="servings" name="servings" min="1" max="10" value="1">
+            
+            <!-- Dietary Restrictions -->
+            <fieldset>
+                <legend>Dietary Restrictions:</legend>
+                <input type="checkbox" id="gluten-free" name="dietary" value="gluten-free">
+                <label for="gluten-free">Gluten-Free</label>
+                <input type="checkbox" id="vegan" name="dietary" value="vegan">
+                <label for="vegan">Vegan</label>
+                <input type="checkbox" id="vegetarian" name="dietary" value="vegetarian">
+                <label for="vegetarian">Vegetarian</label>
+                <input type="checkbox" id="dairy-free" name="dietary" value="dairy-free">
+                <label for="dairy-free">Dairy-Free</label>
+                <input type="checkbox" id="keto" name="dietary" value="keto">
+                <label for="keto">Keto</label>
+                <input type="checkbox" id="other-diet" name="dietary" value="other">
+                <label for="other-diet">Other</label>
+                <input type="text" id="other-diet-text" name="other-diet-text" placeholder="Specify Other" disabled>
+            </fieldset>
+            
+            <!-- Create Meal Plan Button -->
+            <button type="submit">Create Meal Plan</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('other-diet').addEventListener('change', function() {
+            document.getElementById('other-diet-text').disabled = !this.checked;
+        });
+    </script>
+</body>
+</html>
