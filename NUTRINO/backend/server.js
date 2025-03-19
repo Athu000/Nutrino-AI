@@ -155,53 +155,76 @@ app.get("/api/recent-recipes", verifyAuthToken, async (req, res) => {
 // ✅ Update Firestore Recipes to Structured Format (Without Image)
 app.post("/api/update-recipes", async (req, res) => {
     try {
+        const { aiResponse } = req.body; // Extract AI-generated recipe
+        if (!aiResponse || !aiResponse.candidates || !aiResponse.candidates[0]?.content?.parts[0]?.text) {
+            return res.status(400).json({ error: "Invalid AI response format." });
+        }
+
         const recipesRef = db.collection("recipes");
         const snapshot = await recipesRef.get();
 
         let updatedCount = 0;
-
-        const batch = db.batch(); // ✅ Use batch for efficiency
+        const batch = db.batch(); // ✅ Batch update for efficiency
 
         snapshot.forEach((doc) => {
             const data = doc.data();
 
-            // ✅ Check if recipe is missing structured fields
             if (!data.title || !data.ingredients || !data.steps) {
                 console.log(`🔄 Updating recipe: ${doc.id}`);
 
-                // ✅ Extract structured data from "recipe" text (basic parsing)
-                const recipeText = data.content || "";
-                const titleMatch = recipeText.match(/## (.*?) 🍋/);
-                const title = titleMatch ? titleMatch[1] : "Untitled Recipe";
+                // ✅ Extract structured data from AI response
+                const recipeText = aiResponse.candidates[0].content.parts[0].text;
+
+                const titleMatch = recipeText.match(/## (.*?) 🌾🥣?/);
+                const title = titleMatch ? titleMatch[1].trim() : "Untitled Recipe";
 
                 const ingredientsMatch = recipeText.match(/\*\*Ingredients:\*\*([\s\S]*?)\*\*/);
-                const ingredientsList = ingredientsMatch ? 
-                    ingredientsMatch[1].split("\n").map(item => item.trim()).filter(Boolean) : [];
+                const ingredientsList = ingredientsMatch
+                    ? ingredientsMatch[1].split("\n").map(item => item.trim()).filter(Boolean)
+                    : [];
 
                 const stepsMatch = recipeText.match(/\*\*Instructions:\*\*([\s\S]*?)\*\*/);
-                const stepsList = stepsMatch ? 
-                    stepsMatch[1].split("\n").map(item => item.trim()).filter(Boolean) : [];
+                const stepsList = stepsMatch
+                    ? stepsMatch[1].split("\n").map(item => item.trim()).filter(Boolean)
+                    : [];
 
-                // ✅ Prepare updated data (without image)
+                const nutritionMatch = recipeText.match(/\*\*Nutritional Information.*?\*\*([\s\S]*?)\*\*/);
+                const nutritionText = nutritionMatch ? nutritionMatch[1] : "";
+
+                const caloriesMatch = nutritionText.match(/\*\*Calories:\*\*\s*([\d-]+)/);
+                const calories = caloriesMatch ? parseInt(caloriesMatch[1], 10) : 0;
+
+                const servingsMatch = recipeText.match(/\*\*Yields:\*\*\s*(\d+)/);
+                const servings = servingsMatch ? parseInt(servingsMatch[1], 10) : 1;
+
+                const prepTimeMatch = recipeText.match(/\*\*Prep time:\*\*\s*(\d+)/);
+                const prepTime = prepTimeMatch ? parseInt(prepTimeMatch[1], 10) : 10;
+
+                const cookTimeMatch = recipeText.match(/\*\*Cook time:\*\*\s*(\d+)/);
+                const cookTime = cookTimeMatch ? parseInt(cookTimeMatch[1], 10) : 15;
+
+                const totalTime = prepTime + cookTime;
+
+                // ✅ Prepare structured data
                 const updatedData = {
                     title,
                     ingredients: ingredientsList,
                     steps: stepsList,
-                    calories: 350, // Default value, adjust if needed
-                    servings: 12,
-                    prepTime: 20,
-                    cookTime: 35,
-                    totalTime: 55,
-                    tags: ["dessert", "cake", "lemon"]
+                    calories,
+                    servings,
+                    prepTime,
+                    cookTime,
+                    totalTime,
+                    tags: ["custom", "ai-generated"]
                 };
 
-                // ✅ Batch update
+                // ✅ Batch update Firestore
                 batch.update(doc.ref, updatedData);
                 updatedCount++;
             }
         });
 
-        // ✅ Commit batch updates
+        // ✅ Commit all batch updates
         await batch.commit();
         console.log(`✅ Successfully updated ${updatedCount} recipes.`);
 
