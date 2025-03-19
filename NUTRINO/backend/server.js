@@ -133,47 +133,21 @@ app.post("/api/fetch-recipe", verifyAuthToken, async (req, res) => {
         });
     }
 });
-
-// ✅ Fetch User's Recent Recipes
-app.get("/api/recent-recipes", verifyAuthToken, async (req, res) => {
-    try {
-        const snapshot = await db.collection("recipes")
-            .where("userId", "==", req.user.uid)
-            .orderBy("createdAt", "desc")
-            .limit(10)
-            .get();
-
-        const recipes = snapshot.docs.map(doc => ({
-            id: doc.id,
-            content: doc.data().content,
-            createdAt: doc.data().createdAt
-        }));
-
-        return res.json({ recentRecipes: recipes });
-
-    } catch (error) {
-        console.error("❌ Error fetching recent recipes:", error.message);
-        return res.status(500).json({ error: "Failed to retrieve recent recipes." });
-    }
-});
-// ✅ Meal Plan Management API
+// ✅ Fetch User's Latest Meal Plan
 app.get("/api/meal-plan", verifyAuthToken, async (req, res) => {
     try {
-        const { userId } = req.user;
-        if (!userId) return res.status(400).json({ error: "User ID is required." });
-
         const mealRef = db.collection("meals")
-            .where("userId", "==", userId)
+            .where("userId", "==", req.user.uid)
             .orderBy("createdAt", "desc")
             .limit(1);
-
+        
         const snapshot = await mealRef.get();
         if (snapshot.empty) {
             return res.status(404).json({ error: "No meal plan found." });
         }
 
         const mealPlanData = snapshot.docs[0].data();
-        return res.json({ mealPlan: mealPlanData.mealPlan });
+        return res.json({ mealPlan: mealPlanData });
 
     } catch (error) {
         console.error("❌ Error fetching meal plan:", error);
@@ -192,19 +166,18 @@ app.post("/api/generate-meal-plan", verifyAuthToken, async (req, res) => {
         }
 
         const prompt = `
-            Create a structured meal plan using:
+            Generate a structured meal plan with:
             - Ingredients: ${ingredients}
             - Meals per day: ${mealsPerDay}
             - Servings: ${servings}
             - Dietary restrictions: ${dietaryRestrictions.length > 0 ? dietaryRestrictions.join(", ") : "None"}
 
-            The meal plan should:
-            1. Follow the dietary restrictions.
-            2. Include Breakfast, Lunch, Dinner, and Snacks.
-            3. Provide a detailed meal description.
-            4. List ingredients and cooking instructions.
-            5. Approximate calories per meal.
-            6. Use food-related emojis for engagement.
+            Format:
+            - Include Breakfast, Lunch, Dinner, and Snacks.
+            - Provide a detailed meal description.
+            - List ingredients and cooking instructions.
+            - Approximate calories per meal.
+            - Use engaging food-related emojis.
         `;
 
         const response = await fetch(API_URL, { 
@@ -219,7 +192,6 @@ app.post("/api/generate-meal-plan", verifyAuthToken, async (req, res) => {
         }
 
         const mealPlanText = data.candidates[0].content.parts[0].text;
-
         const mealPlanRef = db.collection("meals").doc();
         await mealPlanRef.set({
             userId: req.user.uid,
@@ -232,7 +204,7 @@ app.post("/api/generate-meal-plan", verifyAuthToken, async (req, res) => {
         });
 
         console.log(`✅ Meal Plan stored: ${mealPlanRef.id}`);
-        return res.json({ mealPlanId: mealPlanRef.id });
+        return res.json({ mealPlanId: mealPlanRef.id, mealPlan: mealPlanText });
 
     } catch (error) {
         console.error("❌ Error:", error);
@@ -241,13 +213,10 @@ app.post("/api/generate-meal-plan", verifyAuthToken, async (req, res) => {
 });
 
 // ✅ Delete Latest Meal Plan
-app.delete("/api/delete-meal-plan", async (req, res) => {
+app.delete("/api/delete-meal-plan", verifyAuthToken, async (req, res) => {
     try {
-        const { userId } = req.user;
-        if (!userId) return res.status(400).json({ error: "User ID is required." });
-
         const mealRef = db.collection("meals")
-            .where("userId", "==", userId)
+            .where("userId", "==", req.user.uid)
             .orderBy("createdAt", "desc")
             .limit(1);
 
@@ -262,91 +231,6 @@ app.delete("/api/delete-meal-plan", async (req, res) => {
     } catch (error) {
         console.error("❌ Error deleting meal plan:", error);
         return res.status(500).json({ error: "Failed to delete meal plan." });
-    }
-});
-
-
-// ✅ Update Firestore Recipes to Structured Format (Without Image)
-app.post("/api/update-recipes", async (req, res) => {
-    try {
-        const { aiResponse } = req.body; // Extract AI-generated recipe
-        if (!aiResponse || !aiResponse.candidates || !aiResponse.candidates[0]?.content?.parts[0]?.text) {
-            return res.status(400).json({ error: "Invalid AI response format." });
-        }
-
-        const recipesRef = db.collection("recipes");
-        const snapshot = await recipesRef.get();
-
-        let updatedCount = 0;
-        const batch = db.batch(); // ✅ Batch update for efficiency
-
-        snapshot.forEach((doc) => {
-            const data = doc.data();
-
-            if (!data.title || !data.ingredients || !data.steps) {
-                console.log(`🔄 Updating recipe: ${doc.id}`);
-
-                // ✅ Extract structured data from AI response
-                const recipeText = aiResponse.candidates[0].content.parts[0].text;
-
-                const titleMatch = recipeText.match(/## (.*?) 🌾🥣?/);
-                const title = titleMatch ? titleMatch[1].trim() : "Untitled Recipe";
-
-                const ingredientsMatch = recipeText.match(/\*\*Ingredients:\*\*([\s\S]*?)\*\*/);
-                const ingredientsList = ingredientsMatch
-                    ? ingredientsMatch[1].split("\n").map(item => item.trim()).filter(Boolean)
-                    : [];
-
-                const stepsMatch = recipeText.match(/\*\*Instructions:\*\*([\s\S]*?)\*\*/);
-                const stepsList = stepsMatch
-                    ? stepsMatch[1].split("\n").map(item => item.trim()).filter(Boolean)
-                    : [];
-
-                const nutritionMatch = recipeText.match(/\*\*Nutritional Information.*?\*\*([\s\S]*?)\*\*/);
-                const nutritionText = nutritionMatch ? nutritionMatch[1] : "";
-
-                const caloriesMatch = nutritionText.match(/\*\*Calories:\*\*\s*([\d-]+)/);
-                const calories = caloriesMatch ? parseInt(caloriesMatch[1], 10) : 0;
-
-                const servingsMatch = recipeText.match(/\*\*Yields:\*\*\s*(\d+)/);
-                const servings = servingsMatch ? parseInt(servingsMatch[1], 10) : 1;
-
-                const prepTimeMatch = recipeText.match(/\*\*Prep time:\*\*\s*(\d+)/);
-                const prepTime = prepTimeMatch ? parseInt(prepTimeMatch[1], 10) : 10;
-
-                const cookTimeMatch = recipeText.match(/\*\*Cook time:\*\*\s*(\d+)/);
-                const cookTime = cookTimeMatch ? parseInt(cookTimeMatch[1], 10) : 15;
-
-                const totalTime = prepTime + cookTime;
-
-                // ✅ Prepare structured data
-                const updatedData = {
-                    title,
-                    ingredients: ingredientsList,
-                    steps: stepsList,
-                    calories,
-                    servings,
-                    prepTime,
-                    cookTime,
-                    totalTime,
-                    tags: ["custom", "ai-generated"]
-                };
-
-                // ✅ Batch update Firestore
-                batch.update(doc.ref, updatedData);
-                updatedCount++;
-            }
-        });
-
-        // ✅ Commit all batch updates
-        await batch.commit();
-        console.log(`✅ Successfully updated ${updatedCount} recipes.`);
-
-        res.json({ message: `Updated ${updatedCount} recipes successfully!` });
-
-    } catch (error) {
-        console.error("❌ Error updating recipes:", error.message);
-        res.status(500).json({ error: "Failed to update recipes." });
     }
 });
 
