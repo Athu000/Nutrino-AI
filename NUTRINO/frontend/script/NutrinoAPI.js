@@ -18,6 +18,20 @@ async function getAuthToken() {
     return null;
 }
 
+async function getAuthToken() {
+    try {
+        const user = auth.currentUser;
+        if (user) {
+            return await user.getIdToken(true);
+        }
+    } catch (error) {
+        console.error("❌ Auth Token Error:", error);
+        alert("Session expired. Please log in again.");
+        window.location.href = "login.html";
+    }
+    return null;
+}
+
 // ✅ Delete Old Recipe from Firestore
 async function deleteOldRecipe() {
     try {
@@ -49,14 +63,11 @@ async function deleteOldRecipe() {
 // ✅ Fetch Recipe & Save to Firestore
 async function fetchRecipe(prompt) {
     let authToken = await getAuthToken();
-    if (!authToken) {
-        alert("Authentication failed. Please log in again.");
-        return;
-    }
+    if (!authToken) return;
 
     try {
         console.log("🗑️ Deleting old recipe before fetching a new one...");
-        await deleteOldRecipe(); 
+        await deleteOldRecipe(); // ✅ Moved deletion before API call
 
         console.log("📤 Sending request to API:", API_BASE_URL);
         const response = await fetch(`${API_BASE_URL}/fetch-recipe`, {
@@ -70,59 +81,44 @@ async function fetchRecipe(prompt) {
 
         if (!response.ok) {
             console.error("❌ API Request Failed:", response.status, response.statusText);
-            alert(`Failed to fetch recipe: ${response.statusText} (${response.status})`);
+            alert("Failed to fetch recipe. Try again.");
             return;
         }
 
         const data = await response.json();
         console.log("✅ API Response Received:", data);
 
-        // ✅ Better Response Validation
-        if (!data || !data.candidates || !data.candidates.length || !data.candidates[0].content) {
+        if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
             console.error("❌ API Response is malformed:", data);
-            alert("Received an invalid recipe response. Please try again later.");
+            alert("Received an invalid recipe response.");
             return;
         }
 
-        let recipeText = data.candidates[0]?.content?.parts?.[0]?.text;
-        if (!recipeText) {
-            console.error("❌ No recipe text found in response:", data);
-            alert("Recipe data is missing. Please try again.");
-            return;
-        }
-
+        let recipeText = data.candidates[0].content.parts[0].text;
         console.log("✅ Extracted Recipe Text:", recipeText);
 
         // ✅ Save new Recipe to Firestore
         const user = auth.currentUser;
         if (user) {
-            try {
-                const docRef = await addDoc(collection(db, "recipes"), {
-                    userId: user.uid,
-                    recipe: recipeText,
-                    createdAt: new Date()
-                });
-                console.log(`✅ New recipe saved to Firestore (ID: ${docRef.id})`);
+            const docRef = await addDoc(collection(db, "recipes"), {
+                userId: user.uid,
+                recipe: recipeText,
+                createdAt: new Date()
+            });
+            console.log(`✅ New recipe saved to Firestore (ID: ${docRef.id})`);
 
-                // ✅ Update sessionStorage and delay redirect for UI smoothness
-                sessionStorage.setItem("latestRecipe", JSON.stringify({ id: docRef.id, recipeText }));
-                
-                setTimeout(() => {
-                    window.location.href = "generated_recipe.html"; 
-                }, 1500);
-            } catch (firestoreError) {
-                console.error("❌ Firestore Write Failed:", firestoreError);
-                alert("Failed to save recipe. Please try again.");
-            }
-        } else {
-            alert("User authentication error. Please log in again.");
+            // ✅ Ensure the page updates instead of a full reload
+            sessionStorage.setItem("latestRecipe", JSON.stringify({ id: docRef.id, recipeText }));
+            window.location.href = "generated_recipe.html";
+            setTimeout(() => {
+                window.location.href = "generated_recipe.html"; // Redirect after a short delay
+            }, 1500);
         }
     } catch (error) {
         console.error("❌ API Error:", error);
-        alert("An error occurred while fetching the recipe. Please check your connection and try again.");
+        alert("Error fetching recipe. Try again.");
     }
 }
-
 document.addEventListener("DOMContentLoaded", function () {
     const recipeCards = document.querySelectorAll(".Grid-col1"); // Select all recipe cards
     const recipeInput = document.getElementById("rec_search"); // Recipe input box
@@ -199,7 +195,7 @@ async function displayRecipe() {
 
         // ✅ Update UI Elements
         document.getElementById("recipe-title").textContent = extractTitle(latestRecipe);
-        document.getElementById("recipe-desc").textContent = "A delicious AI-generated recipe! 😋\n" + extractSection(latestRecipe, "Note");
+        document.getElementById("recipe-desc").textContent = "A delicious AI-generated recipe! 😋";
         console.log("✅ Extracting Ingredients...");
         document.getElementById("ingredients-list").innerHTML = extractSection(latestRecipe, "Ingredients");
 
