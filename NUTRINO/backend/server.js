@@ -4,46 +4,42 @@ import fetch from "node-fetch";
 import dotenv from "dotenv";
 import admin from "firebase-admin";
 
-dotenv.config();
+dotenv.config(); // Load environment variables
 
 const app = express();
-app.use(cors({ origin: ["https://yourdomain.com"] })); // ✅ Restricted CORS for security
+app.use(cors({ origin: "*" })); // Allow all frontend requests
 app.use(express.json());
 
 const API_KEY = process.env.API_KEY;
 const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
+// ✅ Check if API Key is available
 if (!API_KEY) {
     console.error("❌ ERROR: Missing API_KEY in environment variables.");
     process.exit(1);
 }
 
-// ✅ Firebase Initialization with Cleanup
+// ✅ Initialize Firebase Admin SDK
 let serviceAccount;
 try {
     serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-    admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+    });
     console.log("✅ Firebase Admin SDK initialized.");
 } catch (error) {
-    console.error("❌ ERROR: Firebase Initialization Failed:", error.message);
+    console.error("❌ ERROR: Failed to initialize Firebase Admin SDK:", error.message);
     process.exit(1);
 }
 
-const db = admin.firestore();
-
-// ✅ Graceful Shutdown
-process.on("SIGINT", async () => {
-    console.log("🛑 Server shutting down...");
-    await admin.app().delete();
-    process.exit(0);
-});
+const db = admin.firestore(); // Firestore database instance
 
 // ✅ Health Check Route
 app.get("/", (req, res) => {
     res.json({ message: "✅ Nutrino AI Backend is Running!" });
 });
 
-// ✅ Middleware: Verify User Authentication
+// ✅ Middleware for Authentication Verification
 async function verifyAuthToken(req, res, next) {
     try {
         const authHeader = req.headers.authorization;
@@ -52,32 +48,67 @@ async function verifyAuthToken(req, res, next) {
         }
 
         const idToken = authHeader.split("Bearer ")[1];
+        console.log("🔑 Received Auth Token:", idToken);
+        
         const decodedToken = await admin.auth().verifyIdToken(idToken);
         req.user = decodedToken;
+        console.log(`🔑 Authenticated User: ${decodedToken.email}`);
         next();
     } catch (error) {
-        return res.status(403).json({ error: "Unauthorized: Invalid token" });
+        console.error("❌ Authentication Error:", error.message);
+        return res.status(403).json({
+            error: "Unauthorized: Invalid token",
+            details: error.message
+        });
     }
 }
 
-// ✅ Generate & Store Recipe
+// ✅ Recipe Fetching API Route
 app.post("/api/fetch-recipe", verifyAuthToken, async (req, res) => {
     try {
-        const { prompt } = req.body;
-        if (!prompt) return res.status(400).json({ error: "❌ Prompt is required." });
+        console.log("📩 Received Request:", req.body);
 
-        const response = await fetch(API_URL, {
+        const { prompt } = req.body;
+        if (!prompt) {
+            return res.status(400).json({ error: "❌ Prompt is required." });
+        }
+
+        const response = await fetch(API_URL, { 
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ contents: [{ parts: [{ text: `Recipe for ${prompt}` }] }] }),
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: `Provide a detailed, structured recipe for ${prompt}. 
+                        - Include a title, ingredients, step-by-step instructions, and nutritional facts.
+                        - Specify the number of calories in a clear format.
+                        - Use appropriate food-related emojis to make the recipe visually engaging.
+                        - Format steps in a numbered list, removing any unnecessary symbols like "**".`
+                    }]
+                }]
+            }),
         });
 
         const data = await response.json();
-        if (!data?.candidates?.[0]?.content?.parts?.[0]?.text) {
-            return res.status(500).json({ error: "❌ Invalid recipe response format" });
+        console.log("🔹 API Response:", JSON.stringify(data, null, 2));
+
+        if (!response.ok) {
+            return res.status(response.status).json({ 
+                error: data.error?.message || "❌ API request failed",
+                details: data
+            });
+        }
+
+        if (!data || !data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
+            return res.status(500).json({
+                error: "❌ Invalid recipe response format",
+                solution: "Try again later or check the API response structure."
+            });
         }
 
         const recipeText = data.candidates[0].content.parts[0].text;
+        console.log("🔹 Extracted Recipe:", recipeText);
+
         const newRecipeRef = db.collection("recipes").doc();
         await newRecipeRef.set({
             userId: req.user.uid,
@@ -85,13 +116,20 @@ app.post("/api/fetch-recipe", verifyAuthToken, async (req, res) => {
             createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
 
-        return res.json({ recipeId: newRecipeRef.id, recipeText });
+        console.log(`✅ Recipe stored successfully in Firestore: ${newRecipeRef.id}`);
+        return res.json({ candidates: [{ content: { parts: [{ text: recipeText }] } }] });
+
     } catch (error) {
-        return res.status(500).json({ error: "❌ Failed to fetch recipe" });
+        console.error("❌ Error fetching recipe:", error.message);
+        return res.status(500).json({
+            error: "❌ Failed to fetch from Gemini API",
+            details: error.message,
+            solution: "Try again later or check if your API key is valid."
+        });
     }
 });
 
-// ✅ Fetch Recent Recipes
+// ✅ Fetch User's Recent Recipes
 app.get("/api/recent-recipes", verifyAuthToken, async (req, res) => {
     try {
         const snapshot = await db.collection("recipes")
@@ -107,10 +145,13 @@ app.get("/api/recent-recipes", verifyAuthToken, async (req, res) => {
         }));
 
         return res.json({ recentRecipes: recipes });
+
     } catch (error) {
-        return res.status(500).json({ error: "Failed to retrieve recipes." });
+        console.error("❌ Error fetching recent recipes:", error.message);
+        return res.status(500).json({ error: "Failed to retrieve recent recipes." });
     }
 });
 
+// ✅ Dynamic Port Handling
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
