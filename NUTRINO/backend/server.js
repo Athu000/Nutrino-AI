@@ -18,6 +18,11 @@ if (!API_KEY) {
     console.error("❌ ERROR: Missing API_KEY in environment variables.");
     process.exit(1);
 }
+app.get("/api", (req, res) => {
+    res.json({ message: "API is working!" });
+});
+const cors = require("cors");
+app.use(cors());
 
 // ✅ Initialize Firebase Admin SDK
 let serviceAccount;
