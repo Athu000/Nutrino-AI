@@ -18,20 +18,6 @@ async function getAuthToken() {
     return null;
 }
 
-async function getAuthToken() {
-    try {
-        const user = auth.currentUser;
-        if (user) {
-            return await user.getIdToken(true);
-        }
-    } catch (error) {
-        console.error("❌ Auth Token Error:", error);
-        alert("Session expired. Please log in again.");
-        window.location.href = "login.html";
-    }
-    return null;
-}
-
 // ✅ Delete Old Recipe from Firestore
 async function deleteOldRecipe() {
     try {
