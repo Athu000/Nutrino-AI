@@ -538,6 +538,55 @@
         margin-top: 10px;
     }
 }
+/* Hide the hamburger menu by default */
+.hamburger {
+    display: none;
+    cursor: pointer;
+    font-size: 28px;
+    color: #fff;
+    background: none;
+    border: none;
+    padding: 10px;
+}
+
+/* Navigation container */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Responsive - Convert navigation into a hamburger menu */
+@media (max-width: 768px) {
+    .nav-links {
+        display: none; /* Hide links by default on small screens */
+        flex-direction: column;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        background: #000;
+        padding: 20px;
+        z-index: 1000;
+        text-align: center;
+    }
+
+    .nav-links a {
+        padding: 10px 0;
+        display: block;
+        font-size: 18px;
+    }
+
+    /* Show the hamburger icon */
+    .hamburger {
+        display: block;
+    }
+
+    /* When menu is open */
+    .nav-links.show {
+        display: flex;
+    }
+}
 
         .break{
             width: 0;
@@ -1838,6 +1887,7 @@ padding-bottom: 24px;
                             </div>
                         </a>
                     </div>
+                                <button class="hamburger" onclick="toggleMenu()">☰</button>
                     <div class="headContainer3 nav-links">
                         <a href="index.html">Home</a>
                         <a href="meal_planner.html">AI Meal Planner</a>
@@ -1858,6 +1908,10 @@ padding-bottom: 24px;
                 </div>
             </div>
         <script>
+            function toggleMenu() {
+                document.querySelector(".nav-links").classList.toggle("show");
+            }
+
             document.addEventListener("DOMContentLoaded", () => {
                 const userInfo = document.getElementById("user-info");
                 const authLinks = document.getElementById("auth-links");
