@@ -151,7 +151,32 @@ app.get("/api/recent-recipes", verifyAuthToken, async (req, res) => {
         return res.status(500).json({ error: "Failed to retrieve recent recipes." });
     }
 });
-// ✅ AI Meal Planner API Route
+// ✅ Meal Plan Management API
+app.get("/api/meal-plan", verifyAuthToken, async (req, res) => {
+    try {
+        const { userId } = req.user;
+        if (!userId) return res.status(400).json({ error: "User ID is required." });
+
+        const mealRef = db.collection("meals")
+            .where("userId", "==", userId)
+            .orderBy("createdAt", "desc")
+            .limit(1);
+
+        const snapshot = await mealRef.get();
+        if (snapshot.empty) {
+            return res.status(404).json({ error: "No meal plan found." });
+        }
+
+        const mealPlanData = snapshot.docs[0].data();
+        return res.json({ mealPlan: mealPlanData.mealPlan });
+
+    } catch (error) {
+        console.error("❌ Error fetching meal plan:", error);
+        return res.status(500).json({ error: "Failed to retrieve meal plan." });
+    }
+});
+
+// ✅ Store Meal Plan with User ID
 app.post("/api/generate-meal-plan", verifyAuthToken, async (req, res) => {
     try {
         console.log("📩 Received Meal Plan Request:", req.body);
@@ -161,52 +186,35 @@ app.post("/api/generate-meal-plan", verifyAuthToken, async (req, res) => {
             return res.status(400).json({ error: "❌ Missing required fields." });
         }
 
-        // Construct prompt for AI
         const prompt = `
-            Create a structured meal plan using the following details:
+            Create a structured meal plan using:
             - Ingredients: ${ingredients}
             - Meals per day: ${mealsPerDay}
             - Servings: ${servings}
             - Dietary restrictions: ${dietaryRestrictions.length > 0 ? dietaryRestrictions.join(", ") : "None"}
-            
-            The plan should include:
-            1. Breakfast, lunch, dinner, and snacks (if applicable).
-            2. Detailed meal descriptions.
-            3. Ingredient breakdown and cooking instructions.
-            4. Approximate calories per meal.
-            5. Food-related emojis for a visually engaging output.
-            Format the response in an easy-to-read, structured way.
+
+            The meal plan should:
+            1. Follow the dietary restrictions.
+            2. Include Breakfast, Lunch, Dinner, and Snacks.
+            3. Provide a detailed meal description.
+            4. List ingredients and cooking instructions.
+            5. Approximate calories per meal.
+            6. Use food-related emojis for engagement.
         `;
 
         const response = await fetch(API_URL, { 
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }]
-            }),
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
         });
 
         const data = await response.json();
-        console.log("🔹 AI Meal Plan Response:", JSON.stringify(data, null, 2));
-
-        if (!response.ok) {
-            return res.status(response.status).json({
-                error: data.error?.message || "❌ API request failed",
-                details: data
-            });
-        }
-
-        if (!data || !data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
-            return res.status(500).json({
-                error: "❌ Invalid meal plan response format",
-                solution: "Try again later or check the API response structure."
-            });
+        if (!response.ok || !data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
+            return res.status(500).json({ error: "Invalid AI response format" });
         }
 
         const mealPlanText = data.candidates[0].content.parts[0].text;
-        console.log("🔹 Generated Meal Plan:", mealPlanText);
 
-        // Store the meal plan in Firebase Firestore
         const mealPlanRef = db.collection("meals").doc();
         await mealPlanRef.set({
             userId: req.user.uid,
@@ -218,18 +226,40 @@ app.post("/api/generate-meal-plan", verifyAuthToken, async (req, res) => {
             createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
 
-        console.log(`✅ Meal Plan stored in Firestore: ${mealPlanRef.id}`);
-        return res.json({ mealPlan: mealPlanText });
+        console.log(`✅ Meal Plan stored: ${mealPlanRef.id}`);
+        return res.json({ mealPlanId: mealPlanRef.id });
 
     } catch (error) {
-        console.error("❌ Error generating meal plan:", error.message);
-        return res.status(500).json({
-            error: "❌ Failed to generate meal plan",
-            details: error.message,
-            solution: "Try again later or check API key validity."
-        });
+        console.error("❌ Error:", error);
+        return res.status(500).json({ error: "Failed to generate meal plan" });
     }
 });
+
+// ✅ Delete Latest Meal Plan
+app.delete("/api/delete-meal-plan", verifyAuthToken, async (req, res) => {
+    try {
+        const { userId } = req.user;
+        if (!userId) return res.status(400).json({ error: "User ID is required." });
+
+        const mealRef = db.collection("meals")
+            .where("userId", "==", userId)
+            .orderBy("createdAt", "desc")
+            .limit(1);
+
+        const snapshot = await mealRef.get();
+        if (snapshot.empty) {
+            return res.status(404).json({ error: "No meal plan found to delete." });
+        }
+
+        await snapshot.docs[0].ref.delete();
+        return res.json({ message: "✅ Meal plan deleted successfully." });
+
+    } catch (error) {
+        console.error("❌ Error deleting meal plan:", error);
+        return res.status(500).json({ error: "Failed to delete meal plan." });
+    }
+});
+
 
 // ✅ Update Firestore Recipes to Structured Format (Without Image)
 app.post("/api/update-recipes", async (req, res) => {
