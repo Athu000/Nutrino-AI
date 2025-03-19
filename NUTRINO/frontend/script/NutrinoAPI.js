@@ -306,6 +306,94 @@ document.addEventListener("DOMContentLoaded", function () {
     displayRecipe();
 });
 
+// ✅ Updated NutrinoAPI.js to Match mealplanner.html
+
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("meal-planner-form");
+
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        // Gather input values
+        const ingredients = document.getElementById("ingredients").value;
+        const mealsPerDay = document.getElementById("meals").value;
+        const servings = document.getElementById("servings").value;
+        
+        // Collect dietary restrictions
+        const dietaryRestrictions = [];
+        document.querySelectorAll("input[name='dietary']:checked").forEach(checkbox => {
+            if (checkbox.id === "other-diet") {
+                const otherDietText = document.getElementById("other-diet-text").value;
+                if (otherDietText) dietaryRestrictions.push(otherDietText);
+            } else {
+                dietaryRestrictions.push(checkbox.value);
+            }
+        });
+
+        // Prepare request body
+        const requestBody = {
+            ingredients,
+            mealsPerDay: parseInt(mealsPerDay, 10),
+            servings: parseInt(servings, 10),
+            dietaryRestrictions
+        };
+
+        try {
+            const response = await fetch("/api/generate-meal-plan", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                localStorage.setItem("mealPlanId", data.mealPlanId);
+                window.location.href = "meals.html"; // Redirect to meals page
+            } else {
+                alert("Failed to generate meal plan: " + data.error);
+            }
+        } catch (error) {
+            console.error("Error generating meal plan:", error);
+            alert("An error occurred. Please try again.");
+        }
+    });
+});
+
+// ✅ Fetch and Display Meal Plan in meals.html
+document.addEventListener("DOMContentLoaded", function () {
+    async function fetchMealPlan() {
+        const mealPlanId = localStorage.getItem("mealPlanId");
+        if (!mealPlanId) {
+            document.getElementById("meal-plan").innerText = "No meal plan found.";
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/get-meal-plan?mealPlanId=${mealPlanId}`);
+            const data = await response.json();
+
+            if (response.ok) {
+                document.getElementById("meal-plan").innerHTML = `<h3>Your AI Meal Plan:</h3><p>${data.mealPlan.replace(/\n/g, '<br>')}</p>`;
+            } else {
+                document.getElementById("meal-plan").innerText = "Failed to load meal plan.";
+            }
+        } catch (error) {
+            console.error("Error fetching meal plan:", error);
+            document.getElementById("meal-plan").innerText = "An error occurred.";
+        }
+    }
+    
+    function goBack() {
+        localStorage.removeItem("mealPlanId");
+        window.location.href = "index.html";
+    }
+
+    document.getElementById("goBackBtn")?.addEventListener("click", goBack);
+    fetchMealPlan();
+});
+
 // ✅ Make function globally accessible
 window.fetchRecipe = fetchRecipe;
 window.displayRecipe = displayRecipe;
