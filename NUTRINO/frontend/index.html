@@ -264,98 +264,78 @@
             padding-top: 75px;
         }
         /* HEADER */
+/* HEADER STYLING */
 .header1 {
-    padding-top: 12px;
-    background-color: #000000;
+    background-color: #000;
     border-bottom: 1px solid #303030;
     position: fixed;
     z-index: 1000;
     left: 0;
     right: 0;
     top: 0;
-    min-height: 60px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     padding: 15px 50px;
     width: 100%;
+    height: 70px;
 }
 
-/* CONTAINERS */
+/* HEADER CONTAINERS */
 .headContainer1 {
-    padding-left: 16px;
-    padding-right: 16px;
-    max-width: 960px;
-    margin-left: auto;
-    margin-right: auto;
-    padding-bottom: 12px;
-}
-
-.headContainer2 {
-    box-sizing: border-box;
+    max-width: 1200px;
+    width: 100%;
     display: flex;
-    flex-direction: row;
     align-items: center;
-    flex-wrap: wrap;
     justify-content: space-between;
-    gap: 16px;
-    flex-grow: 0;
 }
 
-.headContainer3 {
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: 16px;
-    flex-grow: 0;
-}
-
-/* LOGO & BRANDING */
+/* LOGO & BRAND */
 .LOGONAME {
+    display: flex;
+    align-items: center;
     font-size: 24px;
     font-weight: bold;
     color: #00ccff;
     text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    position: relative;
 }
 
 .AILOGO {
-    top: 3px;
-    right: 3px;
-    transform: translate(50%, -50%);
-    z-index: 100;
-    position: absolute;
-    min-width: 16px;
-    height: 16px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     font-size: 12px;
-    padding-left: calc(10px / 2);
-    padding-right: calc(10px / 2);
-    border-radius: 1000px;
+    padding: 5px;
+    border-radius: 50%;
     background-color: #00ccff;
     color: #fff;
-    white-space: nowrap;
+    margin-right: 6px;
 }
 
-/* NAVIGATION LINKS */
-.header1 a {
+/* NAVIGATION MENU */
+.nav-links {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links a {
     text-decoration: none;
     color: #b3b3b3;
     font-size: 16px;
     font-weight: 500;
-    margin: 0 15px;
     transition: color 0.3s ease-in-out;
 }
 
-.header1 a:hover {
+.nav-links a:hover {
     color: #00ccff;
+}
+
+/* HAMBURGER MENU */
+.hamburger {
+    display: none;
+    cursor: pointer;
+    font-size: 28px;
+    color: #fff;
+    background: none;
+    border: none;
+    padding: 10px;
 }
 
 /* AUTH BUTTONS */
@@ -378,17 +358,6 @@
     background-color: #008cff;
 }
 
-.BUTTON_LOG:focus {
-    outline: 2px solid #0400ff;
-    outline-offset: 2px;
-}
-
-.BUTTON_LOG:disabled, .BUTTON_LOG[data-disabled] {
-    background-color: #e9ecef;
-    color: #adb5bd;
-    cursor: not-allowed;
-}
-
 .logout-button {
     background-color: transparent;
     border: 2px solid #00ccff;
@@ -400,169 +369,18 @@
     color: black;
 }
 
-/* DARK MODE TOGGLE */
-.dark-mode-toggle {
-    background: none;
-    border: 2px solid #00ccff;
-    color: #00ccff;
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-size: 14px;
-    transition: 0.3s ease-in-out;
-}
-
-.dark-mode-toggle:hover {
-    background: #00ccff;
-    color: #000;
-}
-
-/* NUTRINO BRANDING */
-.NUTRINOspell {
-    font-family: 'Pacifico', cursive;
-    font-size: 24px;
-    line-height: 1;
-    display: inline-block;
-    width: 65px;
-    height: 14px;
-    color: #00ccff;
-    padding-right: 12px;
-}
-
-.NUTRINOspell:focus {
-    outline: 2px solid #0400ff;
-    outline-offset: 2px;
-}
-
-/* LOGIN & SIGNUP BUTTONS */
-.LOGIN1 {
-    display: block;
-    line-height: 1;
-    padding: 8px 12px;
-    border-radius: 4px;
-    text-decoration: none;
-    color: #495057;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.LOGIN1:hover {
-    background-color: #3d3d3d;
-}
-
-@media (max-width: 767px) {
-    .LOGIN1 {
-        border-radius: 0;
-        padding: 16px;
-    }
-}
-
-/* SIGNUP BUTTON WRAPPER */
-.SIGNUP_but {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    overflow: visible;
-}
-
-/* BUTTON LABEL */
-.BUT_LABEL {
-    white-space: nowrap;
-    height: 100%;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-}
-
-/* AI MEAL PLANNER & GROCERY LIST (COOKING ASSISTANT) */
-.ai-meal-planner, .cooking-assistant {
-    background: #222;
-    padding: 20px;
-    border-radius: 10px;
-    margin: 20px auto;
-    width: 80%;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0, 191, 255, 0.2);
-}
-
-.ai-meal-planner h2, .cooking-assistant h2 {
-    color: #00ccff;
-    font-size: 22px;
-    margin-bottom: 15px;
-}
-
-/* CHECKBOX STYLING */
-.cooking-assistant input[type="checkbox"] {
-    margin-right: 10px;
-    transform: scale(1.2);
-}
-
-/* ANIMATIONS */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.header1, .ai-meal-planner, .cooking-assistant {
-    animation: fadeIn 0.6s ease-in-out;
-}
-
-/* USER EMAIL */
-#user-email {
-    color: #00ccff;
-    font-weight: bold;
-    font-size: 16px;
-    padding-left: 10px;
-}
-
-/* RESPONSIVE DESIGN */
+/* RESPONSIVE NAVBAR */
 @media (max-width: 768px) {
     .header1 {
-        flex-direction: column;
+        flex-direction: row;
         padding: 10px 20px;
     }
 
-    .headContainer2, .headContainer3 {
-        flex-direction: column;
-        text-align: center;
-        gap: 12px;
-    }
-
-    .auth-buttons {
-        margin-top: 10px;
-    }
-}
-/* Hide the hamburger menu by default */
-.hamburger {
-    display: none;
-    cursor: pointer;
-    font-size: 28px;
-    color: #fff;
-    background: none;
-    border: none;
-    padding: 10px;
-}
-
-/* Navigation container */
-.nav-links {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-/* Responsive - Convert navigation into a hamburger menu */
-@media (max-width: 768px) {
     .nav-links {
-        display: none; /* Hide links by default on small screens */
+        display: none;
         flex-direction: column;
         position: absolute;
-        top: 60px;
+        top: 70px;
         left: 0;
         width: 100%;
         background: #000;
@@ -577,7 +395,7 @@
         font-size: 18px;
     }
 
-    /* Show the hamburger icon */
+    /* Show hamburger icon */
     .hamburger {
         display: block;
     }
@@ -586,6 +404,30 @@
     .nav-links.show {
         display: flex;
     }
+}
+
+/* USER INFO */
+#user-email {
+    color: #00ccff;
+    font-weight: bold;
+    font-size: 16px;
+    padding-left: 10px;
+}
+
+/* ANIMATIONS */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header1, .nav-links {
+    animation: fadeIn 0.6s ease-in-out;
 }
 
         .break{
@@ -1876,30 +1718,38 @@ padding-bottom: 24px;
 </head>
 <body>
     <div class="PAGE">
-        <div class="header1">
-            <div class="headContainer1">
-                <div class="headContainer2">
+            <div class="header1">
+                <div class="headContainer1">
+                    <!-- Logo and Name -->
                     <div class="headContainer3">
                         <a href="NUTRINOAI.html">
-                            <div class="LOGONAME" style="padding-right: 88px;">
+                            <div class="LOGONAME">
                                 <div class="AILOGO">AI</div>
-                            <div class="NUTRINOspell">NUTRINO</div>
+                                <div class="NUTRINOspell">NUTRINO</div>
                             </div>
                         </a>
                     </div>
-                                <button class="hamburger" onclick="toggleMenu()">☰</button>
-                    <div class="headContainer3 nav-links">
+        
+                    <!-- Hamburger Menu (For Mobile View) -->
+                    <button class="hamburger" onclick="toggleMenu()">☰</button>
+        
+                    <!-- Navigation Links -->
+                    <nav class="nav-links">
                         <a href="index.html">Home</a>
                         <a href="meal_planner.html">AI Meal Planner</a>
                         <a href="cookingassistant.html">Cooking Assistant</a>
                         <a href="profile.html">Profile</a>
-                    </div>
+                    </nav>
+        
+                    <!-- Auth & User Info -->
                     <div class="headContainer3" id="auth-links">
                         <a href="login.html" class="LOGIN1" id="login-link">Login</a>
                         <a href="signup.html" id="signup-link">
                             <button class="BUTTON_LOG" type="button">Sign Up</button>
                         </a>
                     </div>
+        
+                    <!-- User Info (Displayed after login) -->
                     <div id="user-info" class="user-info" style="display: none;">
                         <img id="user-profile-pic" src="" alt="Profile Picture" width="40" style="border-radius: 50%; display: none;">
                         <span id="user-email" class="welcome-text"></span>
@@ -1907,29 +1757,33 @@ padding-bottom: 24px;
                     </div>
                 </div>
             </div>
-        <script>
-            function toggleMenu() {
-                document.querySelector(".nav-links").classList.toggle("show");
-            }
-
-            document.addEventListener("DOMContentLoaded", () => {
-                const userInfo = document.getElementById("user-info");
-                const authLinks = document.getElementById("auth-links");
-                const userEmail = document.getElementById("user-email");
-                const logoutButton = document.getElementById("logout-button");
-            const loggedInUser = localStorage.getItem("userName");
-            if (loggedInUser) {
-                userEmail.textContent = `Hello\n, ${loggedInUser}`; // Display user name
-                userInfo.style.display = "flex";  // Show user info
-                authLinks.style.display = "none"; // Hide login/signup links
-            }
-            logoutButton.addEventListener("click", () => {
-                localStorage.clear(); // Remove stored user data
-                location.reload(); // Refresh page
-                });
-            });
-        </script>
         </div>
+
+<script>
+    function toggleMenu() {
+        document.querySelector(".nav-links").classList.toggle("show");
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const userInfo = document.getElementById("user-info");
+        const authLinks = document.getElementById("auth-links");
+        const userEmail = document.getElementById("user-email");
+        const logoutButton = document.getElementById("logout-button");
+
+        const loggedInUser = localStorage.getItem("userName");
+        if (loggedInUser) {
+            userEmail.textContent = `Hello, ${loggedInUser}`; // Display user name
+            userInfo.style.display = "flex";  // Show user info
+            authLinks.style.display = "none"; // Hide login/signup links
+        }
+
+        logoutButton.addEventListener("click", () => {
+            localStorage.clear(); // Remove stored user data
+            location.reload(); // Refresh page
+        });
+    });
+</script>
+
         <div class="break"></div>
 
 
