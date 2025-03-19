@@ -1847,7 +1847,7 @@ padding-bottom: 24px;
                 const logoutButton = document.getElementById("logout-button");
             const loggedInUser = localStorage.getItem("userName");
             if (loggedInUser) {
-                userEmail.textContent = `Hello, ${loggedInUser}`; // Display user name
+                userEmail.textContent = `Hello\n, ${loggedInUser}`; // Display user name
                 userInfo.style.display = "flex";  // Show user info
                 authLinks.style.display = "none"; // Hide login/signup links
             }
