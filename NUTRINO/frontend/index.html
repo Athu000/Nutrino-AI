@@ -263,10 +263,11 @@
             min-height: 70px;
             padding-top: 75px;
         }
-        .header1 {
-    padding-top: 20px;
-    background-color: #000;
-    border-bottom: 2px solid #333;
+        /* HEADER */
+.header1 {
+    padding-top: 12px;
+    background-color: #000000;
+    border-bottom: 1px solid #303030;
     position: fixed;
     z-index: 1000;
     left: 0;
@@ -276,9 +277,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 15px 40px;
+    padding: 15px 50px;
+    width: 100%;
 }
 
+/* CONTAINERS */
 .headContainer1 {
     padding-left: 16px;
     padding-right: 16px;
@@ -310,7 +313,7 @@
     flex-grow: 0;
 }
 
-/* Logo & Branding */
+/* LOGO & BRANDING */
 .LOGONAME {
     font-size: 24px;
     font-weight: bold;
@@ -322,24 +325,26 @@
 }
 
 .AILOGO {
-    background-color: #00ccff;
-    color: #fff;
-    border-radius: 50%;
-    font-size: 14px;
-    padding: 4px 10px;
-    margin-left: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 16px;
-    height: 16px;
-    position: absolute;
     top: 3px;
     right: 3px;
     transform: translate(50%, -50%);
+    z-index: 100;
+    position: absolute;
+    min-width: 16px;
+    height: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    padding-left: calc(10px / 2);
+    padding-right: calc(10px / 2);
+    border-radius: 1000px;
+    background-color: #00ccff;
+    color: #fff;
+    white-space: nowrap;
 }
 
-/* Navigation Links */
+/* NAVIGATION LINKS */
 .header1 a {
     text-decoration: none;
     color: #b3b3b3;
@@ -353,7 +358,7 @@
     color: #00ccff;
 }
 
-/* Auth Buttons */
+/* AUTH BUTTONS */
 .BUTTON_LOG, .logout-button {
     font-size: 14px;
     font-weight: bold;
@@ -395,7 +400,7 @@
     color: black;
 }
 
-/* Dark Mode Toggle */
+/* DARK MODE TOGGLE */
 .dark-mode-toggle {
     background: none;
     border: 2px solid #00ccff;
@@ -411,7 +416,7 @@
     color: #000;
 }
 
-/* NUTRINO Branding */
+/* NUTRINO BRANDING */
 .NUTRINOspell {
     font-family: 'Pacifico', cursive;
     font-size: 24px;
@@ -428,7 +433,7 @@
     outline-offset: 2px;
 }
 
-/* Login & Signup Buttons */
+/* LOGIN & SIGNUP BUTTONS */
 .LOGIN1 {
     display: block;
     line-height: 1;
@@ -451,7 +456,7 @@
     }
 }
 
-/* Signup Button Wrapper */
+/* SIGNUP BUTTON WRAPPER */
 .SIGNUP_but {
     display: flex;
     align-items: center;
@@ -460,7 +465,7 @@
     overflow: visible;
 }
 
-/* Button Label */
+/* BUTTON LABEL */
 .BUT_LABEL {
     white-space: nowrap;
     height: 100%;
@@ -469,7 +474,7 @@
     align-items: center;
 }
 
-/* AI Meal Planner & Grocery List (Cooking Assistant) */
+/* AI MEAL PLANNER & GROCERY LIST (COOKING ASSISTANT) */
 .ai-meal-planner, .cooking-assistant {
     background: #222;
     padding: 20px;
@@ -486,23 +491,29 @@
     margin-bottom: 15px;
 }
 
-/* Checkbox Styling */
+/* CHECKBOX STYLING */
 .cooking-assistant input[type="checkbox"] {
     margin-right: 10px;
     transform: scale(1.2);
 }
 
-/* Animations */
+/* ANIMATIONS */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .header1, .ai-meal-planner, .cooking-assistant {
     animation: fadeIn 0.6s ease-in-out;
 }
 
-/* User Email */
+/* USER EMAIL */
 #user-email {
     color: #00ccff;
     font-weight: bold;
@@ -510,7 +521,7 @@
     padding-left: 10px;
 }
 
-/* Responsive Design */
+/* RESPONSIVE DESIGN */
 @media (max-width: 768px) {
     .header1 {
         flex-direction: column;
