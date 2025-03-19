@@ -356,7 +356,7 @@ document.addEventListener("DOMContentLoaded", function () {
         submitButton.textContent = "Generating...";
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/generate-meal-plan`, { 
+            const response = await fetch(`${API_BASE_URL}/generate-meal-plan`, { 
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -392,7 +392,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/meal-plan`, {
+            const response = await fetch(`${API_BASE_URL}/meal-plan`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${authToken}`
