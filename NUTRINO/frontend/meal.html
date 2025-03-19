@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My AI Meal Plan</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+            font-weight: 700;
+        }
+
+        #meal-plan {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s ease;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>My AI Meal Plan</h2>
+        <button onclick="fetchMealPlan()">Load Meal Plan</button>
+        <div id="meal-plan"></div>
+    </div>
+
+    <script src="NutrinoAPI.js"></script>
+</body>
+</html>
