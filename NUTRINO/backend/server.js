@@ -86,7 +86,7 @@ app.post("/api/fetch-recipe", verifyAuthToken, async (req, res) => {
                         - Format steps in a numbered list, removing any unnecessary symbols like "**".`
                     }]
                 }]
-            }),
+            } ),
         });
 
         const data = await response.json();
@@ -149,6 +149,67 @@ app.get("/api/recent-recipes", verifyAuthToken, async (req, res) => {
     } catch (error) {
         console.error("❌ Error fetching recent recipes:", error.message);
         return res.status(500).json({ error: "Failed to retrieve recent recipes." });
+    }
+});
+
+// ✅ Update Firestore Recipes to Structured Format (Without Image)
+app.post("/api/update-recipes", async (req, res) => {
+    try {
+        const recipesRef = db.collection("recipes");
+        const snapshot = await recipesRef.get();
+
+        let updatedCount = 0;
+
+        const batch = db.batch(); // ✅ Use batch for efficiency
+
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+
+            // ✅ Check if recipe is missing structured fields
+            if (!data.title || !data.ingredients || !data.steps) {
+                console.log(`🔄 Updating recipe: ${doc.id}`);
+
+                // ✅ Extract structured data from "recipe" text (basic parsing)
+                const recipeText = data.content || "";
+                const titleMatch = recipeText.match(/## (.*?) 🍋/);
+                const title = titleMatch ? titleMatch[1] : "Untitled Recipe";
+
+                const ingredientsMatch = recipeText.match(/\*\*Ingredients:\*\*([\s\S]*?)\*\*/);
+                const ingredientsList = ingredientsMatch ? 
+                    ingredientsMatch[1].split("\n").map(item => item.trim()).filter(Boolean) : [];
+
+                const stepsMatch = recipeText.match(/\*\*Instructions:\*\*([\s\S]*?)\*\*/);
+                const stepsList = stepsMatch ? 
+                    stepsMatch[1].split("\n").map(item => item.trim()).filter(Boolean) : [];
+
+                // ✅ Prepare updated data (without image)
+                const updatedData = {
+                    title,
+                    ingredients: ingredientsList,
+                    steps: stepsList,
+                    calories: 350, // Default value, adjust if needed
+                    servings: 12,
+                    prepTime: 20,
+                    cookTime: 35,
+                    totalTime: 55,
+                    tags: ["dessert", "cake", "lemon"]
+                };
+
+                // ✅ Batch update
+                batch.update(doc.ref, updatedData);
+                updatedCount++;
+            }
+        });
+
+        // ✅ Commit batch updates
+        await batch.commit();
+        console.log(`✅ Successfully updated ${updatedCount} recipes.`);
+
+        res.json({ message: `Updated ${updatedCount} recipes successfully!` });
+
+    } catch (error) {
+        console.error("❌ Error updating recipes:", error.message);
+        res.status(500).json({ error: "Failed to update recipes." });
     }
 });
 
