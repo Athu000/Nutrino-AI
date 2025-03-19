@@ -306,31 +306,43 @@ document.addEventListener("DOMContentLoaded", function () {
     displayRecipe();
 });
 
-// ✅ Updated NutrinoAPI.js to Match mealplanner.html
-
+// ✅ Submit Meal Plan Request
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("meal-planner-form");
 
-    form.addEventListener("submit", async function (event) {
+    form?.addEventListener("submit", async function (event) {
         event.preventDefault();
 
+        // Get user auth token
+        const authToken = await getAuthToken();
+        if (!authToken) {
+            alert("Authentication required. Please log in.");
+            return;
+        }
+
         // Gather input values
-        const ingredients = document.getElementById("ingredients").value;
+        const ingredients = document.getElementById("ingredients").value.trim();
         const mealsPerDay = document.getElementById("meals").value;
         const servings = document.getElementById("servings").value;
-        
+
         // Collect dietary restrictions
         const dietaryRestrictions = [];
         document.querySelectorAll("input[name='dietary']:checked").forEach(checkbox => {
             if (checkbox.id === "other-diet") {
-                const otherDietText = document.getElementById("other-diet-text").value;
+                const otherDietText = document.getElementById("other-diet-text").value.trim();
                 if (otherDietText) dietaryRestrictions.push(otherDietText);
             } else {
                 dietaryRestrictions.push(checkbox.value);
             }
         });
 
-        // Prepare request body
+        // Validate input fields
+        if (!ingredients || !mealsPerDay || !servings) {
+            alert("Please fill all required fields.");
+            return;
+        }
+
+        // Prepare request payload
         const requestBody = {
             ingredients,
             mealsPerDay: parseInt(mealsPerDay, 10),
@@ -338,11 +350,17 @@ document.addEventListener("DOMContentLoaded", function () {
             dietaryRestrictions
         };
 
+        // Disable button to prevent multiple requests
+        const submitButton = document.getElementById("createMealPlanBtn");
+        submitButton.disabled = true;
+        submitButton.textContent = "Generating...";
+
         try {
             const response = await fetch("/api/generate-meal-plan", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${authToken}`
                 },
                 body: JSON.stringify(requestBody)
             });
@@ -352,11 +370,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 localStorage.setItem("mealPlanId", data.mealPlanId);
                 window.location.href = "meals.html"; // Redirect to meals page
             } else {
-                alert("Failed to generate meal plan: " + data.error);
+                alert("❌ Failed to generate meal plan: " + data.error);
             }
         } catch (error) {
-            console.error("Error generating meal plan:", error);
+            console.error("❌ Error generating meal plan:", error);
             alert("An error occurred. Please try again.");
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = "Create Meal Plan";
         }
     });
 });
@@ -371,9 +392,20 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         try {
-            const response = await fetch(`/api/get-meal-plan?mealPlanId=${mealPlanId}`);
-            const data = await response.json();
+            const authToken = await getAuthToken();
+            if (!authToken) {
+                alert("Authentication required. Please log in.");
+                return;
+            }
 
+            const response = await fetch(`/api/get-meal-plan/${mealPlanId}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${authToken}`
+                }
+            });
+
+            const data = await response.json();
             if (response.ok) {
                 document.getElementById("meal-plan").innerHTML = `<h3>Your AI Meal Plan:</h3><p>${data.mealPlan.replace(/\n/g, '<br>')}</p>`;
             } else {
@@ -384,7 +416,7 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("meal-plan").innerText = "An error occurred.";
         }
     }
-    
+
     function goBack() {
         localStorage.removeItem("mealPlanId");
         window.location.href = "index.html";
