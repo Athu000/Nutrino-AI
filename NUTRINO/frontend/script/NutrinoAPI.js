@@ -305,81 +305,90 @@ document.addEventListener("DOMContentLoaded", function () {
 
     displayRecipe();
 });
-
 // ✅ Submit Meal Plan Request
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("meal-planner-form");
 
-    form?.addEventListener("submit", async function (event) {
-        event.preventDefault();
+    if (form) {
+        form.addEventListener("submit", async function (event) {
+            event.preventDefault();
 
-        // Get user auth token
-        const authToken = await getAuthToken();
-        if (!authToken) {
-            alert("Authentication required. Please log in.");
-            return;
-        }
-
-        // Gather input values
-        const ingredients = document.getElementById("ingredients").value.trim();
-        const mealsPerDay = document.getElementById("meals").value;
-        const servings = document.getElementById("servings").value;
-
-        // Collect dietary restrictions
-        const dietaryRestrictions = [];
-        document.querySelectorAll("input[name='dietary']:checked").forEach(checkbox => {
-            if (checkbox.id === "other-diet") {
-                const otherDietText = document.getElementById("other-diet-text").value.trim();
-                if (otherDietText) dietaryRestrictions.push(otherDietText);
-            } else {
-                dietaryRestrictions.push(checkbox.value);
+            // Get user auth token
+            const authToken = await getAuthToken();
+            if (!authToken) {
+                alert("Authentication required. Please log in.");
+                return;
             }
-        });
 
-        // Validate input fields
-        if (!ingredients || !mealsPerDay || !servings) {
-            alert("Please fill all required fields.");
-            return;
-        }
+            // Gather input values
+            const ingredients = document.getElementById("ingredients").value.trim();
+            const mealsPerDay = document.getElementById("meals").value;
+            const servings = document.getElementById("servings").value;
 
-        // Prepare request payload
-        const requestBody = {
-            ingredients,
-            mealsPerDay: parseInt(mealsPerDay, 10),
-            servings: parseInt(servings, 10),
-            dietaryRestrictions
-        };
-
-        // Disable button to prevent multiple requests
-        const submitButton = document.getElementById("createMealPlanBtn");
-        submitButton.disabled = true;
-        submitButton.textContent = "Generating...";
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/generate-meal-plan`, { 
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${authToken}`
-                },
-                body: JSON.stringify(requestBody)
+            // Collect dietary restrictions
+            const dietaryRestrictions = [];
+            document.querySelectorAll("input[name='dietary']:checked").forEach(checkbox => {
+                if (checkbox.id === "other-diet") {
+                    const otherDietText = document.getElementById("other-diet-text").value.trim();
+                    if (otherDietText) dietaryRestrictions.push(otherDietText);
+                } else {
+                    dietaryRestrictions.push(checkbox.value);
+                }
             });
 
-            const data = await response.json();
-            if (response.ok) {
-                localStorage.setItem("mealPlanId", data.mealPlanId);
-                window.location.href = "meals.html"; // Redirect to meals page
-            } else {
-                alert("❌ Failed to generate meal plan: " + data.error);
+            // ✅ Validate input fields
+            if (!ingredients) {
+                alert("⚠️ Please enter ingredients.");
+                return;
             }
-        } catch (error) {
-            console.error("❌ Error generating meal plan:", error);
-            alert("An error occurred. Please try again.");
-        } finally {
-            submitButton.disabled = false;
-            submitButton.textContent = "Create Meal Plan";
-        }
-    });
+            if (!mealsPerDay || isNaN(mealsPerDay) || mealsPerDay < 1) {
+                alert("⚠️ Please select a valid number of meals per day.");
+                return;
+            }
+            if (!servings || isNaN(servings) || servings < 1) {
+                alert("⚠️ Please enter a valid number of servings.");
+                return;
+            }
+
+            // ✅ Prepare request payload
+            const requestBody = {
+                ingredients,
+                mealsPerDay: parseInt(mealsPerDay, 10),
+                servings: parseInt(servings, 10),
+                dietaryRestrictions
+            };
+
+            // ✅ Disable button to prevent multiple requests
+            const submitButton = document.getElementById("createMealPlanBtn");
+            submitButton.disabled = true;
+            submitButton.textContent = "⏳ Generating...";
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/generate-meal-plan`, { 
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const data = await response.json();
+                if (response.ok && data.mealPlanId) {
+                    localStorage.setItem("mealPlanId", data.mealPlanId);
+                    window.location.href = "meals.html"; // Redirect to meals page
+                } else {
+                    alert(`❌ Failed to generate meal plan: ${data.error || "Unknown error"}`);
+                }
+            } catch (error) {
+                console.error("❌ Error generating meal plan:", error);
+                alert("⚠️ Network error. Please try again.");
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = "Create Meal Plan";
+            }
+        });
+    }
 });
 
 // ✅ Fetch and Display Meal Plan in meals.html
@@ -401,13 +410,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const data = await response.json();
             if (response.ok && data.mealPlan) {
-                document.getElementById("meal-plan").innerHTML = `<h3>Your AI Meal Plan:</h3><p>${data.mealPlan.replace(/\n/g, '<br>')}</p>`;
+                document.getElementById("meal-plan").innerHTML = `<h3>🥗 Your AI Meal Plan:</h3><p>${data.mealPlan.replace(/\n/g, '<br>')}</p>`;
             } else {
-                document.getElementById("meal-plan").innerText = "No meal plan found.";
+                document.getElementById("meal-plan").innerText = "⚠️ No meal plan found.";
             }
         } catch (error) {
             console.error("❌ Error fetching meal plan:", error);
-            document.getElementById("meal-plan").innerText = "An error occurred.";
+            document.getElementById("meal-plan").innerText = "⚠️ An error occurred while retrieving the meal plan.";
         }
     }
 
