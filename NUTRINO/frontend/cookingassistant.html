@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cooking Assistant | Nutrino AI</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .step-display {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #555;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            font-size: 16px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #218838;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🍳 Cooking Assistant</h2>
+        <p>Follow step-by-step instructions to cook your meal!</p>
+        
+        <!-- Step Display -->
+        <div class="step-display">Click "Start Cooking" to begin.</div>
+        
+        <!-- Buttons -->
+        <div class="button-group">
+            <button id="startCooking">Start Cooking</button>
+            <button id="nextStep" disabled>Next Step</button>
+            <button id="voiceAssist" disabled>🔊 Voice Assist</button>
+        </div>
+    </div>
+</body>
+</html>
