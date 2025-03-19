@@ -241,7 +241,7 @@ app.post("/api/generate-meal-plan", verifyAuthToken, async (req, res) => {
 });
 
 // ✅ Delete Latest Meal Plan
-app.delete("/api/delete-meal-plan", verifyAuthToken, async (req, res) => {
+app.delete("/api/delete-meal-plan", async (req, res) => {
     try {
         const { userId } = req.user;
         if (!userId) return res.status(400).json({ error: "User ID is required." });
