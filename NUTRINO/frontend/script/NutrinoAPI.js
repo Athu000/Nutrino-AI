@@ -356,15 +356,14 @@ document.addEventListener("DOMContentLoaded", function () {
         submitButton.textContent = "Generating...";
 
         try {
-            const response = await fetch(`${API_BASE_URL}/generate-meal-plan`, { 
+            const response = await fetch(`${API_BASE_URL}/api/generate-meal-plan`, { 
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${authToken}`
                 },
-                body: JSON.stringify({ ingredients, mealsPerDay, servings, dietaryRestrictions })
+                body: JSON.stringify(requestBody)
             });
-
 
             const data = await response.json();
             if (response.ok) {
@@ -386,20 +385,14 @@ document.addEventListener("DOMContentLoaded", function () {
 // ✅ Fetch and Display Meal Plan in meals.html
 document.addEventListener("DOMContentLoaded", function () {
     async function fetchMealPlan() {
-        const mealPlanId = localStorage.getItem("mealPlanId");
-        if (!mealPlanId) {
-            document.getElementById("meal-plan").innerText = "No meal plan found.";
+        const authToken = await getAuthToken();
+        if (!authToken) {
+            alert("Authentication required. Please log in.");
             return;
         }
 
         try {
-            const authToken = await getAuthToken();
-            if (!authToken) {
-                alert("Authentication required. Please log in.");
-                return;
-            }
-
-            const response = await fetch(`/api/get-meal-plan/${mealPlanId}`, {
+            const response = await fetch(`${API_BASE_URL}/api/meal-plan`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${authToken}`
@@ -407,13 +400,13 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             const data = await response.json();
-            if (response.ok) {
+            if (response.ok && data.mealPlan) {
                 document.getElementById("meal-plan").innerHTML = `<h3>Your AI Meal Plan:</h3><p>${data.mealPlan.replace(/\n/g, '<br>')}</p>`;
             } else {
-                document.getElementById("meal-plan").innerText = "Failed to load meal plan.";
+                document.getElementById("meal-plan").innerText = "No meal plan found.";
             }
         } catch (error) {
-            console.error("Error fetching meal plan:", error);
+            console.error("❌ Error fetching meal plan:", error);
             document.getElementById("meal-plan").innerText = "An error occurred.";
         }
     }
