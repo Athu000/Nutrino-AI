@@ -151,6 +151,85 @@ app.get("/api/recent-recipes", verifyAuthToken, async (req, res) => {
         return res.status(500).json({ error: "Failed to retrieve recent recipes." });
     }
 });
+// ✅ AI Meal Planner API Route
+app.post("/api/generate-meal-plan", verifyAuthToken, async (req, res) => {
+    try {
+        console.log("📩 Received Meal Plan Request:", req.body);
+
+        const { ingredients, mealsPerDay, servings, dietaryRestrictions } = req.body;
+        if (!ingredients || !mealsPerDay || !servings) {
+            return res.status(400).json({ error: "❌ Missing required fields." });
+        }
+
+        // Construct prompt for AI
+        const prompt = `
+            Create a structured meal plan using the following details:
+            - Ingredients: ${ingredients}
+            - Meals per day: ${mealsPerDay}
+            - Servings: ${servings}
+            - Dietary restrictions: ${dietaryRestrictions.length > 0 ? dietaryRestrictions.join(", ") : "None"}
+            
+            The plan should include:
+            1. Breakfast, lunch, dinner, and snacks (if applicable).
+            2. Detailed meal descriptions.
+            3. Ingredient breakdown and cooking instructions.
+            4. Approximate calories per meal.
+            5. Food-related emojis for a visually engaging output.
+            Format the response in an easy-to-read, structured way.
+        `;
+
+        const response = await fetch(API_URL, { 
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }]
+            }),
+        });
+
+        const data = await response.json();
+        console.log("🔹 AI Meal Plan Response:", JSON.stringify(data, null, 2));
+
+        if (!response.ok) {
+            return res.status(response.status).json({
+                error: data.error?.message || "❌ API request failed",
+                details: data
+            });
+        }
+
+        if (!data || !data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
+            return res.status(500).json({
+                error: "❌ Invalid meal plan response format",
+                solution: "Try again later or check the API response structure."
+            });
+        }
+
+        const mealPlanText = data.candidates[0].content.parts[0].text;
+        console.log("🔹 Generated Meal Plan:", mealPlanText);
+
+        // Store the meal plan in Firebase Firestore
+        const mealPlanRef = db.collection("meals").doc();
+        await mealPlanRef.set({
+            userId: req.user.uid,
+            ingredients,
+            mealsPerDay,
+            servings,
+            dietaryRestrictions,
+            mealPlan: mealPlanText,
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        console.log(`✅ Meal Plan stored in Firestore: ${mealPlanRef.id}`);
+        return res.json({ mealPlan: mealPlanText });
+
+    } catch (error) {
+        console.error("❌ Error generating meal plan:", error.message);
+        return res.status(500).json({
+            error: "❌ Failed to generate meal plan",
+            details: error.message,
+            solution: "Try again later or check API key validity."
+        });
+    }
+});
 
 // ✅ Update Firestore Recipes to Structured Format (Without Image)
 app.post("/api/update-recipes", async (req, res) => {
