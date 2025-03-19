@@ -181,7 +181,7 @@ async function displayRecipe() {
 
         // ✅ Update UI Elements
         document.getElementById("recipe-title").textContent = extractTitle(latestRecipe);
-        document.getElementById("recipe-desc").textContent = "A delicious AI-generated recipe! 😋";
+        document.getElementById("recipe-desc").textContent = "A delicious AI-generated recipe! 😋\n" + extractSection(latestRecipe, "Note");
         console.log("✅ Extracting Ingredients...");
         document.getElementById("ingredients-list").innerHTML = extractSection(latestRecipe, "Ingredients");
 
