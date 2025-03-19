@@ -18,11 +18,6 @@ if (!API_KEY) {
     console.error("❌ ERROR: Missing API_KEY in environment variables.");
     process.exit(1);
 }
-app.get("/api", (req, res) => {
-    res.json({ message: "API is working!" });
-});
-const cors = require("cors");
-app.use(cors());
 
 // ✅ Initialize Firebase Admin SDK
 let serviceAccount;
@@ -54,7 +49,7 @@ async function verifyAuthToken(req, res, next) {
 
         const idToken = authHeader.split("Bearer ")[1];
         console.log("🔑 Received Auth Token:", idToken);
-        
+
         const decodedToken = await admin.auth().verifyIdToken(idToken);
         req.user = decodedToken;
         console.log(`🔑 Authenticated User: ${decodedToken.email}`);
@@ -68,7 +63,7 @@ async function verifyAuthToken(req, res, next) {
     }
 }
 
-// ✅ Recipe Fetching API Route
+// ✅ Fetch Recipe API Route
 app.post("/api/fetch-recipe", verifyAuthToken, async (req, res) => {
     try {
         console.log("📩 Received Request:", req.body);
@@ -82,16 +77,8 @@ app.post("/api/fetch-recipe", verifyAuthToken, async (req, res) => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: `Provide a detailed, structured recipe for ${prompt}. 
-                        - Include a title, ingredients, step-by-step instructions, and nutritional facts.
-                        - Specify the number of calories in a clear format.
-                        - Use appropriate food-related emojis to make the recipe visually engaging.
-                        - Format steps in a numbered list, removing any unnecessary symbols like "**".`
-                    }]
-                }]
-            } ),
+                contents: [{ parts: [{ text: `Provide a detailed, structured recipe for ${prompt}.` }] }]
+            }),
         });
 
         const data = await response.json();
@@ -104,16 +91,12 @@ app.post("/api/fetch-recipe", verifyAuthToken, async (req, res) => {
             });
         }
 
-        if (!data || !data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
-            return res.status(500).json({
-                error: "❌ Invalid recipe response format",
-                solution: "Try again later or check the API response structure."
-            });
+        const recipeText = data.candidates[0]?.content?.parts[0]?.text;
+        if (!recipeText) {
+            return res.status(500).json({ error: "❌ Invalid recipe response format" });
         }
 
-        const recipeText = data.candidates[0].content.parts[0].text;
-        console.log("🔹 Extracted Recipe:", recipeText);
-
+        // Store Recipe in Firestore
         const newRecipeRef = db.collection("recipes").doc();
         await newRecipeRef.set({
             userId: req.user.uid,
@@ -122,17 +105,14 @@ app.post("/api/fetch-recipe", verifyAuthToken, async (req, res) => {
         });
 
         console.log(`✅ Recipe stored successfully in Firestore: ${newRecipeRef.id}`);
-        return res.json({ candidates: [{ content: { parts: [{ text: recipeText }] } }] });
+        return res.json({ recipe: recipeText });
 
     } catch (error) {
         console.error("❌ Error fetching recipe:", error.message);
-        return res.status(500).json({
-            error: "❌ Failed to fetch from Gemini API",
-            details: error.message,
-            solution: "Try again later or check if your API key is valid."
-        });
+        return res.status(500).json({ error: "Failed to fetch recipe", details: error.message });
     }
 });
+
 // ✅ Fetch User's Latest Meal Plan
 app.get("/api/meal-plan", verifyAuthToken, async (req, res) => {
     try {
@@ -155,7 +135,7 @@ app.get("/api/meal-plan", verifyAuthToken, async (req, res) => {
     }
 });
 
-// ✅ Store Meal Plan with User ID
+// ✅ Store Meal Plan
 app.post("/api/generate-meal-plan", verifyAuthToken, async (req, res) => {
     try {
         console.log("📩 Received Meal Plan Request:", req.body);
@@ -171,13 +151,6 @@ app.post("/api/generate-meal-plan", verifyAuthToken, async (req, res) => {
             - Meals per day: ${mealsPerDay}
             - Servings: ${servings}
             - Dietary restrictions: ${dietaryRestrictions.length > 0 ? dietaryRestrictions.join(", ") : "None"}
-
-            Format:
-            - Include Breakfast, Lunch, Dinner, and Snacks.
-            - Provide a detailed meal description.
-            - List ingredients and cooking instructions.
-            - Approximate calories per meal.
-            - Use engaging food-related emojis.
         `;
 
         const response = await fetch(API_URL, { 
@@ -187,7 +160,7 @@ app.post("/api/generate-meal-plan", verifyAuthToken, async (req, res) => {
         });
 
         const data = await response.json();
-        if (!response.ok || !data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
+        if (!data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
             return res.status(500).json({ error: "Invalid AI response format" });
         }
 
@@ -234,6 +207,6 @@ app.delete("/api/delete-meal-plan", verifyAuthToken, async (req, res) => {
     }
 });
 
-// ✅ Dynamic Port Handling
+// ✅ Start Server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
