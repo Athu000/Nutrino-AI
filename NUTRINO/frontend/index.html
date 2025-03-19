@@ -263,264 +263,271 @@
             min-height: 70px;
             padding-top: 75px;
         }
-        .header1{
-            padding-top: 12px;
-            background-color: #000000;
-            border-bottom: 1px solid #303030;
-            position: fixed;
-            z-index: 100;
-            left: 0;
-            right: 0;
-            top: 0;
-            min-height: 50px;
-            padding-top: 25px;
-        }
-        .headContainer1{
-            padding-left: 16px;
-            padding-right: 16px;
-            max-width: 960px;
-            margin-left: auto;
-            margin-right: auto;
-            padding-bottom: 12px;
-        }
-        .headContainer2 {
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            gap: 16px;
-            box-sizing: border-box;
-            flex-grow: 0;
-        }
-        .headContainer3{
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            flex-wrap: wrap;
-            justify-content: flex-start;
-            gap: 16px;
-            box-sizing: border-box;
-            flex-grow: 0;
-        }
-        .LOGONAME{
-            position: relative;
-            display: block;
-        }
-        .AILOGO
-        {
-            top: 3px;
-            right: 3px;
-            transform: translate(50%, -50%);
-            z-index: 100;
-            position: absolute;
-            min-width: 16px;
-            height: 16px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 12px;
-            padding-left: calc(10px / 2);
-            padding-right: calc(10px / 2);
-            border-radius: 1000px;
-            background-color: #00ccff;
-            color: #fff;
-            white-space: nowrap;
-            top: 3px;
-            right: 3px;
-            transform: translate(50%, -50%);
-            position: absolute;
-            min-width: 16px;
-            height: 16px;
-            border-radius: 1000px;
-        }
-        .BUTTON_LOG {
-            -webkit-tap-highlight-color: transparent;
-            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-            cursor: pointer;
-            border: 0;
-            padding: 0;
-            appearance: none;
-            font-size: 16px;
-            background-color: transparent;
-            text-align: left;
-            color: #000;
-            text-decoration: none;
-            box-sizing: border-box;
-            height: 36px;
-            padding-left: 18px;
-            padding-right: 18px;
-            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-            -webkit-tap-highlight-color: transparent;
-            display: inline-block;
-            width: auto;
-            border-radius: 4px;
-            font-weight: 600;
-            position: relative;
-            line-height: 1;
-            font-size: 14px;
-            user-select: none;
-            cursor: pointer;
-            border: 1px solid transparent;
-            background-color: #00ccff;
-            color: #fff;
-        }
+        .header1 {
+    padding-top: 20px;
+    background-color: #000;
+    border-bottom: 2px solid #333;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    right: 0;
+    top: 0;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 40px;
+}
 
-        .BUTTON_LOG:focus {
-            outline-offset: 2px;
-            outline: 2px solid #0400ff;
-        }
+.headContainer1 {
+    padding-left: 16px;
+    padding-right: 16px;
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-bottom: 12px;
+}
 
-        .BUTTON_LOG:focus:not(:focus-visible) {
-            outline: none;
-        }
+.headContainer2 {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 16px;
+    flex-grow: 0;
+}
 
-        .BUTTON_LOG:focus {
-            outline-offset: 2px;
-            outline: 2px solid #0400ff;
-        }
+.headContainer3 {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 16px;
+    flex-grow: 0;
+}
 
-        .BUTTON_LOG:focus:not(:focus-visible) {
-            outline: none;
-        }
+/* Logo & Branding */
+.LOGONAME {
+    font-size: 24px;
+    font-weight: bold;
+    color: #00ccff;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
 
-        @media (hover: hover) {
-            .BUTTON_LOG:hover {
-                background-color:#0400ff;
-            }
-        }
+.AILOGO {
+    background-color: #00ccff;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 14px;
+    padding: 4px 10px;
+    margin-left: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 16px;
+    height: 16px;
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    transform: translate(50%, -50%);
+}
 
-        @media (hover: none) {
-            .BUTTON_LOG:active {
-                background-color:#0400ff;
-            }
-        }
+/* Navigation Links */
+.header1 a {
+    text-decoration: none;
+    color: #b3b3b3;
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0 15px;
+    transition: color 0.3s ease-in-out;
+}
 
-        .BUTTON_LOG:active {
-            transform: translateY(1px);
-        }
+.header1 a:hover {
+    color: #00ccff;
+}
 
-        .BUTTON_LOG:disabled,.BUTTON_LOG[data-disabled] {
-            border-color: transparent;
-            background-color: #e9ecef;
-            color: #adb5bd;
-            cursor: not-allowed;
-            background-image: none;
-            pointer-events: none;
-        }
+/* Auth Buttons */
+.BUTTON_LOG, .logout-button {
+    font-size: 14px;
+    font-weight: bold;
+    padding: 10px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+    border: 1px solid transparent;
+}
 
-        .BUTTON_LOG:disabled:active,.BUTTON_LOG[data-disabled]:active {
-            transform: none;
-        }
+.BUTTON_LOG {
+    background-color: #00ccff;
+    color: #fff;
+}
 
-        .BUTTON_LOG[data-loading] {
-            pointer-events: none;
-        }
+.BUTTON_LOG:hover {
+    background-color: #008cff;
+}
 
-        .BUTTON_LOG[data-loading]::before {
-            content: "";
-            position: absolute;
-            top: -1px;
-            left: -1px;
-            right: -1px;
-            bottom: -1px;
-            background-color: rgba(255, 255, 255, .5);
-            border-radius: 4px;
-            cursor: not-allowed;
-        }
-        .logout-button{
-             -webkit-tap-highlight-color: transparent;
-            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-            cursor: pointer;
-            border: 0;
-            padding: 0;
-            appearance: none;
-            font-size: 16px;
-            background-color: transparent;
-            text-align: left;
-            color: #000;
-            text-decoration: none;
-            box-sizing: border-box;
-            height: 36px;
-            padding-left: 18px;
-            padding-right: 18px;
-            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-            -webkit-tap-highlight-color: transparent;
-            display: inline-block;
-            width: auto;
-            border-radius: 4px;
-            font-weight: 600;
-            position: relative;
-            line-height: 1;
-            font-size: 14px;
-            user-select: none;
-            cursor: pointer;
-            border: 1px solid transparent;
-            background-color: #00ccff;
-            color: #fff;
-        }
-        .NUTRINOspell {
-            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-            -webkit-tap-highlight-color: transparent;
-            color: inherit;
-            font-size: inherit;
-            line-height: 1.55;
-            text-decoration: none;
-            font-family: 'Pacifico',cursive;
-            font-size: 24px;
-            line-height: 1;
-            display: inline-block;
-            width: 65px;
-            height: 14px;
-            color: #00ccff;
-            padding-right: 12px;
-        }
+.BUTTON_LOG:focus {
+    outline: 2px solid #0400ff;
+    outline-offset: 2px;
+}
 
-        .NUTRINOspell:focus {
-            outline-offset: 2px;
-            outline: 2px solid #0400ff;
-        }
+.BUTTON_LOG:disabled, .BUTTON_LOG[data-disabled] {
+    background-color: #e9ecef;
+    color: #adb5bd;
+    cursor: not-allowed;
+}
 
-        .NUTRINOspell:focus:not(:focus-visible) {
-            outline: none;
-        }
-        .LOGIN1 {
-            display: block;
-            line-height: 1;
-            padding: 8px 12px;
-            border-radius: 4px;
-            text-decoration: none;
-            color: #495057;
-            font-size: 14px;
-            font-weight: 500;
-        }	
+.logout-button {
+    background-color: transparent;
+    border: 2px solid #00ccff;
+    color: #00ccff;
+}
 
-        .LOGIN1:hover {
-            background-color: #3d3d3d;
-        }
+.logout-button:hover {
+    background-color: #00ccff;
+    color: black;
+}
 
-        @media (max-width: 767px) {
-            .LOGIN1 {
-                border-radius:0;
-                padding: 16px;
-            }
-        }
-        .SIGNUP_but{
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            overflow: visible;
-        }
-        .BUT_LABEL{
-            white-space: nowrap;
-            height: 100%;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-        }
+/* Dark Mode Toggle */
+.dark-mode-toggle {
+    background: none;
+    border: 2px solid #00ccff;
+    color: #00ccff;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    transition: 0.3s ease-in-out;
+}
+
+.dark-mode-toggle:hover {
+    background: #00ccff;
+    color: #000;
+}
+
+/* NUTRINO Branding */
+.NUTRINOspell {
+    font-family: 'Pacifico', cursive;
+    font-size: 24px;
+    line-height: 1;
+    display: inline-block;
+    width: 65px;
+    height: 14px;
+    color: #00ccff;
+    padding-right: 12px;
+}
+
+.NUTRINOspell:focus {
+    outline: 2px solid #0400ff;
+    outline-offset: 2px;
+}
+
+/* Login & Signup Buttons */
+.LOGIN1 {
+    display: block;
+    line-height: 1;
+    padding: 8px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #495057;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.LOGIN1:hover {
+    background-color: #3d3d3d;
+}
+
+@media (max-width: 767px) {
+    .LOGIN1 {
+        border-radius: 0;
+        padding: 16px;
+    }
+}
+
+/* Signup Button Wrapper */
+.SIGNUP_but {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    overflow: visible;
+}
+
+/* Button Label */
+.BUT_LABEL {
+    white-space: nowrap;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+/* AI Meal Planner & Grocery List (Cooking Assistant) */
+.ai-meal-planner, .cooking-assistant {
+    background: #222;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px auto;
+    width: 80%;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 191, 255, 0.2);
+}
+
+.ai-meal-planner h2, .cooking-assistant h2 {
+    color: #00ccff;
+    font-size: 22px;
+    margin-bottom: 15px;
+}
+
+/* Checkbox Styling */
+.cooking-assistant input[type="checkbox"] {
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.header1, .ai-meal-planner, .cooking-assistant {
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+/* User Email */
+#user-email {
+    color: #00ccff;
+    font-weight: bold;
+    font-size: 16px;
+    padding-left: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header1 {
+        flex-direction: column;
+        padding: 10px 20px;
+    }
+
+    .headContainer2, .headContainer3 {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .auth-buttons {
+        margin-top: 10px;
+    }
+}
+
         .break{
             width: 0;
             min-width: 0;
