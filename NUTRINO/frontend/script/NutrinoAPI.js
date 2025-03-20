@@ -292,6 +292,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     displayRecipe();
 });
+// ✅ Handle Meal Plan Creation & Fetching
 export async function handleMealPlan(action, ingredients = "", mealsPerDay = 3, servings = 1, dietaryRestrictions = []) {
     const mealPlanContainer = document.getElementById("meal-plan");
     if (!mealPlanContainer) {
@@ -379,7 +380,7 @@ export async function handleMealPlan(action, ingredients = "", mealsPerDay = 3, 
     }
 }
 
-// ✅ **Enhanced Meal Plan Formatting (Preserved original structure)**
+// ✅ **Enhanced Meal Plan Formatting**
 function formatMealPlan(mealText, mealsPerDay) {
     if (!mealText) return "<p>⚠️ No meal plan available.</p>";
 
@@ -408,7 +409,7 @@ function formatMealPlan(mealText, mealsPerDay) {
         mealSections.Snack.push("<li>🥜 Healthy Snack: Nuts, Yogurt, or Fruit</li>");
     }
 
-    // ✅ Append meals in correct order (Preserving original UI logic)
+    // ✅ Append meals in correct order
     formattedHTML += `<div class="meal-day"><h3>📅 Your Meal Plan</h3>`;
     
     ["Breakfast", "Lunch", "Dinner", "Snack"].forEach(mealType => {
@@ -432,10 +433,51 @@ function cleanText(text) {
         .trim();
 }
 
-// ✅ **Wait for Firebase Auth before fetching meal plan (Preserved original structure)**
-document.addEventListener("DOMContentLoaded", async function () {
+// ✅ **Event Listeners Moved from `meal_planner.html`**
+document.addEventListener("DOMContentLoaded", function () {
     console.log("✅ DOM Loaded");
 
+    // ✅ Handle Meal Plan Form Submission
+    const mealPlannerForm = document.getElementById("meal-planner-form");
+    if (mealPlannerForm) {
+        mealPlannerForm.addEventListener("submit", async function (event) {
+            event.preventDefault(); // Prevent page reload
+
+            const ingredients = document.getElementById("ingredients").value.trim();
+            const mealsPerDay = parseInt(document.getElementById("meals").value);
+            const servings = parseInt(document.getElementById("servings").value);
+            
+            // ✅ Collect dietary restrictions
+            const dietaryRestrictions = [];
+            document.querySelectorAll('input[name="dietary"]:checked').forEach((checkbox) => {
+                dietaryRestrictions.push(checkbox.value);
+            });
+
+            console.log("📩 Sending Meal Plan Request:", { ingredients, mealsPerDay, servings, dietaryRestrictions });
+
+            // ✅ Call handleMealPlan function
+            handleMealPlan("create", ingredients, mealsPerDay, servings, dietaryRestrictions);
+        });
+    }
+
+    // ✅ Show/Hide "Other Diet" Text Field
+    const otherDietCheckbox = document.getElementById("other-diet");
+    const otherDietText = document.getElementById("other-diet-text");
+    if (otherDietCheckbox && otherDietText) {
+        otherDietCheckbox.addEventListener("change", function () {
+            otherDietText.style.display = this.checked ? "block" : "none";
+        });
+    }
+
+    // ✅ Handle "Go Back" Button
+    const goBackBtn = document.getElementById("goBackBtn");
+    if (goBackBtn) {
+        goBackBtn.addEventListener("click", function () {
+            window.location.href = "index.html"; // Redirect to home or dashboard
+        });
+    }
+
+    // ✅ Fetch Meal Plan if User is Logged In
     auth.onAuthStateChanged(user => {
         if (user) {
             console.log("✅ User is logged in:", user.email);
@@ -446,7 +488,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
 });
 
-// ✅ **Make function globally accessible (Preserved original)**
+// ✅ **Make function globally accessible**
 window.handleMealPlan = handleMealPlan;
 
 // ✅ Make function globally accessible
