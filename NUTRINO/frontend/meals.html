@@ -7,9 +7,11 @@
     <script type="module" src="./script/NutrinoAPI.js"></script>
     <script type="module" src="./script/auth.js"></script>
     <script type="module">
-        import { fetchMealPlan } from "./script/NutrinoAPI.js";
+        import { handleMealPlan } from "./script/NutrinoAPI.js";
 
-        document.getElementById("loadMealBtn").addEventListener("click", fetchMealPlan);
+        document.addEventListener("DOMContentLoaded", function () {
+            handleMealPlan("fetch"); // Auto-fetch meal plan when the page loads
+        });
     </script>
 
     <style>
@@ -64,33 +66,12 @@
             font-size: 14px;
             color: #555;
         }
-
-        button {
-            background: #007bff;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: 0.3s ease;
-            padding: 12px;
-            border-radius: 6px;
-            margin-top: 15px;
-            width: 100%;
-        }
-
-        button:hover {
-            background: #0056b3;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="container">
-            <h2>My AI Meal Plan</h2>
-            <button id="loadMealBtn">Load Meal Plan</button>
-            <div id="meal-plan" class="meals-grid"></div>
-        </div>
+        <h2>My AI Meal Plan</h2>
+        <div id="meal-plan" class="meals-grid"></div>
     </div>
 </body>
 </html>
