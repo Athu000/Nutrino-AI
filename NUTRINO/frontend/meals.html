@@ -6,6 +6,12 @@
     <title>My AI Meal Plan</title>
     <script type="module" src="./script/NutrinoAPI.js"></script>
     <script type="module" src="./script/auth.js"></script>
+    <script type="module">
+        import { fetchMealPlan } from "./script/NutrinoAPI.js";
+
+        document.getElementById("loadMealBtn").addEventListener("click", fetchMealPlan);
+    </script>
+
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -80,9 +86,11 @@
 </head>
 <body>
     <div class="container">
-        <h2>My AI Meal Plan</h2>
-        <button onclick="fetchMealPlan()">Load Meal Plan</button>
-        <div id="meal-plan" class="meals-grid"></div>
+        <div class="container">
+            <h2>My AI Meal Plan</h2>
+            <button id="loadMealBtn">Load Meal Plan</button>
+            <div id="meal-plan" class="meals-grid"></div>
+        </div>
     </div>
 </body>
 </html>
