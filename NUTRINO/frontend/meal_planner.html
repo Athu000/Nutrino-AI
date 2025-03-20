@@ -149,6 +149,30 @@
         document.getElementById('other-diet').addEventListener('change', function() {
             document.getElementById('other-diet-text').style.display = this.checked ? "block" : "none";
         });
+    document.getElementById("meal-planner-form").addEventListener("submit", async function (event) {
+        event.preventDefault(); // Prevent page reload
+
+        const ingredients = document.getElementById("ingredients").value.trim();
+        const mealsPerDay = parseInt(document.getElementById("meals").value);
+        const servings = parseInt(document.getElementById("servings").value);
+        
+        // ✅ Collect dietary restrictions
+        const dietaryRestrictions = [];
+        document.querySelectorAll('input[name="dietary"]:checked').forEach((checkbox) => {
+            dietaryRestrictions.push(checkbox.value);
+        });
+
+        console.log("📩 Sending Meal Plan Request:", { ingredients, mealsPerDay, servings, dietaryRestrictions });
+
+        // ✅ Call handleMealPlan function to create the meal plan
+        handleMealPlan("create", ingredients, mealsPerDay, servings, dietaryRestrictions);
+    });
+
+    document.getElementById("goBackBtn").addEventListener("click", function () {
+        window.location.href = "index.html"; // Redirect back to home or dashboard
+    });
+
+
     </script>
 </body>
 </html>
