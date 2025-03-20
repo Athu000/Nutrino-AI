@@ -1856,23 +1856,26 @@ padding-bottom: 24px;
                     </div>
                 </div>
                 <script>
-                    document.addEventListener("DOMContentLoaded", () => {
-                        document.getElementById("generateRecipe").addEventListener("click", async () => {
-                            const query = document.getElementById("rec_search")?.value.trim();
-                            if (!query) {
-                                alert("Enter a recipe name!");
-                                return;
-                            }
-                            document.getElementById("generateRecipe").innerText = "Loading...";
-                            const recipeData = await fetchRecipe(query);
-                            if (recipeData) {
-                                window.location.href = `generated_recipe.html?data=${encodeURIComponent(JSON.stringify(recipeData))}`;
-                            } else {
-                                document.getElementById("generateRecipe").innerText = "Create";
-                            }
-                        });
-                    });
-                </script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("generateRecipe").addEventListener("click", async () => {
+            const query = document.getElementById("rec_search")?.value.trim();
+            if (!query) {
+                alert("Enter a recipe name!");
+                return;
+            }
+            document.getElementById("generateRecipe").innerText = "Loading...";
+            
+            // ✅ Call fetchRecipe after ensuring it's defined globally
+            const recipeData = await fetchRecipe(query);
+            
+            if (recipeData) {
+                window.location.href = `generated_recipe.html?data=${encodeURIComponent(JSON.stringify(recipeData))}`;
+            } else {
+                document.getElementById("generateRecipe").innerText = "Create";
+            }
+        });
+    });
+</script>
                 
                 <div class="Grid-col ">
                     <div class="1q1idfv"></div>
