@@ -389,10 +389,6 @@ export async function handleMealPlan(action, ingredients = "", mealsPerDay = 0, 
 
         if (action === "create") {
             // 🔹 Create a Meal Plan
-            const createMealPlanButton = document.getElementById("createMealPlanBtn");
-            createMealPlanButton.disabled = true;
-            createMealPlanButton.textContent = "⏳ Generating...";
-
             console.log("📩 Creating meal plan for user:", user.uid);
 
             // ✅ Firestore: Save Temporary Meal Plan
@@ -431,8 +427,6 @@ export async function handleMealPlan(action, ingredients = "", mealsPerDay = 0, 
 
             alert("🎉 Meal plan created successfully!");
             window.location.href = "meals.html"; // Redirect to meals page
-            createMealPlanButton.disabled = false;
-            createMealPlanButton.textContent = "Create Meal Plan";
 
         } else if (action === "fetch") {
             // 🔹 Fetch the Latest Meal Plan
@@ -472,13 +466,14 @@ function formatMealPlan(text) {
     return `<div class="meal-plan-text">${text.replace(/\n/g, "<br>")}</div>`;
 }
 
-// ✅ Attach Fetch Meal Plan to Button Click
+// ✅ Automatically Fetch Meal Plan on Page Load
 document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("fetchMealPlanBtn")?.addEventListener("click", () => handleMealPlan("fetch"));
+    handleMealPlan("fetch"); // Fetch meal plan automatically when meals.html loads
 });
 
 // ✅ Make function globally accessible
 window.handleMealPlan = handleMealPlan;
+
 
 // ✅ Make function globally accessible
 window.fetchRecipe = fetchRecipe;
