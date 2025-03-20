@@ -436,19 +436,20 @@ export async function handleMealPlan(action, ingredients = "", mealsPerDay = 0, 
             console.log("🔍 Fetching meal plan for user:", user.uid);
 
             const mealPlanQuery = query(
-                collection(db, "meals"),
+                collection(db, "mealPlans"),
                 where("userId", "==", user.uid),
                 orderBy("createdAt", "desc"),
                 limit(1)
             );
-
+            
             const querySnapshot = await getDocs(mealPlanQuery);
-
+            console.log("🔍 Firestore Query Result:", querySnapshot.docs.map(doc => doc.data()));
+            
             if (querySnapshot.empty) {
+                console.warn("⚠️ No meal plan found.");
                 mealPlanContainer.innerHTML = "<p>⚠️ No meal plan found.</p>";
                 return;
             }
-
             const latestMealPlan = querySnapshot.docs[0].data().mealPlan;
             console.log("✅ Meal Plan Found:", latestMealPlan);
             mealPlanContainer.innerHTML = formatMealPlan(latestMealPlan);
@@ -458,14 +459,7 @@ export async function handleMealPlan(action, ingredients = "", mealsPerDay = 0, 
         alert(`Failed to ${action} meal plan. Please try again.`);
     }
 }
-const auth = getAuth();
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    fetchMeals(user.uid);
-  } else {
-    console.error("User not signed in");
-  }
-});
+
 function formatMealPlan(text) {
     return `<div class="meal-plan-text">${text.replace(/\n/g, "<br>")}</div>`;
 }
