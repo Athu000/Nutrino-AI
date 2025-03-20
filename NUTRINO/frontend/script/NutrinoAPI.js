@@ -54,7 +54,7 @@ async function fetchRecipe(prompt) {
 
     try {
         console.log("🗑️ Deleting old recipe before fetching a new one...");
-        await deleteOldRecipe(); // ✅ Delete the previous recipe before API call
+        await deleteOldRecipe(); // ✅ Moved deletion before API call
 
         console.log("📤 Sending request to API:", API_BASE_URL);
         const response = await fetch(`${API_BASE_URL}/fetch-recipe`, {
@@ -74,14 +74,14 @@ async function fetchRecipe(prompt) {
 
         const data = await response.json();
         console.log("✅ API Response Received:", data);
-        
-        if (!data.recipe || typeof data.recipe !== "string") {
+
+        if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
             console.error("❌ API Response is malformed:", data);
             alert("Received an invalid recipe response.");
             return;
         }
 
-        let recipeText = data.recipe;
+        let recipeText = data.candidates[0].content.parts[0].text;
         console.log("✅ Extracted Recipe Text:", recipeText);
 
         // ✅ Save new Recipe to Firestore
@@ -96,10 +96,9 @@ async function fetchRecipe(prompt) {
 
             // ✅ Ensure the page updates instead of a full reload
             sessionStorage.setItem("latestRecipe", JSON.stringify({ id: docRef.id, recipeText }));
-
-            // ✅ Redirect properly (prevent double navigation)
+            window.location.href = "generated_recipe.html";
             setTimeout(() => {
-                window.location.href = "generated_recipe.html";
+                window.location.href = "generated_recipe.html"; // Redirect after a short delay
             }, 1500);
         }
     } catch (error) {
@@ -197,7 +196,6 @@ async function displayRecipe() {
         console.error("❌ Error displaying recipe:", error);
     }
 }
-
 
 
 // ✅ Extract Title (Keep emojis)
