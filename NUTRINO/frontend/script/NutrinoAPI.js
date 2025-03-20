@@ -458,7 +458,14 @@ export async function handleMealPlan(action, ingredients = "", mealsPerDay = 0, 
         alert(`Failed to ${action} meal plan. Please try again.`);
     }
 }
-
+const auth = getAuth();
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    fetchMeals(user.uid);
+  } else {
+    console.error("User not signed in");
+  }
+});
 function formatMealPlan(text) {
     return `<div class="meal-plan-text">${text.replace(/\n/g, "<br>")}</div>`;
 }
