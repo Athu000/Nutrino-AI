@@ -414,42 +414,48 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("goBackBtn")?.addEventListener("click", goBack);
     fetchMealPlan();
 });
+import { auth, db } from "./auth.js";
+import { doc, getDoc, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
- export async function fetchMealPlan() {
+export async function fetchMealPlan() {
     const mealPlanContainer = document.getElementById("meal-plan");
     mealPlanContainer.innerHTML = "<p>Loading...</p>";
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             try {
-                const mealPlanRef = doc(db, "mealPlans", user.uid);
+                console.log("🔍 Fetching meal plan for user:", user.uid);
+                const mealPlanRef = doc(db, "meals", user.uid); // ✅ FIX: Corrected Firestore collection name
                 const mealPlanSnap = await getDoc(mealPlanRef);
 
                 if (mealPlanSnap.exists()) {
-                    const mealPlan = mealPlanSnap.data().mealPlan;
-                    mealPlanContainer.innerHTML = "";
+                    const mealPlanText = mealPlanSnap.data().mealPlan;
+                    console.log("✅ Meal Plan Found:", mealPlanText);
 
-                    mealPlan.forEach(meal => {
-                        const mealItem = document.createElement("div");
-                        mealItem.classList.add("meal-item");
-                        mealItem.innerHTML = `
-                            <h3>${meal.name}</h3>
-                            <p>${meal.description}</p>
-                        `;
-                        mealPlanContainer.appendChild(mealItem);
-                    });
+                    // 🔄 Convert mealPlan text into formatted HTML
+                    mealPlanContainer.innerHTML = formatMealPlan(mealPlanText);
                 } else {
+                    console.warn("⚠️ No meal plan found in Firestore.");
                     mealPlanContainer.innerHTML = "<p>No meal plan available.</p>";
                 }
             } catch (error) {
+                console.error("❌ Error fetching meal plan:", error);
                 mealPlanContainer.innerHTML = "<p>Failed to load meal plan. Please try again.</p>";
-                console.error("Error fetching meal plan:", error);
             }
         } else {
             mealPlanContainer.innerHTML = "<p>Please log in to view your meal plan.</p>";
         }
     });
 }
+
+// ✅ Format Meal Plan Text into HTML
+function formatMealPlan(text) {
+    // Convert `\n` to `<br>` for proper formatting
+    return `<div class="meal-plan-text">${text.replace(/\n/g, "<br>")}</div>`;
+}
+
+// Make function globally accessible
+window.fetchMealPlan = fetchMealPlan;
 
 // ✅ Make function globally accessible
 window.fetchRecipe = fetchRecipe;
