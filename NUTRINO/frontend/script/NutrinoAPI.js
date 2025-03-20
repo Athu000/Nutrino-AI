@@ -414,42 +414,41 @@ document.addEventListener("DOMContentLoaded", function () {
     fetchMealPlan();
 });
 
- // Fetch Meal Plan Function
-    async function fetchMealPlan() {
-        const mealPlanContainer = document.getElementById("meal-plan");
-        mealPlanContainer.innerHTML = "<p>Loading...</p>";
+ export async function fetchMealPlan() {
+    const mealPlanContainer = document.getElementById("meal-plan");
+    mealPlanContainer.innerHTML = "<p>Loading...</p>";
 
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                try {
-                    const mealPlanRef = doc(db, "mealPlans", user.uid);
-                    const mealPlanSnap = await getDoc(mealPlanRef);
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            try {
+                const mealPlanRef = doc(db, "mealPlans", user.uid);
+                const mealPlanSnap = await getDoc(mealPlanRef);
 
-                    if (mealPlanSnap.exists()) {
-                        const mealPlan = mealPlanSnap.data().mealPlan;
-                        mealPlanContainer.innerHTML = "";
+                if (mealPlanSnap.exists()) {
+                    const mealPlan = mealPlanSnap.data().mealPlan;
+                    mealPlanContainer.innerHTML = "";
 
-                        mealPlan.forEach(meal => {
-                            const mealItem = document.createElement("div");
-                            mealItem.classList.add("meal-item");
-                            mealItem.innerHTML = `
-                                <h3>${meal.name}</h3>
-                                <p>${meal.description}</p>
-                            `;
-                            mealPlanContainer.appendChild(mealItem);
-                        });
-                    } else {
-                        mealPlanContainer.innerHTML = "<p>No meal plan available.</p>";
-                    }
-                } catch (error) {
-                    mealPlanContainer.innerHTML = "<p>Failed to load meal plan. Please try again.</p>";
-                    console.error("Error fetching meal plan:", error);
+                    mealPlan.forEach(meal => {
+                        const mealItem = document.createElement("div");
+                        mealItem.classList.add("meal-item");
+                        mealItem.innerHTML = `
+                            <h3>${meal.name}</h3>
+                            <p>${meal.description}</p>
+                        `;
+                        mealPlanContainer.appendChild(mealItem);
+                    });
+                } else {
+                    mealPlanContainer.innerHTML = "<p>No meal plan available.</p>";
                 }
-            } else {
-                mealPlanContainer.innerHTML = "<p>Please log in to view your meal plan.</p>";
+            } catch (error) {
+                mealPlanContainer.innerHTML = "<p>Failed to load meal plan. Please try again.</p>";
+                console.error("Error fetching meal plan:", error);
             }
-        });
-    }
+        } else {
+            mealPlanContainer.innerHTML = "<p>Please log in to view your meal plan.</p>";
+        }
+    });
+}
 
 // ✅ Make function globally accessible
 window.fetchRecipe = fetchRecipe;
