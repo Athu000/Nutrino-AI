@@ -201,6 +201,7 @@ async function displayRecipe() {
 }
 
 
+
 // ✅ Extract Title (Keep emojis)
 function extractTitle(text) {
     if (!text) return "AI-Generated Recipe";
