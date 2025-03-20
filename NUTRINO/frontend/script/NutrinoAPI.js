@@ -436,7 +436,7 @@ export async function handleMealPlan(action, ingredients = "", mealsPerDay = 0, 
             console.log("🔍 Fetching meal plan for user:", user.uid);
 
             const mealPlanQuery = query(
-                collection(db, "mealPlans"),
+                collection(db, "meals"),
                 where("userId", "==", user.uid),
                 orderBy("createdAt", "desc"),
                 limit(1)
