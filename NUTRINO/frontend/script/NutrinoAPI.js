@@ -292,7 +292,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     displayRecipe();
 });
-
 export async function handleMealPlan(action, ingredients = "", mealsPerDay = 3, servings = 1, dietaryRestrictions = []) {
     const mealPlanContainer = document.getElementById("meal-plan");
     if (!mealPlanContainer) {
@@ -368,10 +367,11 @@ export async function handleMealPlan(action, ingredients = "", mealsPerDay = 3, 
                 return;
             }
 
-            const latestMealPlan = querySnapshot.docs[0].data().mealPlan;
+            const latestMealPlan = querySnapshot.docs[0].data();
             console.log("✅ Meal Plan Found:", latestMealPlan);
 
-            mealPlanContainer.innerHTML = formatMealPlan(latestMealPlan);
+            // ✅ Updated line to include mealsPerDay
+            mealPlanContainer.innerHTML = formatMealPlan(latestMealPlan.mealPlan, latestMealPlan.mealsPerDay);
         }
     } catch (error) {
         console.error(`❌ Error handling meal plan (${action}):`, error);
@@ -379,70 +379,60 @@ export async function handleMealPlan(action, ingredients = "", mealsPerDay = 3, 
     }
 }
 
-// ✅ Format meal plan data into structured UI with snack support
-function formatMealPlan(text) {
-    if (!text) return "<p>⚠️ No meal plan available.</p>";
+// ✅ **Enhanced Meal Plan Formatting (Preserved original structure)**
+function formatMealPlan(mealText, mealsPerDay) {
+    if (!mealText) return "<p>⚠️ No meal plan available.</p>";
 
     let formattedHTML = "";
-    const mealSections = text.split("**Day"); // Split into days
+    const mealSections = {
+        "Breakfast": [],
+        "Lunch": [],
+        "Dinner": [],
+        "Snack": []
+    };
 
-    mealSections.forEach((dayPlan, index) => {
-        if (dayPlan.trim() === "") return;
+    const mealLines = mealText.split("\n").filter(line => line.trim() !== "");
+    let currentMealType = "Breakfast"; // Default start
 
-        let dayNumber = index + 1;
-        formattedHTML += `<div class="meal-day">
-            <h3>📅 Day ${dayNumber}</h3>`;
+    for (let line of mealLines) {
+        if (/breakfast/i.test(line)) currentMealType = "Breakfast";
+        else if (/lunch/i.test(line)) currentMealType = "Lunch";
+        else if (/dinner/i.test(line)) currentMealType = "Dinner";
+        else if (/snack/i.test(line)) currentMealType = "Snack";
 
-        const meals = {
-            "Breakfast": [],
-            "Lunch": [],
-            "Dinner": [],
-            "Snack": [] // ✅ Added Snack Category
-        };
+        mealSections[currentMealType].push(`<li>${cleanText(line)}</li>`);
+    }
 
-        // Extract meals (Breakfast, Lunch, Dinner, Snack)
-        const mealEntries = dayPlan.split("**");
-        mealEntries.forEach(meal => {
-            if (meal.includes(":")) {
-                const [mealTitle, mealDetails] = meal.split(":");
+    // ✅ **Auto-add a snack if mealsPerDay > 3**
+    if (mealsPerDay > 3 && mealSections.Snack.length === 0) {
+        mealSections.Snack.push("<li>🥜 Healthy Snack: Nuts, Yogurt, or Fruit</li>");
+    }
 
-                if (mealTitle.includes("Breakfast")) {
-                    meals.Breakfast.push({ title: mealTitle, details: mealDetails });
-                } else if (mealTitle.includes("Lunch")) {
-                    meals.Lunch.push({ title: mealTitle, details: mealDetails });
-                } else if (mealTitle.includes("Dinner")) {
-                    meals.Dinner.push({ title: mealTitle, details: mealDetails });
-                }
-            }
-        });
-
-        // ✅ Add a snack if meals per day is more than 3
-        if (meals.Breakfast.length + meals.Lunch.length + meals.Dinner.length >= 3) {
-            meals.Snack.push({
-                title: "Healthy Snack 🍎",
-                details: "A small fruit, yogurt, or nuts to keep energy levels high."
-            });
+    // ✅ Append meals in correct order (Preserving original UI logic)
+    formattedHTML += `<div class="meal-day"><h3>📅 Your Meal Plan</h3>`;
+    
+    ["Breakfast", "Lunch", "Dinner", "Snack"].forEach(mealType => {
+        if (mealSections[mealType].length > 0) {
+            formattedHTML += `<div class="meal-item">
+                <h4>🍽️ ${mealType}</h4>
+                <ul>${mealSections[mealType].join("")}</ul>
+            </div>`;
         }
-
-        // ✅ Append meals in proper order
-        ["Breakfast", "Lunch", "Dinner", "Snack"].forEach(mealType => {
-            if (meals[mealType].length > 0) {
-                formattedHTML += `<div class="meal-item">
-                    <h4>🍽️ ${mealType}</h4>`;
-                meals[mealType].forEach(meal => {
-                    formattedHTML += `<p><strong>${meal.title}</strong>: ${meal.details}</p>`;
-                });
-                formattedHTML += `</div>`;
-            }
-        });
-
-        formattedHTML += `</div>`;
     });
 
+    formattedHTML += `</div>`;
     return formattedHTML;
 }
 
-// ✅ Wait for Firebase Auth before fetching meal plan
+// ✅ **Text Cleaning Helper**
+function cleanText(text) {
+    return text
+        .replace(/\*\*/g, "") // Remove bold formatting
+        .replace(/^[-*•]\s*(?=\w)/g, "• ") // Keep bullet points
+        .trim();
+}
+
+// ✅ **Wait for Firebase Auth before fetching meal plan (Preserved original structure)**
 document.addEventListener("DOMContentLoaded", async function () {
     console.log("✅ DOM Loaded");
 
@@ -456,7 +446,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
 });
 
-// ✅ Make function globally accessible
+// ✅ **Make function globally accessible (Preserved original)**
 window.handleMealPlan = handleMealPlan;
 
 // ✅ Make function globally accessible
