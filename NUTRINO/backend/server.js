@@ -79,7 +79,8 @@ app.post("/api/fetch-recipe", verifyAuthToken, async (req, res) => {
             body: JSON.stringify({
                 contents: [{ parts: [{
                         text: `Provide a detailed, structured recipe for ${prompt}. 
-                        - Include a title, ingredients, step-by-step instructions, and nutritional facts.
+                        - Include a title, ingredients, step-by-step instructions.
+                        - Specify nutritional information from recipe with specific detail.
                         - Specify the number of calories in a clear format.
                         - Use appropriate food-related emojis to make the recipe visually engaging.
                         - Format steps in a numbered list, removing any unnecessary symbols like "**".`
