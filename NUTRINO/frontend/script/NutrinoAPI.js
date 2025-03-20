@@ -73,12 +73,16 @@ async function fetchRecipe(prompt) {
 
         const data = await response.json();
         console.log("✅ API Response Received:", data);
-
-        if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
+        
+        if (!data.recipe || typeof data.recipe !== "string") {
             console.error("❌ API Response is malformed:", data);
             alert("Received an invalid recipe response.");
             return;
         }
+        
+        // If the response is valid, continue processing the recipe
+        console.log("✅ Recipe:", data.recipe);
+
 
         let recipeText = data.candidates[0].content.parts[0].text;
         console.log("✅ Extracted Recipe Text:", recipeText);
