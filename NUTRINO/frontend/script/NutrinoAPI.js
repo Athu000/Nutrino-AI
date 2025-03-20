@@ -1,6 +1,6 @@
 import { auth, db } from "./auth.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { collection, addDoc, getDocs, query, where, deleteDoc, doc, orderBy,getDoc, limit  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { collection, addDoc, getDocs, query, where, deleteDoc, doc, orderBy,getDoc, limit,setDoc  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const API_BASE_URL = "https://nutrino-ai.onrender.com/api";
 
@@ -377,12 +377,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 export async function handleMealPlan(action, ingredients = "", mealsPerDay = 0, servings = 0, dietaryRestrictions = []) {
-    const mealPlanContainer = document.getElementById("meal-plan");
-    if (!mealPlanContainer) {
-        console.warn("⚠️ meal-plan container not found in DOM.");
-        return;
-    }
-
+        if (action === "fetch") {
+            const mealPlanContainer = document.getElementById("meal-plan");
+            if (!mealPlanContainer) {
+                console.warn("⚠️ meal-plan container not found in DOM.");
+                return;
+            }
+        }
     try {
         if (!auth || !auth.currentUser) {
             console.warn("⚠️ Firebase Auth is not initialized or user is not logged in.");
@@ -426,7 +427,10 @@ export async function handleMealPlan(action, ingredients = "", mealsPerDay = 0, 
             await setDoc(mealPlanRef, { mealPlan: data.mealPlan }, { merge: true });
 
             alert("🎉 Meal plan created successfully!");
-            window.location.href = "meals.html";
+            setTimeout(() => {
+                window.location.href = "meals.html";
+            }, 1000);
+
         } else if (action === "fetch") {
             mealPlanContainer.innerHTML = "<p>Loading...</p>";
             console.log("🔍 Fetching meal plan for user:", user.uid);
