@@ -376,22 +376,24 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
-// ✅ Create and Fetch Meal Plan Combined
 export async function handleMealPlan(action, ingredients = "", mealsPerDay = 0, servings = 0, dietaryRestrictions = []) {
     const mealPlanContainer = document.getElementById("meal-plan");
-    
+    if (!mealPlanContainer) {
+        console.warn("⚠️ meal-plan container not found in DOM.");
+        return;
+    }
+
     try {
-        const user = auth.currentUser;
-        if (!user) {
+        if (!auth || !auth.currentUser) {
+            console.warn("⚠️ Firebase Auth is not initialized or user is not logged in.");
             alert("❌ Please log in to continue.");
             return;
         }
 
-        if (action === "create") {
-            // 🔹 Create a Meal Plan
-            console.log("📩 Creating meal plan for user:", user.uid);
+        const user = auth.currentUser;
 
-            // ✅ Firestore: Save Temporary Meal Plan
+        if (action === "create") {
+            console.log("📩 Creating meal plan for user:", user.uid);
             const mealPlanRef = await addDoc(collection(db, "meals"), {
                 userId: user.uid,
                 ingredients,
@@ -404,7 +406,6 @@ export async function handleMealPlan(action, ingredients = "", mealsPerDay = 0, 
 
             console.log(`✅ Meal Plan Created in Firestore (ID: ${mealPlanRef.id})`);
 
-            // ✅ Call Backend API to Generate Meal Plan
             const authToken = await user.getIdToken();
             const response = await fetch("https://nutrino-ai.onrender.com/api/generate-meal-plan", {
                 method: "POST",
@@ -422,19 +423,14 @@ export async function handleMealPlan(action, ingredients = "", mealsPerDay = 0, 
 
             console.log("✅ API Meal Plan:", data.mealPlan);
 
-            // ✅ Update Firestore with Generated Meal Plan
             await setDoc(mealPlanRef, { mealPlan: data.mealPlan }, { merge: true });
 
             alert("🎉 Meal plan created successfully!");
-            window.location.href = "meals.html"; // Redirect to meals page
-
+            window.location.href = "meals.html";
         } else if (action === "fetch") {
-            // 🔹 Fetch the Latest Meal Plan
             mealPlanContainer.innerHTML = "<p>Loading...</p>";
-
             console.log("🔍 Fetching meal plan for user:", user.uid);
 
-            // ✅ Query Firestore for the latest meal plan
             const mealPlanQuery = query(
                 collection(db, "meals"),
                 where("userId", "==", user.uid),
@@ -451,8 +447,6 @@ export async function handleMealPlan(action, ingredients = "", mealsPerDay = 0, 
 
             const latestMealPlan = querySnapshot.docs[0].data().mealPlan;
             console.log("✅ Meal Plan Found:", latestMealPlan);
-
-            // ✅ Convert mealPlan text into formatted HTML
             mealPlanContainer.innerHTML = formatMealPlan(latestMealPlan);
         }
     } catch (error) {
@@ -461,20 +455,26 @@ export async function handleMealPlan(action, ingredients = "", mealsPerDay = 0, 
     }
 }
 
-// ✅ Format Meal Plan Text into HTML
 function formatMealPlan(text) {
     return `<div class="meal-plan-text">${text.replace(/\n/g, "<br>")}</div>`;
 }
 
-// ✅ Automatically Fetch Meal Plan on Page Load
-document.addEventListener("DOMContentLoaded", function () {
-    handleMealPlan("fetch"); // Fetch meal plan automatically when meals.html loads
+// ✅ Wait for Firebase Auth before fetching meal plan
+document.addEventListener("DOMContentLoaded", async function () {
+    console.log("✅ DOM Loaded");
+
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            console.log("✅ User is logged in:", user.email);
+            handleMealPlan("fetch");
+        } else {
+            console.warn("⚠️ No user logged in.");
+        }
+    });
 });
 
 // ✅ Make function globally accessible
 window.handleMealPlan = handleMealPlan;
-
-
 // ✅ Make function globally accessible
 window.fetchRecipe = fetchRecipe;
 window.displayRecipe = displayRecipe;
