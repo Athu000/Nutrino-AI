@@ -291,99 +291,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     displayRecipe();
 });
-// ✅ Submit Meal Plan Request
-document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("meal-planner-form");
 
-    if (form) {
-        form.addEventListener("submit", async function (event) {
-            event.preventDefault();
-
-            // Get user auth token
-            const authToken = await getAuthToken();
-            if (!authToken) {
-                alert("Authentication required. Please log in.");
-                return;
-            }
-
-            // Gather input values
-            const ingredients = document.getElementById("ingredients").value.trim();
-            const mealsPerDay = document.getElementById("meals").value;
-            const servings = document.getElementById("servings").value;
-
-            // Collect dietary restrictions
-            const dietaryRestrictions = [];
-            document.querySelectorAll("input[name='dietary']:checked").forEach(checkbox => {
-                if (checkbox.id === "other-diet") {
-                    const otherDietText = document.getElementById("other-diet-text").value.trim();
-                    if (otherDietText) dietaryRestrictions.push(otherDietText);
-                } else {
-                    dietaryRestrictions.push(checkbox.value);
-                }
-            });
-
-            // ✅ Validate input fields
-            if (!ingredients) {
-                alert("⚠️ Please enter ingredients.");
-                return;
-            }
-            if (!mealsPerDay || isNaN(mealsPerDay) || mealsPerDay < 1) {
-                alert("⚠️ Please select a valid number of meals per day.");
-                return;
-            }
-            if (!servings || isNaN(servings) || servings < 1) {
-                alert("⚠️ Please enter a valid number of servings.");
-                return;
-            }
-
-            // ✅ Prepare request payload
-            const requestBody = {
-                ingredients,
-                mealsPerDay: parseInt(mealsPerDay, 10),
-                servings: parseInt(servings, 10),
-                dietaryRestrictions
-            };
-
-            // ✅ Disable button to prevent multiple requests
-            const submitButton = document.getElementById("createMealPlanBtn");
-            submitButton.disabled = true;
-            submitButton.textContent = "⏳ Generating...";
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/generate-meal-plan`, { 
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${authToken}`
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-
-                const data = await response.json();
-                if (response.ok && data.mealPlanId) {
-                    localStorage.setItem("mealPlanId", data.mealPlanId);
-                    window.location.href = "meals.html"; // Redirect to meals page
-                } else {
-                    alert(`❌ Failed to generate meal plan: ${data.error || "Unknown error"}`);
-                }
-            } catch (error) {
-                console.error("❌ Error generating meal plan:", error);
-                alert("⚠️ Network error. Please try again.");
-            } finally {
-                submitButton.disabled = false;
-                submitButton.textContent = "Create Meal Plan";
-            }
-        });
+export async function handleMealPlan(action, ingredients = "", mealsPerDay = 3, servings = 1, dietaryRestrictions = []) {
+    const mealPlanContainer = document.getElementById("meal-plan");
+    if (!mealPlanContainer) {
+        console.warn("⚠️ meal-plan container not found in DOM.");
+        return;
     }
-});
-export async function handleMealPlan(action, ingredients = "", mealsPerDay = 0, servings = 0, dietaryRestrictions = []) {
-        if (action === "fetch") {
-            const mealPlanContainer = document.getElementById("meal-plan");
-            if (!mealPlanContainer) {
-                console.warn("⚠️ meal-plan container not found in DOM.");
-                return;
-            }
-        }
+
     try {
         if (!auth || !auth.currentUser) {
             console.warn("⚠️ Firebase Auth is not initialized or user is not logged in.");
@@ -395,8 +310,9 @@ export async function handleMealPlan(action, ingredients = "", mealsPerDay = 0, 
 
         if (action === "create") {
             console.log("📩 Creating meal plan for user:", user.uid);
+            
             const mealPlanRef = await addDoc(collection(db, "meals"), {
-                userId: auth.currentUser.uid,
+                userId: user.uid,
                 ingredients,
                 mealsPerDay,
                 servings,
@@ -432,7 +348,7 @@ export async function handleMealPlan(action, ingredients = "", mealsPerDay = 0, 
             }, 1000);
 
         } else if (action === "fetch") {
-            mealPlanContainer.innerHTML = "<p>Loading...</p>";
+            mealPlanContainer.innerHTML = "<p>⏳ Loading meal plan...</p>";
             console.log("🔍 Fetching meal plan for user:", user.uid);
 
             const mealPlanQuery = query(
@@ -441,17 +357,19 @@ export async function handleMealPlan(action, ingredients = "", mealsPerDay = 0, 
                 orderBy("createdAt", "desc"),
                 limit(1)
             );
-            
+
             const querySnapshot = await getDocs(mealPlanQuery);
             console.log("🔍 Firestore Query Result:", querySnapshot.docs.map(doc => doc.data()));
-            
+
             if (querySnapshot.empty) {
                 console.warn("⚠️ No meal plan found.");
-                mealPlanContainer.innerHTML = "<p>⚠️ No meal plan found.</p>";
+                mealPlanContainer.innerHTML = "<p>⚠️ No meal plan found. Please create one!</p>";
                 return;
             }
+
             const latestMealPlan = querySnapshot.docs[0].data().mealPlan;
             console.log("✅ Meal Plan Found:", latestMealPlan);
+
             mealPlanContainer.innerHTML = formatMealPlan(latestMealPlan);
         }
     } catch (error) {
@@ -460,8 +378,67 @@ export async function handleMealPlan(action, ingredients = "", mealsPerDay = 0, 
     }
 }
 
+// ✅ Format meal plan data into structured UI with snack support
 function formatMealPlan(text) {
-    return `<div class="meal-plan-text">${text.replace(/\n/g, "<br>")}</div>`;
+    if (!text) return "<p>⚠️ No meal plan available.</p>";
+
+    let formattedHTML = "";
+    const mealSections = text.split("**Day"); // Split into days
+
+    mealSections.forEach((dayPlan, index) => {
+        if (dayPlan.trim() === "") return;
+
+        let dayNumber = index + 1;
+        formattedHTML += `<div class="meal-day">
+            <h3>📅 Day ${dayNumber}</h3>`;
+
+        const meals = {
+            "Breakfast": [],
+            "Lunch": [],
+            "Dinner": [],
+            "Snack": [] // ✅ Added Snack Category
+        };
+
+        // Extract meals (Breakfast, Lunch, Dinner, Snack)
+        const mealEntries = dayPlan.split("**");
+        mealEntries.forEach(meal => {
+            if (meal.includes(":")) {
+                const [mealTitle, mealDetails] = meal.split(":");
+
+                if (mealTitle.includes("Breakfast")) {
+                    meals.Breakfast.push({ title: mealTitle, details: mealDetails });
+                } else if (mealTitle.includes("Lunch")) {
+                    meals.Lunch.push({ title: mealTitle, details: mealDetails });
+                } else if (mealTitle.includes("Dinner")) {
+                    meals.Dinner.push({ title: mealTitle, details: mealDetails });
+                }
+            }
+        });
+
+        // ✅ Add a snack if meals per day is more than 3
+        if (meals.Breakfast.length + meals.Lunch.length + meals.Dinner.length >= 3) {
+            meals.Snack.push({
+                title: "Healthy Snack 🍎",
+                details: "A small fruit, yogurt, or nuts to keep energy levels high."
+            });
+        }
+
+        // ✅ Append meals in proper order
+        ["Breakfast", "Lunch", "Dinner", "Snack"].forEach(mealType => {
+            if (meals[mealType].length > 0) {
+                formattedHTML += `<div class="meal-item">
+                    <h4>🍽️ ${mealType}</h4>`;
+                meals[mealType].forEach(meal => {
+                    formattedHTML += `<p><strong>${meal.title}</strong>: ${meal.details}</p>`;
+                });
+                formattedHTML += `</div>`;
+            }
+        });
+
+        formattedHTML += `</div>`;
+    });
+
+    return formattedHTML;
 }
 
 // ✅ Wait for Firebase Auth before fetching meal plan
@@ -480,6 +457,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 // ✅ Make function globally accessible
 window.handleMealPlan = handleMealPlan;
+
 // ✅ Make function globally accessible
 window.fetchRecipe = fetchRecipe;
 window.displayRecipe = displayRecipe;
