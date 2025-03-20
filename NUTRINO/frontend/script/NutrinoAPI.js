@@ -376,86 +376,109 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
-
-// ✅ Fetch and Display Meal Plan in meals.html
-document.addEventListener("DOMContentLoaded", function () {
-    async function fetchMealPlan() {
-        const authToken = await getAuthToken();
-        if (!authToken) {
-            alert("Authentication required. Please log in.");
+// ✅ Create and Fetch Meal Plan Combined
+export async function handleMealPlan(action, ingredients = "", mealsPerDay = 0, servings = 0, dietaryRestrictions = []) {
+    const mealPlanContainer = document.getElementById("meal-plan");
+    
+    try {
+        const user = auth.currentUser;
+        if (!user) {
+            alert("❌ Please log in to continue.");
             return;
         }
 
-        try {
-            const response = await fetch(`${API_BASE_URL}/meal-plan`, {
-                method: "GET",
+        if (action === "create") {
+            // 🔹 Create a Meal Plan
+            const createMealPlanButton = document.getElementById("createMealPlanBtn");
+            createMealPlanButton.disabled = true;
+            createMealPlanButton.textContent = "⏳ Generating...";
+
+            console.log("📩 Creating meal plan for user:", user.uid);
+
+            // ✅ Firestore: Save Temporary Meal Plan
+            const mealPlanRef = await addDoc(collection(db, "meals"), {
+                userId: user.uid,
+                ingredients,
+                mealsPerDay,
+                servings,
+                dietaryRestrictions,
+                mealPlan: "Generating meal plan...",
+                createdAt: serverTimestamp(),
+            });
+
+            console.log(`✅ Meal Plan Created in Firestore (ID: ${mealPlanRef.id})`);
+
+            // ✅ Call Backend API to Generate Meal Plan
+            const authToken = await user.getIdToken();
+            const response = await fetch("https://nutrino-ai.onrender.com/api/generate-meal-plan", {
+                method: "POST",
                 headers: {
+                    "Content-Type": "application/json",
                     "Authorization": `Bearer ${authToken}`
-                }
+                },
+                body: JSON.stringify({ ingredients, mealsPerDay, servings, dietaryRestrictions }),
             });
 
             const data = await response.json();
-            if (response.ok && data.mealPlan) {
-                document.getElementById("meal-plan").innerHTML = `<h3>🥗 Your AI Meal Plan:</h3><p>${data.mealPlan.replace(/\n/g, '<br>')}</p>`;
-            } else {
-                document.getElementById("meal-plan").innerText = "⚠️ No meal plan found.";
+            if (!response.ok || !data.mealPlan) {
+                throw new Error(data.error || "API did not return a valid meal plan.");
             }
-        } catch (error) {
-            console.error("❌ Error fetching meal plan:", error);
-            document.getElementById("meal-plan").innerText = "⚠️ An error occurred while retrieving the meal plan.";
-        }
-    }
 
-    function goBack() {
-        localStorage.removeItem("mealPlanId");
-        window.location.href = "index.html";
-    }
+            console.log("✅ API Meal Plan:", data.mealPlan);
 
-    document.getElementById("goBackBtn")?.addEventListener("click", goBack);
-    fetchMealPlan();
-});
-import { auth, db } from "./auth.js";
-import { doc, getDoc, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+            // ✅ Update Firestore with Generated Meal Plan
+            await setDoc(mealPlanRef, { mealPlan: data.mealPlan }, { merge: true });
 
-export async function fetchMealPlan() {
-    const mealPlanContainer = document.getElementById("meal-plan");
-    mealPlanContainer.innerHTML = "<p>Loading...</p>";
+            alert("🎉 Meal plan created successfully!");
+            window.location.href = "meals.html"; // Redirect to meals page
+            createMealPlanButton.disabled = false;
+            createMealPlanButton.textContent = "Create Meal Plan";
 
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            try {
-                console.log("🔍 Fetching meal plan for user:", user.uid);
-                const mealPlanRef = doc(db, "meals", user.uid); // ✅ FIX: Corrected Firestore collection name
-                const mealPlanSnap = await getDoc(mealPlanRef);
+        } else if (action === "fetch") {
+            // 🔹 Fetch the Latest Meal Plan
+            mealPlanContainer.innerHTML = "<p>Loading...</p>";
 
-                if (mealPlanSnap.exists()) {
-                    const mealPlanText = mealPlanSnap.data().mealPlan;
-                    console.log("✅ Meal Plan Found:", mealPlanText);
+            console.log("🔍 Fetching meal plan for user:", user.uid);
 
-                    // 🔄 Convert mealPlan text into formatted HTML
-                    mealPlanContainer.innerHTML = formatMealPlan(mealPlanText);
-                } else {
-                    console.warn("⚠️ No meal plan found in Firestore.");
-                    mealPlanContainer.innerHTML = "<p>No meal plan available.</p>";
-                }
-            } catch (error) {
-                console.error("❌ Error fetching meal plan:", error);
-                mealPlanContainer.innerHTML = "<p>Failed to load meal plan. Please try again.</p>";
+            // ✅ Query Firestore for the latest meal plan
+            const mealPlanQuery = query(
+                collection(db, "meals"),
+                where("userId", "==", user.uid),
+                orderBy("createdAt", "desc"),
+                limit(1)
+            );
+
+            const querySnapshot = await getDocs(mealPlanQuery);
+
+            if (querySnapshot.empty) {
+                mealPlanContainer.innerHTML = "<p>⚠️ No meal plan found.</p>";
+                return;
             }
-        } else {
-            mealPlanContainer.innerHTML = "<p>Please log in to view your meal plan.</p>";
+
+            const latestMealPlan = querySnapshot.docs[0].data().mealPlan;
+            console.log("✅ Meal Plan Found:", latestMealPlan);
+
+            // ✅ Convert mealPlan text into formatted HTML
+            mealPlanContainer.innerHTML = formatMealPlan(latestMealPlan);
         }
-    });
+    } catch (error) {
+        console.error(`❌ Error handling meal plan (${action}):`, error);
+        alert(`Failed to ${action} meal plan. Please try again.`);
+    }
 }
 
 // ✅ Format Meal Plan Text into HTML
 function formatMealPlan(text) {
-    // Convert `\n` to `<br>` for proper formatting
     return `<div class="meal-plan-text">${text.replace(/\n/g, "<br>")}</div>`;
 }
 
-// Make function globally accessible
-window.fetchMealPlan = fetchMealPlan;
+// ✅ Attach Fetch Meal Plan to Button Click
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("fetchMealPlanBtn")?.addEventListener("click", () => handleMealPlan("fetch"));
+});
+
+// ✅ Make function globally accessible
+window.handleMealPlan = handleMealPlan;
 
 // ✅ Make function globally accessible
 window.fetchRecipe = fetchRecipe;
