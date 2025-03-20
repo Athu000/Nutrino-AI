@@ -84,31 +84,5 @@
         <button onclick="fetchMealPlan()">Load Meal Plan</button>
         <div id="meal-plan" class="meals-grid"></div>
     </div>
-
-    <script>
-        async function fetchMealPlan() {
-            const mealPlanContainer = document.getElementById("meal-plan");
-            mealPlanContainer.innerHTML = "<p>Loading...</p>";
-
-            try {
-                const response = await fetch('https://api.example.com/get-meal-plan'); // Replace with actual API endpoint
-                const data = await response.json();
-
-                mealPlanContainer.innerHTML = "";
-                data.meals.forEach(meal => {
-                    const mealItem = document.createElement("div");
-                    mealItem.classList.add("meal-item");
-                    mealItem.innerHTML = `
-                        <h3>${meal.name}</h3>
-                        <p>${meal.description}</p>
-                    `;
-                    mealPlanContainer.appendChild(mealItem);
-                });
-            } catch (error) {
-                mealPlanContainer.innerHTML = "<p>Failed to load meal plan. Please try again.</p>";
-                console.error("Error fetching meal plan:", error);
-            }
-        }
-    </script>
 </body>
 </html>
