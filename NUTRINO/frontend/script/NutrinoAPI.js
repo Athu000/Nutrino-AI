@@ -82,9 +82,8 @@ async function fetchRecipe(prompt) {
         
         // If the response is valid, continue processing the recipe
         console.log("✅ Recipe:", data.recipe);
-
-
-        let recipeText = data.candidates[0].content.parts[0].text;
+        
+        let recipeText = data.recipe;
         console.log("✅ Extracted Recipe Text:", recipeText);
 
         // ✅ Save new Recipe to Firestore
