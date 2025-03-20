@@ -396,7 +396,7 @@ export async function handleMealPlan(action, ingredients = "", mealsPerDay = 0, 
         if (action === "create") {
             console.log("📩 Creating meal plan for user:", user.uid);
             const mealPlanRef = await addDoc(collection(db, "meals"), {
-                userId: user.uid,
+                userId: auth.currentUser.uid,
                 ingredients,
                 mealsPerDay,
                 servings,
