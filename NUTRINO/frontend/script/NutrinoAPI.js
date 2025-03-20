@@ -516,9 +516,14 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-// ✅ **Make function globally accessible**
+/// ✅ Make function globally accessible
 window.handleMealPlan = handleMealPlan;
+window.displayRecipe = displayRecipe;
 
+// ✅ Ensure fetchRecipe is available after DOM loads
+document.addEventListener("DOMContentLoaded", function () {
+    window.fetchRecipe = fetchRecipe;
+});
 // ✅ Make function globally accessible
 window.fetchRecipe = fetchRecipe;
-window.displayRecipe = displayRecipe;
+
