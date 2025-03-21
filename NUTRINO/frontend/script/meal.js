@@ -64,7 +64,6 @@ async function fetchMealPlan() {
         console.error("❌ Error fetching meal plan:", error);
     }
 }
-
 // ✅ DISPLAY MEAL PLAN FROM FIRESTORE
 async function displayMealPlan() {
     console.log("🔎 Checking Local Storage...");
@@ -120,8 +119,6 @@ async function displayMealPlan() {
         </div>
     `;
 }
-
-
 // ✅ CLEAR PREVIOUS MEAL PLAN
 function clearPreviousMealPlan() {
     localStorage.removeItem("latestMealPlan");
@@ -222,3 +219,5 @@ document.addEventListener("DOMContentLoaded", function () {
         displayMealPlan();
     }
 });
+// ✅ Make sure function is globally available
+window.displayMealPlan = displayMealPlan;
