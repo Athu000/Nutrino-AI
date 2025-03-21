@@ -1,6 +1,6 @@
 import { auth, db } from "./auth.js";
 import { collection, query, where, getDocs, addDoc, deleteDoc, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
-import { getAuthToken } from "./script/auth.js"; // 🔹 Ensure getAuthToken is in a separate file
+import { getAuthToken } from "./auth.js"; // 🔹 Ensure getAuthToken is in a separate file
 // ✅ DELETE OLD MEAL PLAN
 async function deleteOldMealPlan() {
     const user = auth.currentUser;
