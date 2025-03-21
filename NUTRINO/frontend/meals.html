@@ -4,202 +4,107 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My AI Meal Plan</title>
-    <script type="module" src="./script/meal.js"></script>
-    <script type="module" src="./script/NutrinoAPI.js"></script>
-    <script type="module" src="./script/auth.js"></script>
-    <script type="module">
-        import { handleMealPlan } from "./script/meal.js";
-
-        document.addEventListener("DOMContentLoaded", function () {
-            document.getElementById("meal-plan").innerHTML = '<p class="loading">⏳ Loading your meal plan...</p>';
-            handleMealPlan("fetch");
-        });
-    </script>
-
     <style>
-        /* General Styling */
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f8f9fa;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
             margin: 0;
             padding: 20px;
         }
-
         .container {
-            background: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-            max-width: 900px;
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            text-align: center;
+            color: #333;
+        }
+        .section {
+            background: #fffaf0;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 5px solid #ff9800;
+        }
+        .section h3 {
+            color: #d35400;
+            margin-bottom: 10px;
+        }
+        .meal-item {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .note {
+            font-size: 0.9em;
+            color: #555;
+            background: #e3f2fd;
+            padding: 10px;
+            border-left: 5px solid #2196f3;
+            border-radius: 5px;
+        }
+        #backToMain {
+            display: block;
             width: 100%;
             text-align: center;
-        }
-
-        h2 {
-            color: #333;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-
-        /* Loading Animation */
-        .loading {
+            background: #ff4d4d;
+            color: white;
+            padding: 10px;
             font-size: 16px;
-            color: #777;
-            font-style: italic;
-            margin-top: 10px;
-        }
-
-        /* Meal Grid */
-        .meals-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        /* Meal Card */
-        .meal-item {
-            background: #ffffff;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: left;
-            transition: transform 0.2s ease-in-out;
-        }
-
-        .meal-item:hover {
-            transform: scale(1.02);
-        }
-
-        .meal-item h3 {
-            color: #007bff;
-            margin-bottom: 10px;
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .meal-item p {
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 10px;
-        }
-
-        .meal-section {
-            margin-top: 10px;
-        }
-
-        .meal-section strong {
-            color: #444;
-            font-weight: 600;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .meal-section ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .meal-section ul li {
-            background: #f1f3f5;
-            padding: 8px;
-            margin: 4px 0;
+            border: none;
             border-radius: 5px;
-            font-size: 14px;
-            color: #333;
-        }
-
-        /* No Data Message */
-        .no-data {
-            font-size: 16px;
-            color: #777;
-            font-style: italic;
+            cursor: pointer;
             margin-top: 20px;
+        }
+        #backToMain:hover {
+            background: #e60000;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>🍽️ My AI Meal Plan</h2>
-        <div id="mealPlanContainer" class="meals-grid"></div>
+
+<div class="container">
+    <h1>🍽️ My AI Meal Plan</h1>
+
+    <div class="section">
+        <h3>🥗 Ingredients</h3>
+        <p><strong>Selected Ingredients:</strong> <span id="ingredients"></span></p>
     </div>
 
-    <script type="module">
-        import { handleMealPlan } from "./script/meal.js";
+    <div class="section">
+        <h3>📆 Meal Plan Overview</h3>
+        <p><strong>Meals Per Day:</strong> <span id="mealsPerDay"></span></p>
+        <p><strong>Servings:</strong> <span id="servings"></span></p>
+        <p><strong>⚠️ Dietary Restrictions:</strong> <span id="dietaryRestrictions"></span></p>
+    </div>
 
-        async function displayMealPlan() {
-            const mealPlanContainer = document.getElementById("mealPlanContainer");
-            mealPlanContainer.innerHTML = '<p class="loading">⏳ Fetching meal plan...</p>';
+    <div class="section">
+        <h3>📜 Meal Plan</h3>
+        <p><strong>Plan Name:</strong> <span id="planName"></span></p>
+        <p id="mealPlanDescription"></p>
+    </div>
 
-            try {
-                const user = auth.currentUser;
-                if (!user) {
-                    console.error("❌ User not logged in.");
-                    mealPlanContainer.innerHTML = '<p class="no-data">⚠️ Please log in to see your meal plan.</p>';
-                    return;
-                }
+    <div id="mealsContainer"></div> <!-- ✅ Meals will be dynamically added here -->
 
-                console.log("🔍 Fetching meal plan for user:", user.uid);
+    <div class="note">
+        <h3>⚠️ Important Notes</h3>
+        <ul id="importantNotes"></ul>
+    </div>
 
-                const mealPlanQuery = query(
-                    collection(db, "meals"),
-                    where("userId", "==", user.uid),
-                    orderBy("createdAt", "desc"),
-                    limit(1)
-                );
+    <button id="backToMain">⬅️ Go Back</button> <!-- ✅ Deletes data on click -->
+</div>
 
-                const querySnapshot = await getDocs(mealPlanQuery);
-                console.log("📜 Firestore Query Result:", querySnapshot.docs.map(doc => doc.data()));
+<script>
+    document.getElementById("backToMain").addEventListener("click", function () {
+        localStorage.removeItem("mealPlanData"); // ✅ Deletes stored meal plan
+        window.location.href = "index.html"; // ✅ Redirects to main page
+    });
+</script>
 
-                if (querySnapshot.empty) {
-                    console.warn("⚠️ No meal plan found.");
-                    mealPlanContainer.innerHTML = '<p class="no-data">⚠️ No meal plan found. Try generating one!</p>';
-                    return;
-                }
-
-                const latestMealPlan = querySnapshot.docs[0].data().mealPlan;
-                console.log("✅ Meal Plan Found:", latestMealPlan);
-
-                mealPlanContainer.innerHTML = formatMealPlan(latestMealPlan);
-            } catch (error) {
-                console.error("❌ Error fetching meal plan:", error);
-                mealPlanContainer.innerHTML = '<p class="no-data">❌ Failed to load meal plan. Try again later.</p>';
-            }
-        }
-
-        function formatMealPlan(text) {
-            if (!text) return '<p class="no-data">⚠️ No meal plan available.</p>';
-
-            const sections = text.split("\n\n").map(section => {
-                const lines = section.split("\n");
-                if (lines.length < 2) return "";
-
-                return `
-                    <div class="meal-item">
-                        <h3>${lines[0]}</h3>
-                        <div class="meal-section">
-                            <strong>🍽️ Ingredients:</strong>
-                            <ul>${lines[1].split(",").map(item => `<li>${item.trim()}</li>`).join("")}</ul>
-                        </div>
-                        <div class="meal-section">
-                            <strong>🔄 Instructions:</strong>
-                            <ul>${lines.slice(2).map(step => `<li>${step.trim()}</li>`).join("")}</ul>
-                        </div>
-                    </div>
-                `;
-            }).join("");
-
-            return sections || '<p class="no-data">⚠️ No meal plan available.</p>';
-        }
-
-        document.addEventListener("DOMContentLoaded", function () {
-            displayMealPlan();
-        });
-    </script>
 </body>
 </html>
