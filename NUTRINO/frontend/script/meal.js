@@ -1,4 +1,4 @@
-import { auth, db } from "./firebaseConfig.js"; // 🔹 Import Firebase Auth & Firestore
+import { auth, db } from "./auth.js";
 import { collection, query, where, getDocs, addDoc, deleteDoc, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
 import { getAuthToken } from "./script/auth.js"; // 🔹 Ensure getAuthToken is in a separate file
 // ✅ DELETE OLD MEAL PLAN
