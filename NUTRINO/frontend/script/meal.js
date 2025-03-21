@@ -1,231 +1,137 @@
-import { auth, db } from "./auth.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { collection, addDoc, getDocs, query, where, deleteDoc, doc, orderBy,getDoc, limit,setDoc ,serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-// ✅ Handle Meal Plan Creation & Fetching
-export async function handleMealPlan(action, ingredients = "", mealsPerDay = 3, servings = 1, dietaryRestrictions = []) {
-    const mealPlanContainer = document.getElementById("meal-plan");
+import { auth, db } from "./firebaseConfig.js"; // 🔹 Import Firebase Auth & Firestore
+import { collection, query, where, getDocs, addDoc, deleteDoc, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
+import { getAuthToken } from "./script/auth.js"; // 🔹 Ensure getAuthToken is in a separate file
+// ✅ DELETE OLD MEAL PLAN
+async function deleteOldMealPlan() {
+    const user = auth.currentUser;
+    if (!user) return;
+    
+    try {
+        console.log("🗑️ Deleting old meal plan...");
+        const mealRef = collection(db, "meal_plans");
+        const q = query(mealRef, where("userId", "==", user.uid));
+        const querySnapshot = await getDocs(q);
+
+        querySnapshot.forEach(async (doc) => {
+            await deleteDoc(doc.ref);
+            console.log(`✅ Deleted meal plan: ${doc.id}`);
+        });
+
+    } catch (error) {
+        console.error("❌ Error deleting meal plan:", error);
+    }
+}
+
+// ✅ FETCH NEW MEAL PLAN FROM API
+async function fetchMealPlan(preferences) {
+    const authToken = await getAuthToken();
+    if (!authToken) return;
 
     try {
-        if (!auth || !auth.currentUser) {
-            alert("❌ Please log in to continue.");
+        await deleteOldMealPlan(); // ✅ Delete old plan before fetching a new one
+
+        console.log("📤 Requesting new meal plan from API...");
+        const response = await fetch(`${API_BASE_URL}/fetch-meal-plan`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ preferences })
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch meal plan");
+
+        const data = await response.json();
+        console.log("✅ API Response:", data);
+
+        if (!data.mealPlan) throw new Error("Meal plan data is missing");
+
+        return data.mealPlan;
+
+    } catch (error) {
+        console.error("❌ API Error fetching meal plan:", error);
+        alert("Failed to fetch meal plan.");
+    }
+}
+
+// ✅ DISPLAY MEAL PLAN
+async function displayMealPlan() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    try {
+        const mealRef = collection(db, "meal_plans");
+        const q = query(mealRef, where("userId", "==", user.uid), orderBy("createdAt", "desc"), limit(1));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            console.warn("⚠️ No meal plan found.");
+            alert("No meal plan available. Please generate a new one.");
             return;
         }
 
-        const user = auth.currentUser;
+        querySnapshot.forEach((doc) => {
+            const mealPlan = doc.data();
+            document.getElementById("mealPlanContainer").innerHTML = formatMealPlan(mealPlan);
+            console.log("✅ Meal Plan Displayed:", mealPlan);
+        });
 
-        if (action === "create") {
-            console.log("📩 Creating meal plan for user:", user.uid);
-            
-            const mealPlanRef = await addDoc(collection(db, "meals"), {
-                userId: user.uid,
-                ingredients,
-                mealsPerDay,
-                servings,
-                dietaryRestrictions,
-                mealPlan: "Generating meal plan...",
-                createdAt: serverTimestamp(),
-            });
-
-            console.log(`✅ Meal Plan Created in Firestore (ID: ${mealPlanRef.id})`);
-
-            const authToken = await user.getIdToken();
-            const response = await fetch(`${API_BASE_URL}/generate-meal-plan`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${authToken}`
-                },
-                body: JSON.stringify({ ingredients, mealsPerDay, servings, dietaryRestrictions }),
-            });
-
-            const data = await response.json();
-            if (!response.ok || !data.mealPlan) {
-                throw new Error(data.error || "API did not return a valid meal plan.");
-            }
-
-            console.log("✅ API Meal Plan:", data.mealPlan);
-
-            await setDoc(mealPlanRef, { mealPlan: data.mealPlan }, { merge: true });
-
-            alert("🎉 Meal plan created successfully!");
-
-            // ✅ Ensure redirection actually happens
-            setTimeout(() => {
-                window.location.href = "meals.html";
-            }, 1000);
-
-        } else if (action === "fetch") {
-            console.log("🔍 Fetching meal plan for user:", user.uid);
-
-            const mealPlanQuery = query(
-                collection(db, "meals"),
-                where("userId", "==", user.uid),
-                orderBy("createdAt", "desc"),
-                limit(1)
-            );
-
-            const querySnapshot = await getDocs(mealPlanQuery);
-
-            if (querySnapshot.empty) {
-                console.warn("⚠️ No meal plan found.");
-                mealPlanContainer.innerHTML = "<p>⚠️ No meal plan found. Please create one!</p>";
-                return;
-            }
-
-            const latestMealPlan = querySnapshot.docs[0].data();
-            console.log("✅ Meal Plan Found:", latestMealPlan);
-
-            mealPlanContainer.innerHTML = `<p>${latestMealPlan.mealPlan}</p>`;
-        }
     } catch (error) {
-        console.error(`❌ Error handling meal plan (${action}):`, error);
-        alert(`Failed to ${action} meal plan. Please try again.`);
+        console.error("❌ Error displaying meal plan:", error);
     }
 }
 
-// ✅ Ensure DOM elements exist before adding event listeners
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("✅ DOM Loaded");
-
-    // ✅ Fix: Ensure "Create Meal Plan" button works
-    const mealPlannerForm = document.getElementById("meal-planner-form");
-    if (mealPlannerForm) {
-        mealPlannerForm.addEventListener("submit", async function (event) {
-            event.preventDefault(); // Prevent page reload
-
-            const ingredients = document.getElementById("ingredients").value.trim();
-            const mealsPerDay = parseInt(document.getElementById("meals").value);
-            const servings = parseInt(document.getElementById("servings").value);
-            
-            // ✅ Collect dietary restrictions
-            const dietaryRestrictions = [];
-            document.querySelectorAll('input[name="dietary"]:checked').forEach((checkbox) => {
-                dietaryRestrictions.push(checkbox.value);
-            });
-
-            console.log("📩 Sending Meal Plan Request:", { ingredients, mealsPerDay, servings, dietaryRestrictions });
-
-            // ✅ Call handleMealPlan function
-            handleMealPlan("create", ingredients, mealsPerDay, servings, dietaryRestrictions);
-        });
-    }
-
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            console.log("✅ User is logged in:", user.email);
-            handleMealPlan("fetch");
-        } else {
-            console.warn("⚠️ No user logged in.");
-        }
-    });
-});
-// ✅ **Enhanced Meal Plan Formatting**
-function formatMealPlan(mealText, mealsPerDay) {
-    if (!mealText) return "<p>⚠️ No meal plan available.</p>";
-
-    let formattedHTML = "";
-    const mealSections = {
-        "Breakfast": [],
-        "Lunch": [],
-        "Dinner": [],
-        "Snack": []
-    };
-
-    const mealLines = mealText.split("\n").filter(line => line.trim() !== "");
-    let currentMealType = "Breakfast"; // Default start
-
-    for (let line of mealLines) {
-        if (/breakfast/i.test(line)) currentMealType = "Breakfast";
-        else if (/lunch/i.test(line)) currentMealType = "Lunch";
-        else if (/dinner/i.test(line)) currentMealType = "Dinner";
-        else if (/snack/i.test(line)) currentMealType = "Snack";
-
-        mealSections[currentMealType].push(`<li>${cleanText(line)}</li>`);
-    }
-
-    // ✅ **Auto-add a snack if mealsPerDay > 3**
-    if (mealsPerDay > 3 && mealSections.Snack.length === 0) {
-        mealSections.Snack.push("<li>🥜 Healthy Snack: Nuts, Yogurt, or Fruit</li>");
-    }
-
-    // ✅ Append meals in correct order
-    formattedHTML += `<div class="meal-day"><h3>📅 Your Meal Plan</h3>`;
-    
-    ["Breakfast", "Lunch", "Dinner", "Snack"].forEach(mealType => {
-        if (mealSections[mealType].length > 0) {
-            formattedHTML += `<div class="meal-item">
-                <h4>🍽️ ${mealType}</h4>
-                <ul>${mealSections[mealType].join("")}</ul>
-            </div>`;
-        }
-    });
-
-    formattedHTML += `</div>`;
-    return formattedHTML;
+// ✅ EXTRACT MEAL TITLE
+function extractMealTitle(mealText) {
+    return mealText.split("\n")[0] || "Untitled Meal Plan";
 }
 
-// ✅ **Text Cleaning Helper**
-function cleanText(text) {
-    return text
-        .replace(/\*\*/g, "") // Remove bold formatting
-        .replace(/^[-*•]\s*(?=\w)/g, "• ") // Keep bullet points
-        .trim();
+// ✅ EXTRACT MEAL SECTIONS (Breakfast, Lunch, Dinner)
+function extractMealSections(mealText) {
+    const sections = mealText.split("\n\n");
+    return sections.filter((section) => section.includes(":"));
 }
 
-// ✅ **Event Listeners Moved from `meal_planner.html`**
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("✅ DOM Loaded");
+// ✅ CLEAN MEAL PLAN TEXT
+function cleanMealText(mealText) {
+    return mealText.replace(/[*_]/g, "").trim();
+}
 
-    // ✅ Handle Meal Plan Form Submission
-    const mealPlannerForm = document.getElementById("meal-planner-form");
-    if (mealPlannerForm) {
-        mealPlannerForm.addEventListener("submit", async function (event) {
-            event.preventDefault(); // Prevent page reload
+// ✅ CLEAR PREVIOUS MEAL PLAN
+function clearPreviousMealPlan() {
+    document.getElementById("mealPlanContainer").innerHTML = "";
+    console.log("🗑️ Cleared previous meal plan.");
+}
 
-            const ingredients = document.getElementById("ingredients").value.trim();
-            const mealsPerDay = parseInt(document.getElementById("meals").value);
-            const servings = parseInt(document.getElementById("servings").value);
-            
-            // ✅ Collect dietary restrictions
-            const dietaryRestrictions = [];
-            document.querySelectorAll('input[name="dietary"]:checked').forEach((checkbox) => {
-                dietaryRestrictions.push(checkbox.value);
-            });
+// ✅ RELOAD NEW MEAL PLAN
+async function reloadNewMealPlan() {
+    clearPreviousMealPlan();
+    const preferences = document.getElementById("mealPreferences").value.trim();
+    const newMealPlan = await fetchMealPlan(preferences);
 
-            console.log("📩 Sending Meal Plan Request:", { ingredients, mealsPerDay, servings, dietaryRestrictions });
-
-            // ✅ Call handleMealPlan function
-            handleMealPlan("create", ingredients, mealsPerDay, servings, dietaryRestrictions);
-        });
+    if (newMealPlan) {
+        saveMealPlanToFirestore(newMealPlan);
+        displayMealPlan();
     }
+}
 
-    // ✅ Show/Hide "Other Diet" Text Field
-    const otherDietCheckbox = document.getElementById("other-diet");
-    const otherDietText = document.getElementById("other-diet-text");
-    if (otherDietCheckbox && otherDietText) {
-        otherDietCheckbox.addEventListener("change", function () {
-            otherDietText.style.display = this.checked ? "block" : "none";
+// ✅ SAVE MEAL PLAN TO FIRESTORE
+async function saveMealPlanToFirestore(mealPlan) {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    try {
+        const docRef = await addDoc(collection(db, "meal_plans"), {
+            userId: user.uid,
+            mealPlan: mealPlan,
+            createdAt: new Date()
         });
+        console.log(`✅ New meal plan saved to Firestore (ID: ${docRef.id})`);
+
+    } catch (error) {
+        console.error("❌ Error saving meal plan:", error);
     }
-
-    // ✅ Handle "Go Back" Button
-    const goBackBtn = document.getElementById("goBackBtn");
-    if (goBackBtn) {
-        goBackBtn.addEventListener("click", function () {
-            window.location.href = "index.html"; // Redirect to home or dashboard
-        });
-    }
-
-    // ✅ Fetch Meal Plan if User is Logged In
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            console.log("✅ User is logged in:", user.email);
-            handleMealPlan("fetch");
-        } else {
-            console.warn("⚠️ No user logged in.");
-        }
-    });
-});
-
+}
 /// ✅ Make function globally accessible
 window.handleMealPlan = handleMealPlan;
