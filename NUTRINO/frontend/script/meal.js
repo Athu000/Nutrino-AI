@@ -109,9 +109,15 @@ function cleanMealText(mealText) {
 
 // ✅ CLEAR PREVIOUS MEAL PLAN
 function clearPreviousMealPlan() {
-    document.getElementById("mealPlanContainer").innerHTML = "";
-    console.log("🗑️ Cleared previous meal plan.");
+    const container = document.getElementById("mealPlanContainer");
+    if (container) {
+        container.innerHTML = ""; // ✅ Clears only if the container exists
+        console.log("🗑️ Cleared previous meal plan.");
+    } else {
+        console.warn("⚠️ Warning: 'mealPlanContainer' not found in DOM.");
+    }
 }
+
 
 // ✅ RELOAD NEW MEAL PLAN
 async function reloadNewMealPlan() {
@@ -149,7 +155,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const createMealPlanBtn = document.getElementById("createMealPlanBtn");
     if (createMealPlanBtn) {
         createMealPlanBtn.addEventListener("click", (event) => {
-            event.preventDefault(); // Prevent form refresh
+            event.preventDefault(); // Prevent page refresh
             reloadNewMealPlan();
         });
     } else {
