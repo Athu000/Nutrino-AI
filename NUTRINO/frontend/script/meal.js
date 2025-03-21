@@ -1,7 +1,7 @@
 import { auth, db } from "./auth.js";
 import { 
     collection, query, where, getDocs, addDoc, deleteDoc, orderBy, limit, serverTimestamp 
-} from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuthToken } from "./NutrinoAPI.js"; 
 
 const API_BASE_URL = "https://nutrino-ai.onrender.com/api";
