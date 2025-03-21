@@ -1856,24 +1856,32 @@ padding-bottom: 24px;
                 <script>
                     document.addEventListener("DOMContentLoaded", () => {
                     document.getElementById("generateRecipe").addEventListener("click", async () => {
-                            const query = document.getElementById("rec_search")?.value.trim();
-                            if (!query) {
-                                alert("Enter a recipe name!");
-                                return;
-                            }
-                            document.getElementById("generateRecipe").innerText = "Loading...";
-                            
-                            import { fetchRecipe } from './script/NutrinoAPI.js';
-                            // ✅ Call fetchRecipe after ensuring it's defined globally
-                            const recipeData = await fetchRecipe(query);
-                            
-                            if (recipeData) {
-                                window.location.href = `generated_recipe.html?data=${encodeURIComponent(JSON.stringify(recipeData))}`;
-                            } else {
-                                document.getElementById("generateRecipe").innerText = "Create";
-                            }
-                        });
-                    });
+                        const query = document.getElementById("rec_search")?.value.trim();
+                        if (!query) {
+                            alert("Enter a recipe name!");
+                            return;
+                        }
+                        
+                    document.getElementById("generateRecipe").innerText = "Loading...";
+                    
+                    // ❌ Remove dynamic import, use the globally available function
+                    if (typeof window.fetchRecipe !== "function") {
+                        console.error("❌ fetchRecipe function is not defined. Check if NutrinoAPI.js is loaded.");
+                        alert("Error: Recipe generator is not available.");
+                        return;
+                    }
+                    
+                    // ✅ Call fetchRecipe directly
+                    const recipeData = await window.fetchRecipe(query);
+                    
+                    if (recipeData) {
+                        window.location.href = `generated_recipe.html?data=${encodeURIComponent(JSON.stringify(recipeData))}`;
+                    } else {
+                        document.getElementById("generateRecipe").innerText = "Create";
+                    }
+                });
+            });
+
                 </script>
                 
                 <div class="Grid-col ">
