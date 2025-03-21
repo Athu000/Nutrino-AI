@@ -5,19 +5,21 @@ import { getAuthToken } from "./NutrinoAPI.js";
 const API_BASE_URL = "https://nutrino-ai.onrender.com/api";
 // ✅ DELETE OLD MEAL PLAN
 async function deleteOldMealPlan() {
-    const user = auth.currentUser;
-    if (!user) return;
-    
+    const authToken = await getAuthToken();
+    if (!authToken) return;
+
     try {
         console.log("🗑️ Deleting old meal plan...");
-        const mealRef = collection(db, "meal_plans");
-        const q = query(mealRef, where("userId", "==", user.uid));
-        const querySnapshot = await getDocs(q);
-
-        querySnapshot.forEach(async (doc) => {
-            await deleteDoc(doc.ref);
-            console.log(`✅ Deleted meal plan: ${doc.id}`);
+        const response = await fetch(`${API_BASE_URL}/delete-meal-plan`, {  // ✅ Updated API endpoint
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${authToken}`
+            }
         });
+
+        if (!response.ok) throw new Error(`Delete Error: ${response.status} ${response.statusText}`);
+
+        console.log("✅ Old meal plan deleted successfully.");
 
     } catch (error) {
         console.error("❌ Error deleting meal plan:", error);
@@ -33,16 +35,16 @@ async function fetchMealPlan(preferences) {
         await deleteOldMealPlan(); // ✅ Delete old plan before fetching a new one
 
         console.log("📤 Requesting new meal plan from API...");
-        const response = await fetch(`${API_BASE_URL}/fetch-meal-plan`, {
+        const response = await fetch(`${API_BASE_URL}/generate-meal-plan`, {  // ✅ Updated API endpoint
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${authToken}`
             },
-            body: JSON.stringify({ preferences })
+            body: JSON.stringify(preferences) // ✅ Backend expects structured JSON input
         });
 
-        if (!response.ok) throw new Error("Failed to fetch meal plan");
+        if (!response.ok) throw new Error(`API Error: ${response.status} ${response.statusText}`);
 
         const data = await response.json();
         console.log("✅ API Response:", data);
@@ -56,16 +58,24 @@ async function fetchMealPlan(preferences) {
         alert("Failed to fetch meal plan.");
     }
 }
-
 // ✅ DISPLAY MEAL PLAN
 async function displayMealPlan() {
-    const user = auth.currentUser;
-    if (!user) return;
+    const authToken = await getAuthToken();
+    if (!authToken) return;
 
     try {
-        const mealRef = collection(db, "meal_plans");
-        const q = query(mealRef, where("userId", "==", user.uid), orderBy("createdAt", "desc"), limit(1));
-        const querySnapshot = await getDocs(q);
+        console.log("📥 Fetching latest meal plan...");
+        const response = await fetch(`${API_BASE_URL}/meal-plan`, {  // ✅ Updated API endpoint
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${authToken}`
+            }
+        });
+
+        if (!response.ok) throw new Error(`API Error: ${response.status} ${response.statusText}`);
+
+        const data = await response.json();
+        if (!data.mealPlan) throw new Error("No meal plan found.");
 
         const container = document.getElementById("mealPlanContainer");
         if (!container) {
@@ -73,24 +83,14 @@ async function displayMealPlan() {
             return;
         }
 
-        if (querySnapshot.empty) {
-            console.warn("⚠️ No meal plan found.");
-            alert("No meal plan available. Please generate a new one.");
-            return;
-        }
-
-        querySnapshot.forEach((doc) => {
-            const mealPlan = doc.data();
-            container.innerHTML = `<pre>${JSON.stringify(mealPlan, null, 2)}</pre>`; // ✅ Temporary display
-            console.log("✅ Meal Plan Displayed:", mealPlan);
-        });
+        container.innerHTML = `<pre>${JSON.stringify(data.mealPlan, null, 2)}</pre>`;
+        console.log("✅ Meal Plan Displayed:", data.mealPlan);
 
     } catch (error) {
         console.error("❌ Error displaying meal plan:", error);
+        alert("Could not load meal plan.");
     }
 }
-
-
 // ✅ EXTRACT MEAL TITLE
 function extractMealTitle(mealText) {
     return mealText.split("\n")[0] || "Untitled Meal Plan";
