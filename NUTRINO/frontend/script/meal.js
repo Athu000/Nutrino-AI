@@ -111,39 +111,6 @@ function displayMealPlan(mealPlanData) {
 // ✅ Fetch meal plan when page loads
 document.addEventListener("DOMContentLoaded", fetchMealPlan);
 
-// ✅ DISPLAY MEAL PLAN
-async function displayMealPlan() {
-    const authToken = await getAuthToken();
-    if (!authToken) return;
-
-    try {
-        console.log("📥 Fetching latest meal plan...");
-        const response = await fetch(`${API_BASE_URL}/meal-plan`, {  // ✅ Updated API endpoint
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${authToken}`
-            }
-        });
-
-        if (!response.ok) throw new Error(`API Error: ${response.status} ${response.statusText}`);
-
-        const data = await response.json();
-        if (!data.mealPlan) throw new Error("No meal plan found.");
-
-        const container = document.getElementById("mealPlanContainer");
-        if (!container) {
-            console.error("❌ Error: 'mealPlanContainer' not found in the DOM.");
-            return;
-        }
-
-        container.innerHTML = `<pre>${JSON.stringify(data.mealPlan, null, 2)}</pre>`;
-        console.log("✅ Meal Plan Displayed:", data.mealPlan);
-
-    } catch (error) {
-        console.error("❌ Error displaying meal plan:", error);
-        alert("Could not load meal plan.");
-    }
-}
 // ✅ EXTRACT MEAL TITLE
 function extractMealTitle(mealText) {
     return mealText.split("\n")[0] || "Untitled Meal Plan";
