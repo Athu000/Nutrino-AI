@@ -27,43 +27,89 @@ async function deleteOldMealPlan() {
 }
 
 // ✅ FETCH NEW MEAL PLAN FROM API
-async function fetchMealPlan(preferences) {
-    const authToken = await getAuthToken();
-    if (!authToken) return;
+async function fetchMealPlan() {
+    const user = auth.currentUser;
+    if (!user) {
+        console.error("❌ User not authenticated.");
+        return;
+    }
 
     try {
-        await deleteOldMealPlan(); // ✅ Delete old plan before fetching a new one
+        console.log("📥 Fetching latest meal plan...");
+        
+        const mealQuery = query(
+            collection(db, "meals"),
+            where("userId", "==", user.uid),
+            orderBy("createdAt", "desc"),
+            limit(1)
+        );
 
-        // ✅ Debugging - Log the exact data being sent
-        console.log("📤 Sending request to API with:", JSON.stringify(preferences, null, 2));
-
-        const response = await fetch(`${API_BASE_URL}/generate-meal-plan`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${authToken}`
-            },
-            body: JSON.stringify(preferences) // 🚨 Ensure preferences is correctly structured
-        });
-
-        if (!response.ok) {
-            const errorResponse = await response.json();  // Capture API error details
-            console.error("❌ API Error Response:", errorResponse);
-            throw new Error(`API Error: ${response.status} - ${errorResponse.error}`);
+        const snapshot = await getDocs(mealQuery);
+        if (snapshot.empty) {
+            console.warn("⚠️ No meal plan found.");
+            return;
         }
 
-        const data = await response.json();
-        console.log("✅ API Response:", data);
-
-        if (!data.mealPlan) throw new Error("Meal plan data is missing");
-
-        return data.mealPlan;
+        const mealPlanData = snapshot.docs[0].data();
+        console.log("✅ Meal Plan:", mealPlanData);
+        displayMealPlan(mealPlanData); // ✅ Function to display the meal plan in the DOM
 
     } catch (error) {
-        console.error("❌ API Error fetching meal plan:", error);
-        alert("Failed to fetch meal plan.");
+        console.error("❌ Error fetching meal plan:", error);
     }
 }
+
+// ✅ Function to save a new meal plan
+async function saveMealPlanToFirestore(mealPlan) {
+    const user = auth.currentUser;
+    if (!user) {
+        console.error("❌ User not authenticated.");
+        return;
+    }
+
+    try {
+        console.log("📤 Saving meal plan to Firestore...");
+
+        const mealRef = collection(db, "meals");
+        await addDoc(mealRef, {
+            userId: user.uid,
+            ingredients: mealPlan.ingredients || "",
+            mealsPerDay: mealPlan.mealsPerDay || 0,
+            servings: mealPlan.servings || 0,
+            dietaryRestrictions: mealPlan.dietaryRestrictions || [],
+            mealPlan: mealPlan.mealPlan || "No meal plan generated",
+            createdAt: serverTimestamp() // ✅ Ensures timestamp is added
+        });
+
+        console.log("✅ Meal plan saved successfully.");
+        fetchMealPlan(); // ✅ Refresh the displayed meal plan
+
+    } catch (error) {
+        console.error("❌ Error saving meal plan:", error);
+    }
+}
+
+// ✅ Function to display meal plan in HTML
+function displayMealPlan(mealPlanData) {
+    const mealPlanContainer = document.getElementById("mealPlanContainer");
+    if (!mealPlanContainer) {
+        console.error("❌ Error: 'mealPlanContainer' not found in the DOM.");
+        return;
+    }
+
+    mealPlanContainer.innerHTML = `
+        <h3>🍽️ Your Meal Plan</h3>
+        <p><strong>Meals per Day:</strong> ${mealPlanData.mealsPerDay}</p>
+        <p><strong>Servings:</strong> ${mealPlanData.servings}</p>
+        <p><strong>Ingredients:</strong> ${mealPlanData.ingredients}</p>
+        <p><strong>Dietary Restrictions:</strong> ${mealPlanData.dietaryRestrictions.join(", ") || "None"}</p>
+        <p><strong>Meal Plan:</strong></p>
+        <pre>${mealPlanData.mealPlan}</pre>
+    `;
+}
+
+// ✅ Fetch meal plan when page loads
+document.addEventListener("DOMContentLoaded", fetchMealPlan);
 
 // ✅ DISPLAY MEAL PLAN
 async function displayMealPlan() {
