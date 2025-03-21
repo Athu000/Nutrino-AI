@@ -8,7 +8,7 @@
     <script type="module" src="./script/NutrinoAPI.js"></script>
     <script type="module" src="./script/auth.js"></script>
     <script type="module">
-        import { handleMealPlan } from "./script/NutrinoAPI.js";
+        import { handleMealPlan } from "./script/meal.js";
 
         document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("meal-plan").innerHTML = '<p class="loading">⏳ Loading your meal plan...</p>';
@@ -130,7 +130,7 @@
     </div>
 
     <script type="module">
-        import { handleMealPlan } from "./script/NutrinoAPI.js";
+        import { handleMealPlan } from "./script/meal.js";
 
         async function displayMealPlan() {
             const mealPlanContainer = document.getElementById("meal-plan");
