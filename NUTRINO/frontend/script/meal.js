@@ -56,8 +56,7 @@ async function fetchMealPlan() {
         const mealPlanData = snapshot.docs[0].data();
         console.log("✅ Meal Plan Retrieved:", mealPlanData);
 
-        // ✅ Store data in localStorage for use in meals.html
-        localStorage.setItem("latestMealPlan", JSON.stringify(mealPlanData));
+        displayMealPlan(mealPlanData);
 
         // Redirect to meals.html
         window.location.href = "meals.html";
@@ -66,43 +65,14 @@ async function fetchMealPlan() {
     }
 }
 
-// ✅ SAVE NEW MEAL PLAN TO FIRESTORE
-async function saveMealPlanToFirestore(mealPlan) {
-    const user = auth.currentUser;
-    if (!user) {
-        console.error("❌ User not authenticated.");
-        alert("You must be logged in to save a meal plan.");
-        return;
-    }
-
-    try {
-        console.log("📤 Saving meal plan to Firestore...");
-        console.log("👤 Current User:", user.uid);
-
-        await addDoc(collection(db, "meals"), {
-            userId: user.uid,
-            ingredients: mealPlan.ingredients || "",
-            mealsPerDay: mealPlan.mealsPerDay || 0,
-            servings: mealPlan.servings || 0,
-            dietaryRestrictions: mealPlan.dietaryRestrictions || [],
-            mealPlan: mealPlan.mealPlan || "No meal plan generated",
-            createdAt: serverTimestamp()
-        });
-
-        console.log("✅ Meal plan saved successfully.");
-        fetchMealPlan();
-    } catch (error) {
-        console.error("❌ Error saving meal plan:", error);
-    }
-}
-function displayMealPlan() {
+// ✅ DISPLAY MEAL PLAN FROM FIRESTORE
+function displayMealPlan(mealPlanData) {
     const mealPlanContainer = document.getElementById("mealPlanContainer");
     if (!mealPlanContainer) {
         console.error("❌ Error: 'mealPlanContainer' not found in the DOM.");
         return;
     }
 
-    const mealPlanData = JSON.parse(localStorage.getItem("latestMealPlan"));
     if (!mealPlanData) {
         mealPlanContainer.innerHTML = `<p>⚠️ No meal plan available.</p>`;
         return;
@@ -159,6 +129,7 @@ function displayMealPlan() {
         </div>
     `;
 }
+
 
 // ✅ CLEAR PREVIOUS MEAL PLAN
 function clearPreviousMealPlan() {
