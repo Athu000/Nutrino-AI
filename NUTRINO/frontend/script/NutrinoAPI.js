@@ -74,14 +74,13 @@ export async function fetchRecipe(prompt) {
 
         const data = await response.json();
         console.log("✅ API Response Received:", data);
+        let recipeText = data.recipe || (data.candidates?.[0]?.content?.parts?.[0]?.text);
 
-        if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
+        if (!recipeText) {
             console.error("❌ API Response is malformed:", data);
             alert("Received an invalid recipe response.");
             return;
         }
-
-        let recipeText = data.candidates[0].content.parts[0].text;
         console.log("✅ Extracted Recipe Text:", recipeText);
 
         // ✅ Save new Recipe to Firestore
