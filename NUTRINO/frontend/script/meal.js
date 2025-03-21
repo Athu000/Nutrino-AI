@@ -135,5 +135,9 @@ async function saveMealPlanToFirestore(mealPlan) {
         console.error("❌ Error saving meal plan:", error);
     }
 }
+function handleMealPlan() {
+    reloadNewMealPlan(); // ✅ Call function to fetch & display meal plan
+}
+
 /// ✅ Make function globally accessible
 window.handleMealPlan = handleMealPlan;
