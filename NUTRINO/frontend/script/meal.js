@@ -6,6 +6,17 @@ import { getAuthToken } from "./NutrinoAPI.js";
 
 const API_BASE_URL = "https://nutrino-ai.onrender.com/api";
 
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        console.log("✅ User Logged In:", user.email);
+        fetchMealPlan(user.uid); // 🔹 Only fetch if user is logged in
+    } else {
+        console.error("❌ User not authenticated.");
+        alert("Please log in first.");
+        window.location.href = "login.html"; // 🔹 Redirect to login page
+    }
+});
+
 // ✅ DELETE OLD MEAL PLAN (Optional, but keeping it)
 async function deleteOldMealPlan() {
     const authToken = await getAuthToken();
@@ -135,7 +146,6 @@ function getMealPreferences() {
     return { ingredients, mealsPerDay, servings, dietaryRestrictions };
 }
 
-// ✅ REQUEST NEW MEAL PLAN FROM API
 // ✅ REQUEST NEW MEAL PLAN FROM API
 async function fetchNewMealPlan() {
     clearPreviousMealPlan(); // Clears old meal plan from local storage
