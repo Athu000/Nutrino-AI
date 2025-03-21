@@ -69,8 +69,11 @@ async function fetchMealPlan() {
 
         displayMealPlan(mealPlanData);
 
-        // Redirect to meals.html
-        window.location.href = "meals.html";
+        if (!window.location.pathname.includes("meals.html")) {
+            window.location.href = "meals.html";
+        } else {
+            displayMealPlan(mealPlanData); // ✅ Show meal plan if already on page
+        }
     } catch (error) {
         console.error("❌ Error fetching meal plan:", error);
     }
