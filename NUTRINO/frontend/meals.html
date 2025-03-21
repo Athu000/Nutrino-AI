@@ -104,6 +104,11 @@
         localStorage.removeItem("mealPlanData"); // ✅ Deletes stored meal plan
         window.location.href = "index.html"; // ✅ Redirects to main page
     });
+    document.addEventListener("DOMContentLoaded", function () {
+    console.log("🔹 Page Loaded: Checking for Meal Plan Data...");
+    displayMealPlan();
+});
+
 </script>
 
 </body>
