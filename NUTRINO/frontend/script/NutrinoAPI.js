@@ -48,7 +48,7 @@ async function deleteOldRecipe() {
 }
 
 // ✅ Fetch Recipe & Save to Firestore
-async function fetchRecipe(prompt) {
+export async function fetchRecipe(prompt) {
     let authToken = await getAuthToken();
     if (!authToken) return;
 
