@@ -67,6 +67,12 @@ async function displayMealPlan() {
         const q = query(mealRef, where("userId", "==", user.uid), orderBy("createdAt", "desc"), limit(1));
         const querySnapshot = await getDocs(q);
 
+        const container = document.getElementById("mealPlanContainer");
+        if (!container) {
+            console.error("❌ Error: 'mealPlanContainer' not found in the DOM.");
+            return;
+        }
+
         if (querySnapshot.empty) {
             console.warn("⚠️ No meal plan found.");
             alert("No meal plan available. Please generate a new one.");
@@ -75,7 +81,7 @@ async function displayMealPlan() {
 
         querySnapshot.forEach((doc) => {
             const mealPlan = doc.data();
-            document.getElementById("mealPlanContainer").innerHTML = formatMealPlan(mealPlan);
+            container.innerHTML = `<pre>${JSON.stringify(mealPlan, null, 2)}</pre>`; // ✅ Temporary display
             console.log("✅ Meal Plan Displayed:", mealPlan);
         });
 
@@ -83,6 +89,7 @@ async function displayMealPlan() {
         console.error("❌ Error displaying meal plan:", error);
     }
 }
+
 
 // ✅ EXTRACT MEAL TITLE
 function extractMealTitle(mealText) {
@@ -138,6 +145,14 @@ async function saveMealPlanToFirestore(mealPlan) {
 function handleMealPlan() {
     reloadNewMealPlan(); // ✅ Call function to fetch & display meal plan
 }
-
-/// ✅ Make function globally accessible
-window.handleMealPlan = handleMealPlan;
+document.addEventListener("DOMContentLoaded", function () {
+    const createMealPlanBtn = document.getElementById("createMealPlanBtn");
+    if (createMealPlanBtn) {
+        createMealPlanBtn.addEventListener("click", (event) => {
+            event.preventDefault(); // Prevent form refresh
+            reloadNewMealPlan();
+        });
+    } else {
+        console.error("❌ Error: 'Create Meal Plan' button not found in DOM.");
+    }
+});
