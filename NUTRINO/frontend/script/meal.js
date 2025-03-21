@@ -34,17 +34,23 @@ async function fetchMealPlan(preferences) {
     try {
         await deleteOldMealPlan(); // ✅ Delete old plan before fetching a new one
 
-        console.log("📤 Requesting new meal plan from API...");
-        const response = await fetch(`${API_BASE_URL}/generate-meal-plan`, {  // ✅ Updated API endpoint
+        // ✅ Debugging - Log the exact data being sent
+        console.log("📤 Sending request to API with:", JSON.stringify(preferences, null, 2));
+
+        const response = await fetch(`${API_BASE_URL}/generate-meal-plan`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${authToken}`
             },
-            body: JSON.stringify(preferences) // ✅ Backend expects structured JSON input
+            body: JSON.stringify(preferences) // 🚨 Ensure preferences is correctly structured
         });
 
-        if (!response.ok) throw new Error(`API Error: ${response.status} ${response.statusText}`);
+        if (!response.ok) {
+            const errorResponse = await response.json();  // Capture API error details
+            console.error("❌ API Error Response:", errorResponse);
+            throw new Error(`API Error: ${response.status} - ${errorResponse.error}`);
+        }
 
         const data = await response.json();
         console.log("✅ API Response:", data);
@@ -58,6 +64,7 @@ async function fetchMealPlan(preferences) {
         alert("Failed to fetch meal plan.");
     }
 }
+
 // ✅ DISPLAY MEAL PLAN
 async function displayMealPlan() {
     const authToken = await getAuthToken();
@@ -135,16 +142,44 @@ function getMealPreferences() {
 async function reloadNewMealPlan() {
     clearPreviousMealPlan();
 
-    // ✅ Ensure the element exists before accessing `.value`
-   const preferences = getMealPreferences(); 
-    const newMealPlan = await fetchMealPlan(preferences);
+    const ingredientsInput = document.getElementById("ingredients");
+    const mealsInput = document.getElementById("meals");
+    const servingsInput = document.getElementById("servings");
+    const dietaryInputs = document.querySelectorAll("input[name='dietary']:checked");
 
+    if (!ingredientsInput || !mealsInput || !servingsInput) {
+        console.error("❌ Missing input fields in DOM.");
+        return;
+    }
+
+    // ✅ Extract values correctly
+    const ingredients = ingredientsInput.value.trim();
+    const mealsPerDay = parseInt(mealsInput.value, 10);
+    const servings = parseInt(servingsInput.value, 10);
+    const dietaryRestrictions = Array.from(dietaryInputs).map(input => input.value);
+
+    if (!ingredients || !mealsPerDay || !servings) {
+        console.error("❌ Missing required fields.");
+        alert("Please fill all required fields.");
+        return;
+    }
+
+    // ✅ Create properly structured request
+    const preferences = {
+        ingredients,
+        mealsPerDay,
+        servings,
+        dietaryRestrictions
+    };
+
+    console.log("📤 Final Meal Plan Request:", preferences); // ✅ Debugging step
+
+    const newMealPlan = await fetchMealPlan(preferences);
     if (newMealPlan) {
         saveMealPlanToFirestore(newMealPlan);
         displayMealPlan();
     }
 }
-
 
 // ✅ SAVE MEAL PLAN TO FIRESTORE
 async function saveMealPlanToFirestore(mealPlan) {
