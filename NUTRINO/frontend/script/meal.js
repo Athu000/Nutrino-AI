@@ -118,19 +118,25 @@ function clearPreviousMealPlan() {
     }
 }
 
+// ✅ FETCH MEAL PLAN FORM DATA
+function getMealPreferences() {
+    const ingredients = document.getElementById("ingredients")?.value.trim() || "";
+    const meals = parseInt(document.getElementById("meals")?.value) || 3;
+    const servings = parseInt(document.getElementById("servings")?.value) || 1;
+    
+    // ✅ Collect selected dietary restrictions
+    const dietaryRestrictions = [...document.querySelectorAll("input[name='dietary']:checked")]
+        .map(input => input.value);
+
+    return { ingredients, meals, servings, dietaryRestrictions };
+}
 
 // ✅ RELOAD NEW MEAL PLAN
 async function reloadNewMealPlan() {
     clearPreviousMealPlan();
 
     // ✅ Ensure the element exists before accessing `.value`
-    const preferencesInput = document.getElementById("mealPreferences");
-    if (!preferencesInput) {
-        console.error("❌ Element '#mealPreferences' not found in DOM.");
-        return;
-    }
-
-    const preferences = preferencesInput.value.trim();
+   const preferences = getMealPreferences(); 
     const newMealPlan = await fetchMealPlan(preferences);
 
     if (newMealPlan) {
@@ -167,10 +173,14 @@ document.addEventListener("DOMContentLoaded", function () {
         console.warn("⚠️ mealPreferences input not found in DOM.");
     }
 
-    const createMealPlanBtn = document.getElementById("createMealPlanBtn");
-    if (createMealPlanBtn) {
-        createMealPlanBtn.addEventListener("click", reloadNewMealPlan);
-    } else {
-        console.error("❌ 'Create Meal Plan' button not found.");
-    }
+    const form = document.getElementById("meal-planner-form");
+if (form) {
+    form.addEventListener("submit", function (event) {
+        event.preventDefault(); // ✅ Prevents page reload
+        reloadNewMealPlan();
+    });
+} else {
+    console.error("❌ 'Meal Planner Form' not found.");
+}
+
 });
