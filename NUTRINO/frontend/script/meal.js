@@ -41,43 +41,69 @@ async function deleteOldMealPlan() {
 }
 
 // ✅ FETCH LATEST MEAL PLAN FROM FIRESTORE
-async function fetchMealPlan() {
-    const user = auth.currentUser;
-    if (!user) {
-        console.error("❌ User not authenticated.");
+async function fetchNewMealPlan() {
+    clearPreviousMealPlan(); // Clears old meal plan from local storage
+
+    const preferences = getMealPreferences();
+    if (!preferences.ingredients || !preferences.mealsPerDay || !preferences.servings) {
+        alert("Please fill all required fields.");
+        console.error("❌ Missing required fields.");
         return;
     }
 
-    try {
-        console.log("📥 Fetching latest meal plan...");
-        
-        const mealQuery = query(
-            collection(db, "meals"),
-            where("userId", "==", user.uid),
-            orderBy("createdAt", "desc"),
-            limit(1)
-        );
+    console.log("📤 Sending meal plan request:", preferences);
 
-        const snapshot = await getDocs(mealQuery);
-        if (snapshot.empty) {
-            console.warn("⚠️ No meal plan found.");
+    try {
+        const authToken = await getAuthToken();
+        if (!authToken) throw new Error("❌ Authentication token missing.");
+
+        const response = await fetch(`${API_BASE_URL}/generate-meal-plan`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${authToken}`
+            },
+            body: JSON.stringify(preferences)
+        });
+
+        if (!response.ok) throw new Error(`API Error: ${response.status} ${response.statusText}`);
+
+        const newMealPlan = await response.json();
+        console.log("✅ API Response:", newMealPlan);
+
+        // ✅ Save directly to Firestore
+        const user = auth.currentUser;
+        if (!user) {
+            console.error("❌ User not authenticated.");
             return;
         }
 
-        const mealPlanData = snapshot.docs[0].data();
-        console.log("✅ Meal Plan Retrieved:", mealPlanData);
+        console.log("📤 Saving new meal plan to Firestore...");
+        
+        const docRef = await addDoc(collection(db, "meals"), {
+            userId: user.uid,
+            ingredients: preferences.ingredients,
+            mealsPerDay: preferences.mealsPerDay,
+            servings: preferences.servings,
+            dietaryRestrictions: preferences.dietaryRestrictions || [],
+            mealPlan: newMealPlan.mealPlan, // ✅ Directly save API response
+            createdAt: serverTimestamp()
+        });
 
-        displayMealPlan(mealPlanData);
+        localStorage.setItem("mealPlanId", docRef.id); // ✅ Store mealPlan ID
+        console.log("✅ Meal plan saved successfully.");
 
-        if (!window.location.pathname.includes("meals.html")) {
-            window.location.href = "meals.html";
-        } else {
-            displayMealPlan(mealPlanData); // ✅ Show meal plan if already on page
-        }
+        // ✅ Fetch and display latest meal plan
+        await fetchMealPlan();
+
+        // ✅ Redirect **AFTER** meal is generated and stored
+        window.location.href = "meals.html";
+
     } catch (error) {
-        console.error("❌ Error fetching meal plan:", error);
+        console.error("❌ Error fetching new meal plan:", error);
     }
 }
+
 // ✅ DISPLAY MEAL PLAN FROM FIRESTORE
 async function displayMealPlan() {
     console.log("🔎 Checking Local Storage...");
