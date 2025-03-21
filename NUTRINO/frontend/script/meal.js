@@ -71,11 +71,13 @@ async function saveMealPlanToFirestore(mealPlan) {
     const user = auth.currentUser;
     if (!user) {
         console.error("❌ User not authenticated.");
+        alert("You must be logged in to save a meal plan.");
         return;
     }
 
     try {
         console.log("📤 Saving meal plan to Firestore...");
+        console.log("👤 Current User:", user.uid);
 
         await addDoc(collection(db, "meals"), {
             userId: user.uid,
@@ -93,7 +95,6 @@ async function saveMealPlanToFirestore(mealPlan) {
         console.error("❌ Error saving meal plan:", error);
     }
 }
-
 // ✅ DISPLAY MEAL PLAN ATTRACTIVELY IN meals.html
 function displayMealPlan() {
     const mealPlanContainer = document.getElementById("mealPlanContainer");
