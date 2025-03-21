@@ -1,6 +1,8 @@
 import { auth, db } from "./auth.js";
 import { collection, query, where, getDocs, addDoc, deleteDoc, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
-import { getAuthToken } from "./NutrinoAPI.js"; // 🔹 Ensure getAuthToken is in a separate file
+import { getAuthToken } from "./NutrinoAPI.js"; 
+
+const API_BASE_URL = "https://nutrino-ai.onrender.com/api";
 // ✅ DELETE OLD MEAL PLAN
 async function deleteOldMealPlan() {
     const user = auth.currentUser;
