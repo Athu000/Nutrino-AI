@@ -95,8 +95,6 @@ async function saveMealPlanToFirestore(mealPlan) {
         console.error("❌ Error saving meal plan:", error);
     }
 }
-// ✅ DISPLAY MEAL PLAN ATTRACTIVELY IN meals.html
-// ✅ DISPLAY MEAL PLAN ATTRACTIVELY IN meals.html
 function displayMealPlan() {
     const mealPlanContainer = document.getElementById("mealPlanContainer");
     if (!mealPlanContainer) {
@@ -126,7 +124,7 @@ function displayMealPlan() {
         } else if (section.startsWith("**Important Notes:**")) {
             importantNotes = section.replace("**Important Notes:**", "").trim();
         } else {
-            mealPlanDescription += `<p>${section}</p>`;
+            mealPlanDescription += `<p>${section.replace(/\n/g, "<br>")}</p>`; // ✅ Ensure proper formatting
         }
     });
 
@@ -161,7 +159,6 @@ function displayMealPlan() {
         </div>
     `;
 }
-
 
 // ✅ CLEAR PREVIOUS MEAL PLAN
 function clearPreviousMealPlan() {
