@@ -126,14 +126,14 @@
 <body>
     <div class="container">
         <h2>🍽️ My AI Meal Plan</h2>
-        <div id="meal-plan" class="meals-grid"></div>
+        <div id="mealPlanContainer" class="meals-grid"></div>
     </div>
 
     <script type="module">
         import { handleMealPlan } from "./script/meal.js";
 
         async function displayMealPlan() {
-            const mealPlanContainer = document.getElementById("meal-plan");
+            const mealPlanContainer = document.getElementById("mealPlanContainer");
             mealPlanContainer.innerHTML = '<p class="loading">⏳ Fetching meal plan...</p>';
 
             try {
