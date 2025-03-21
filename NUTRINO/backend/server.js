@@ -155,7 +155,7 @@ app.post("/api/generate-meal-plan", verifyAuthToken, async (req, res) => {
         const prompt = `
             Generate a structured meal plan with:
             - Ingredients: ${ingredients}
-            - Meals per day: ${mealsPerDay}
+            - Number of meal you want in one day: ${mealsPerDay}
             - Servings: ${servings}
             - Dietary restrictions: ${dietaryRestrictions.length > 0 ? dietaryRestrictions.join(", ") : "None"}
         `;
