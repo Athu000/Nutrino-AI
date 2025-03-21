@@ -153,12 +153,18 @@ app.post("/api/generate-meal-plan", verifyAuthToken, async (req, res) => {
         }
 
         const prompt = `
-            Generate a structured meal plan with:
+            Generate a structured meal plan for ONE DAY only with:
             - Ingredients: ${ingredients}
-            - Number of meal you want in one day: ${mealsPerDay}
-            - Servings: ${servings}
+            - Number of meals in the day: ${mealsPerDay}
+            - Servings per meal: ${servings}
             - Dietary restrictions: ${dietaryRestrictions.length > 0 ? dietaryRestrictions.join(", ") : "None"}
+            
+            Provide the meal plan in a structured format:
+            - Each meal should be distinct.
+            - Include meal name, ingredients, and step-by-step instructions.
+            - Keep it well-balanced within the given restrictions.
         `;
+
 
         const response = await fetch(API_URL, { 
             method: "POST",
