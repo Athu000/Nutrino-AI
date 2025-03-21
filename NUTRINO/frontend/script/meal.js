@@ -96,6 +96,7 @@ async function saveMealPlanToFirestore(mealPlan) {
     }
 }
 // ✅ DISPLAY MEAL PLAN ATTRACTIVELY IN meals.html
+// ✅ DISPLAY MEAL PLAN ATTRACTIVELY IN meals.html
 function displayMealPlan() {
     const mealPlanContainer = document.getElementById("mealPlanContainer");
     if (!mealPlanContainer) {
@@ -108,6 +109,26 @@ function displayMealPlan() {
         mealPlanContainer.innerHTML = `<p>⚠️ No meal plan available.</p>`;
         return;
     }
+
+    const mealPlanText = mealPlanData.mealPlan || "No meal plan generated.";
+    const sections = mealPlanText.split(/\n\n/); // Split by double newlines
+
+    let planName = "";
+    let mealPlanDescription = "";
+    let mealsHTML = "";
+    let importantNotes = "";
+
+    sections.forEach(section => {
+        if (section.startsWith("##")) {
+            planName = section.replace("## ", "").trim();
+        } else if (section.startsWith("**Breakfast:**") || section.startsWith("**Lunch:**") || section.startsWith("**Dinner:**")) {
+            mealsHTML += `<div class="meal-item"><p>${section.replace(/\*\*/g, "")}</p></div>`;
+        } else if (section.startsWith("**Important Notes:**")) {
+            importantNotes = section.replace("**Important Notes:**", "").trim();
+        } else {
+            mealPlanDescription += `<p>${section}</p>`;
+        }
+    });
 
     mealPlanContainer.innerHTML = `
         <div class="meal-plan-card">
@@ -130,11 +151,17 @@ function displayMealPlan() {
             </div>
             <div class="meal-section">
                 <h3>📜 Meal Plan:</h3>
-                <pre>${mealPlanData.mealPlan || "No meal plan generated"}</pre>
+                <pre>${mealPlanDescription}</pre>
             </div>
+            <div class="meal-section">
+                <h3>🍽️ Meals:</h3>
+                <div id="mealsContainer">${mealsHTML}</div>
+            </div>
+            ${importantNotes ? `<div class="meal-section"><h3>⚠️ Important Notes:</h3><ul><li>${importantNotes.replace(/\n/g, "</li><li>")}</li></ul></div>` : ""}
         </div>
     `;
 }
+
 
 // ✅ CLEAR PREVIOUS MEAL PLAN
 function clearPreviousMealPlan() {
