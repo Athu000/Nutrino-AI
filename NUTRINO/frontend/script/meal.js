@@ -122,7 +122,15 @@ function clearPreviousMealPlan() {
 // ✅ RELOAD NEW MEAL PLAN
 async function reloadNewMealPlan() {
     clearPreviousMealPlan();
-    const preferences = document.getElementById("mealPreferences").value.trim();
+
+    // ✅ Ensure the element exists before accessing `.value`
+    const preferencesInput = document.getElementById("mealPreferences");
+    if (!preferencesInput) {
+        console.error("❌ Element '#mealPreferences' not found in DOM.");
+        return;
+    }
+
+    const preferences = preferencesInput.value.trim();
     const newMealPlan = await fetchMealPlan(preferences);
 
     if (newMealPlan) {
@@ -130,6 +138,7 @@ async function reloadNewMealPlan() {
         displayMealPlan();
     }
 }
+
 
 // ✅ SAVE MEAL PLAN TO FIRESTORE
 async function saveMealPlanToFirestore(mealPlan) {
@@ -152,13 +161,16 @@ function handleMealPlan() {
     reloadNewMealPlan(); // ✅ Call function to fetch & display meal plan
 }
 document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ Document Loaded");
+
+    if (!document.getElementById("mealPreferences")) {
+        console.warn("⚠️ mealPreferences input not found in DOM.");
+    }
+
     const createMealPlanBtn = document.getElementById("createMealPlanBtn");
     if (createMealPlanBtn) {
-        createMealPlanBtn.addEventListener("click", (event) => {
-            event.preventDefault(); // Prevent page refresh
-            reloadNewMealPlan();
-        });
+        createMealPlanBtn.addEventListener("click", reloadNewMealPlan);
     } else {
-        console.error("❌ Error: 'Create Meal Plan' button not found in DOM.");
+        console.error("❌ 'Create Meal Plan' button not found.");
     }
 });
