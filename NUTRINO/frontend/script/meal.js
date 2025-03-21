@@ -66,66 +66,57 @@ async function fetchMealPlan() {
 }
 
 // ✅ DISPLAY MEAL PLAN FROM FIRESTORE
-function displayMealPlan(mealPlanData) {
-    const mealPlanContainer = document.getElementById("mealPlanContainer");
-    if (!mealPlanContainer) {
-        console.error("❌ Error: 'mealPlanContainer' not found in the DOM.");
-        return;
-    }
+async function displayMealPlan() {
+    console.log("🔎 Checking Local Storage...");
+    
+    let mealPlanData = localStorage.getItem("latestMealPlan");
 
     if (!mealPlanData) {
-        mealPlanContainer.innerHTML = `<p>⚠️ No meal plan available.</p>`;
-        return;
+        console.warn("⚠️ No meal plan found in localStorage. Fetching from Firestore...");
+        
+        const user = auth.currentUser;
+        if (!user) {
+            console.error("❌ User not authenticated.");
+            return;
+        }
+
+        const mealPlanId = localStorage.getItem("mealPlanId");
+        if (!mealPlanId) {
+            console.error("❌ Meal Plan ID not found in localStorage.");
+            return;
+        }
+
+        // Fetch data from Firestore
+        try {
+            const mealPlanRef = doc(db, "meals", mealPlanId);
+            const mealPlanSnap = await getDoc(mealPlanRef);
+            
+            if (!mealPlanSnap.exists()) {
+                console.warn("⚠️ Meal Plan does not exist in Firestore.");
+                return;
+            }
+
+            mealPlanData = mealPlanSnap.data();
+            localStorage.setItem("latestMealPlan", JSON.stringify(mealPlanData));
+
+        } catch (error) {
+            console.error("❌ Error fetching meal plan:", error);
+            return;
+        }
+    } else {
+        mealPlanData = JSON.parse(mealPlanData);
     }
 
-    const mealPlanText = mealPlanData.mealPlan || "No meal plan generated.";
-    const sections = mealPlanText.split(/\n\n/); // Split by double newlines
+    console.log("✅ Meal Plan Retrieved:", mealPlanData);
 
-    let planName = "";
-    let mealPlanDescription = "";
-    let mealsHTML = "";
-    let importantNotes = "";
-
-    sections.forEach(section => {
-        if (section.startsWith("##")) {
-            planName = section.replace("## ", "").trim();
-        } else if (section.startsWith("**Breakfast:**") || section.startsWith("**Lunch:**") || section.startsWith("**Dinner:**")) {
-            mealsHTML += `<div class="meal-item"><p>${section.replace(/\*\*/g, "")}</p></div>`;
-        } else if (section.startsWith("**Important Notes:**")) {
-            importantNotes = section.replace("**Important Notes:**", "").trim();
-        } else {
-            mealPlanDescription += `<p>${section.replace(/\n/g, "<br>")}</p>`; // ✅ Ensure proper formatting
-        }
-    });
-
-    mealPlanContainer.innerHTML = `
+    document.getElementById("mealPlanContainer").innerHTML = `
         <div class="meal-plan-card">
-            <h2>🍽️ Your Personalized Meal Plan</h2>
-            <div class="meal-section">
-                <h3>🥗 Ingredients:</h3>
-                <p>${mealPlanData.ingredients || "Not provided"}</p>
-            </div>
-            <div class="meal-section">
-                <h3>📆 Meals Per Day:</h3>
-                <p>${mealPlanData.mealsPerDay}</p>
-            </div>
-            <div class="meal-section">
-                <h3>🍛 Servings:</h3>
-                <p>${mealPlanData.servings}</p>
-            </div>
-            <div class="meal-section">
-                <h3>⚠️ Dietary Restrictions:</h3>
-                <p>${mealPlanData.dietaryRestrictions.length ? mealPlanData.dietaryRestrictions.join(", ") : "None"}</p>
-            </div>
-            <div class="meal-section">
-                <h3>📜 Meal Plan:</h3>
-                <pre>${mealPlanDescription}</pre>
-            </div>
-            <div class="meal-section">
-                <h3>🍽️ Meals:</h3>
-                <div id="mealsContainer">${mealsHTML}</div>
-            </div>
-            ${importantNotes ? `<div class="meal-section"><h3>⚠️ Important Notes:</h3><ul><li>${importantNotes.replace(/\n/g, "</li><li>")}</li></ul></div>` : ""}
+            <h2>🍽️ Your AI-Generated Meal Plan</h2>
+            <p><strong>Ingredients:</strong> ${mealPlanData.ingredients || "Not provided"}</p>
+            <p><strong>Meals Per Day:</strong> ${mealPlanData.mealsPerDay}</p>
+            <p><strong>Servings:</strong> ${mealPlanData.servings}</p>
+            <p><strong>Dietary Restrictions:</strong> ${mealPlanData.dietaryRestrictions?.join(", ") || "None"}</p>
+            <pre>${mealPlanData.mealPlan || "No meal plan generated."}</pre>
         </div>
     `;
 }
