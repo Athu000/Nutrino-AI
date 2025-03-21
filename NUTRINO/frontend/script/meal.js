@@ -148,8 +148,9 @@ function getMealPreferences() {
 }
 
 // ✅ REQUEST NEW MEAL PLAN FROM API
+// ✅ REQUEST NEW MEAL PLAN FROM API
 async function fetchNewMealPlan() {
-    clearPreviousMealPlan();
+    clearPreviousMealPlan(); // Clears old meal plan from local storage
 
     const preferences = getMealPreferences();
     if (!preferences.ingredients || !preferences.mealsPerDay || !preferences.servings) {
@@ -178,11 +179,35 @@ async function fetchNewMealPlan() {
         const newMealPlan = await response.json();
         console.log("✅ API Response:", newMealPlan);
 
-        await saveMealPlanToFirestore(newMealPlan);
+        // ✅ Save directly to Firestore
+        const user = auth.currentUser;
+        if (!user) {
+            console.error("❌ User not authenticated.");
+            return;
+        }
+
+        console.log("📤 Saving new meal plan to Firestore...");
+        
+        await addDoc(collection(db, "meals"), {
+            userId: user.uid,
+            ingredients: preferences.ingredients,
+            mealsPerDay: preferences.mealsPerDay,
+            servings: preferences.servings,
+            dietaryRestrictions: preferences.dietaryRestrictions || [],
+            mealPlan: newMealPlan.mealPlan, // ✅ Directly save API response
+            createdAt: serverTimestamp()
+        });
+
+        console.log("✅ Meal plan saved successfully.");
+
+        // ✅ Fetch and display latest meal plan
+        fetchMealPlan();
+
     } catch (error) {
         console.error("❌ Error fetching new meal plan:", error);
     }
 }
+
 
 // ✅ FORM HANDLER FUNCTION
 function handleMealPlan() {
