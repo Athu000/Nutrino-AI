@@ -5,7 +5,7 @@ import { collection, addDoc, getDocs, query, where, deleteDoc, doc, orderBy,getD
 const API_BASE_URL = "https://nutrino-ai.onrender.com/api";
 
 // ✅ Get or Refresh Firebase Auth Token
-async function getAuthToken() {
+export async function getAuthToken() {
     try {
         const user = auth.currentUser;
         if (user) {
