@@ -7,6 +7,7 @@ import { getAuthToken } from "./NutrinoAPI.js";
 
 const API_BASE_URL = "https://nutrino-ai.onrender.com/api";
 
+// ✅ Ensure User is Authenticated
 auth.onAuthStateChanged((user) => {
     if (user) {
         console.log("✅ User Logged In:", user.email);
@@ -84,7 +85,7 @@ async function fetchMealPlan() {
 
     console.log("✅ Meal Plan Retrieved:", mealPlanData);
 
-    displayMealPlan(mealPlanData); // ✅ Calls global function to display meal plan
+    displayMealPlan(mealPlanData);
 }
 
 // ✅ DISPLAY MEAL PLAN
@@ -100,51 +101,42 @@ window.displayMealPlan = function displayMealPlan(mealPlanData = null) {
         mealPlanData = JSON.parse(storedData);
     }
 
-    // ✅ Select elements in HTML
-    const ingredientsEl = document.getElementById("ingredients");
-    const mealsPerDayEl = document.getElementById("mealsPerDay");
-    const servingsEl = document.getElementById("servings");
-    const dietaryRestrictionsEl = document.getElementById("dietaryRestrictions");
-    const planNameEl = document.getElementById("planName");
-    const mealPlanDescriptionEl = document.getElementById("mealPlanDescription");
-    const mealsContainerEl = document.getElementById("mealsContainer");
-    const importantNotesEl = document.getElementById("importantNotes");
+    // ✅ Ensure required elements exist
+    const elements = {
+        ingredients: document.getElementById("ingredients"),
+        mealsPerDay: document.getElementById("mealsPerDay"),
+        servings: document.getElementById("servings"),
+        dietaryRestrictions: document.getElementById("dietaryRestrictions"),
+        planName: document.getElementById("planName"),
+        mealPlanDescription: document.getElementById("mealPlanDescription"),
+        mealsContainer: document.getElementById("mealsContainer"),
+        importantNotes: document.getElementById("importantNotes"),
+    };
 
-    if (!ingredientsEl || !mealsPerDayEl || !servingsEl || !dietaryRestrictionsEl || !planNameEl || !mealPlanDescriptionEl || !mealsContainerEl || !importantNotesEl) {
-        console.error("❌ Missing required elements in HTML.");
-        return;
+    for (let key in elements) {
+        if (!elements[key]) {
+            console.error(`❌ Missing element: #${key}`);
+            return;
+        }
     }
 
     // ✅ Populate meal plan details
-    ingredientsEl.textContent = mealPlanData.ingredients || "Not provided";
-    mealsPerDayEl.textContent = mealPlanData.mealsPerDay || "Unknown";
-    servingsEl.textContent = mealPlanData.servings || "Unknown";
-    dietaryRestrictionsEl.textContent = mealPlanData.dietaryRestrictions?.join(", ") || "None";
-    planNameEl.textContent = "Custom AI-Generated Meal Plan";
-    mealPlanDescriptionEl.textContent = mealPlanData.mealPlan || "No meal description available.";
+    elements.ingredients.textContent = mealPlanData.ingredients || "Not provided";
+    elements.mealsPerDay.textContent = mealPlanData.mealsPerDay || "Unknown";
+    elements.servings.textContent = mealPlanData.servings || "Unknown";
+    elements.dietaryRestrictions.textContent = mealPlanData.dietaryRestrictions?.join(", ") || "None";
+    elements.planName.textContent = "Custom AI-Generated Meal Plan";
+    elements.mealPlanDescription.textContent = mealPlanData.mealPlan || "No meal description available.";
 
     // ✅ Populate meals dynamically
-    mealsContainerEl.innerHTML = "";
+    elements.mealsContainer.innerHTML = "";
     const mealSections = mealPlanData.mealPlan.split("\n\n").filter(section => section.trim() !== "");
 
     mealSections.forEach(meal => {
         const mealItemDiv = document.createElement("div");
         mealItemDiv.classList.add("meal-item");
         mealItemDiv.innerHTML = `<p>${meal.replace(/\n/g, "<br>")}</p>`;
-        mealsContainerEl.appendChild(mealItemDiv);
-    });
-
-    // ✅ Add Important Notes
-    importantNotesEl.innerHTML = "";
-    const notes = [
-        "⚠️ This is an AI-generated meal plan. Consult a nutritionist for professional advice.",
-        "✅ Ensure a balanced diet by including fruits, vegetables, and proteins.",
-        "💧 Stay hydrated throughout the day!"
-    ];
-    notes.forEach(note => {
-        const li = document.createElement("li");
-        li.textContent = note;
-        importantNotesEl.appendChild(li);
+        elements.mealsContainer.appendChild(mealItemDiv);
     });
 
     console.log("✅ Meal Plan Displayed Successfully.");
@@ -199,7 +191,7 @@ async function fetchNewMealPlan() {
 
         localStorage.setItem("mealPlanId", docRef.id);
         console.log("✅ Meal plan saved successfully.");
-        window.location.href = "meals.html";
+        setTimeout(() => window.location.href = "meals.html", 1000);
 
     } catch (error) {
         console.error("❌ Error generating meal plan:", error);
@@ -209,7 +201,16 @@ async function fetchNewMealPlan() {
 // ✅ EVENT LISTENERS
 document.addEventListener("DOMContentLoaded", function () {
     console.log("✅ Document Loaded");
+
     if (window.location.pathname.includes("meals.html")) {
-        displayMealPlan();
+        setTimeout(displayMealPlan, 500); // Ensure elements exist before rendering
+    }
+
+    const form = document.getElementById("meal-planner-form");
+    if (form) {
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+            fetchNewMealPlan();
+        });
     }
 });
