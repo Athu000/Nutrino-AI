@@ -1,6 +1,7 @@
 import { auth, db } from "./auth.js";
 import { 
-    collection, query, where, getDocs, addDoc, deleteDoc, orderBy, limit, serverTimestamp 
+    collection, query, where, getDocs, addDoc, deleteDoc, orderBy, limit, serverTimestamp, 
+    doc, getDoc // ✅ Fix: Import missing Firestore functions
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuthToken } from "./NutrinoAPI.js"; 
 
@@ -9,7 +10,7 @@ const API_BASE_URL = "https://nutrino-ai.onrender.com/api";
 auth.onAuthStateChanged((user) => {
     if (user) {
         console.log("✅ User Logged In:", user.email);
-        fetchMealPlan(user.uid); // 🔹 Only fetch if user is logged in
+        fetchMealPlan(user.uid); // 🔹 Fetch meal plan only if user is logged in
     } else {
         console.error("❌ User not authenticated.");
         alert("Please log in first.");
@@ -17,7 +18,7 @@ auth.onAuthStateChanged((user) => {
     }
 });
 
-// ✅ DELETE OLD MEAL PLAN (Optional, but keeping it)
+// ✅ DELETE OLD MEAL PLAN
 async function deleteOldMealPlan() {
     const authToken = await getAuthToken();
     if (!authToken) {
@@ -41,71 +42,7 @@ async function deleteOldMealPlan() {
 }
 
 // ✅ FETCH LATEST MEAL PLAN FROM FIRESTORE
-async function fetchNewMealPlan() {
-    clearPreviousMealPlan(); // Clears old meal plan from local storage
-
-    const preferences = getMealPreferences();
-    if (!preferences.ingredients || !preferences.mealsPerDay || !preferences.servings) {
-        alert("Please fill all required fields.");
-        console.error("❌ Missing required fields.");
-        return;
-    }
-
-    console.log("📤 Sending meal plan request:", preferences);
-
-    try {
-        const authToken = await getAuthToken();
-        if (!authToken) throw new Error("❌ Authentication token missing.");
-
-        const response = await fetch(`${API_BASE_URL}/generate-meal-plan`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${authToken}`
-            },
-            body: JSON.stringify(preferences)
-        });
-
-        if (!response.ok) throw new Error(`API Error: ${response.status} ${response.statusText}`);
-
-        const newMealPlan = await response.json();
-        console.log("✅ API Response:", newMealPlan);
-
-        // ✅ Save directly to Firestore
-        const user = auth.currentUser;
-        if (!user) {
-            console.error("❌ User not authenticated.");
-            return;
-        }
-
-        console.log("📤 Saving new meal plan to Firestore...");
-        
-        const docRef = await addDoc(collection(db, "meals"), {
-            userId: user.uid,
-            ingredients: preferences.ingredients,
-            mealsPerDay: preferences.mealsPerDay,
-            servings: preferences.servings,
-            dietaryRestrictions: preferences.dietaryRestrictions || [],
-            mealPlan: newMealPlan.mealPlan, // ✅ Directly save API response
-            createdAt: serverTimestamp()
-        });
-
-        localStorage.setItem("mealPlanId", docRef.id); // ✅ Store mealPlan ID
-        console.log("✅ Meal plan saved successfully.");
-
-        // ✅ Fetch and display latest meal plan
-        await fetchMealPlan();
-
-        // ✅ Redirect **AFTER** meal is generated and stored
-        window.location.href = "meals.html";
-
-    } catch (error) {
-        console.error("❌ Error fetching new meal plan:", error);
-    }
-}
-
-// ✅ DISPLAY MEAL PLAN FROM FIRESTORE
-async function displayMealPlan() {
+async function fetchMealPlan() {
     console.log("🔎 Checking Local Storage...");
     
     let mealPlanData = localStorage.getItem("latestMealPlan");
@@ -148,17 +85,23 @@ async function displayMealPlan() {
 
     console.log("✅ Meal Plan Retrieved:", mealPlanData);
 
-    document.getElementById("mealPlanContainer").innerHTML = `
-        <div class="meal-plan-card">
-            <h2>🍽️ Your AI-Generated Meal Plan</h2>
-            <p><strong>Ingredients:</strong> ${mealPlanData.ingredients || "Not provided"}</p>
-            <p><strong>Meals Per Day:</strong> ${mealPlanData.mealsPerDay}</p>
-            <p><strong>Servings:</strong> ${mealPlanData.servings}</p>
-            <p><strong>Dietary Restrictions:</strong> ${mealPlanData.dietaryRestrictions?.join(", ") || "None"}</p>
-            <pre>${mealPlanData.mealPlan || "No meal plan generated."}</pre>
-        </div>
-    `;
+    const mealPlanContainer = document.getElementById("mealPlanContainer");
+    if (mealPlanContainer) {
+        mealPlanContainer.innerHTML = `
+            <div class="meal-plan-card">
+                <h2>🍽️ Your AI-Generated Meal Plan</h2>
+                <p><strong>Ingredients:</strong> ${mealPlanData.ingredients || "Not provided"}</p>
+                <p><strong>Meals Per Day:</strong> ${mealPlanData.mealsPerDay}</p>
+                <p><strong>Servings:</strong> ${mealPlanData.servings}</p>
+                <p><strong>Dietary Restrictions:</strong> ${mealPlanData.dietaryRestrictions?.join(", ") || "None"}</p>
+                <pre>${mealPlanData.mealPlan || "No meal plan generated."}</pre>
+            </div>
+        `;
+    } else {
+        console.error("❌ mealPlanContainer element not found.");
+    }
 }
+
 // ✅ CLEAR PREVIOUS MEAL PLAN
 function clearPreviousMealPlan() {
     localStorage.removeItem("latestMealPlan");
@@ -215,7 +158,7 @@ async function fetchNewMealPlan() {
 
         console.log("📤 Saving new meal plan to Firestore...");
         
-        await addDoc(collection(db, "meals"), {
+        const docRef = await addDoc(collection(db, "meals"), {
             userId: user.uid,
             ingredients: preferences.ingredients,
             mealsPerDay: preferences.mealsPerDay,
@@ -225,20 +168,15 @@ async function fetchNewMealPlan() {
             createdAt: serverTimestamp()
         });
 
+        localStorage.setItem("mealPlanId", docRef.id); // ✅ Store mealPlan ID
         console.log("✅ Meal plan saved successfully.");
 
-        // ✅ Fetch and display latest meal plan
-        fetchMealPlan();
+        // ✅ Redirect **AFTER** meal is stored
+        window.location.href = "meals.html";
 
     } catch (error) {
         console.error("❌ Error fetching new meal plan:", error);
     }
-}
-
-
-// ✅ FORM HANDLER FUNCTION
-function handleMealPlan() {
-    fetchNewMealPlan();
 }
 
 // ✅ EVENT LISTENERS
@@ -258,5 +196,6 @@ document.addEventListener("DOMContentLoaded", function () {
         displayMealPlan();
     }
 });
+
 // ✅ Make sure function is globally available
 window.displayMealPlan = displayMealPlan;
