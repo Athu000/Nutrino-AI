@@ -62,62 +62,88 @@
             cursor: not-allowed;
         }
     </style>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const stepDisplay = document.querySelector(".step-display");
-            const startBtn = document.getElementById("startCooking");
-            const nextBtn = document.getElementById("nextStep");
-            const voiceBtn = document.getElementById("voiceAssist");
-        
-            let steps = JSON.parse(sessionStorage.getItem("recipeSteps")) || [];
-            let stepIndex = 0;
-        
-            // ✅ Function to speak text
-            function speak(text) {
-                const speech = new SpeechSynthesisUtterance(text);
-                speech.lang = "en-US";
-                speech.volume = 1;
-                speech.rate = 1;
-                speech.pitch = 1;
-                window.speechSynthesis.speak(speech);
-            }
-        
-            // ✅ Function to show next step
-            function showStep() {
-                if (stepIndex < steps.length) {
-                    stepDisplay.innerHTML = steps[stepIndex];
-                    stepIndex++;
-                    voiceBtn.disabled = false;
-                } else {
-                    stepDisplay.innerHTML = "🎉 Cooking Complete! Enjoy your meal!";
-                    nextBtn.disabled = true;
-                    voiceBtn.disabled = true;
-                }
-            }
-        
-            // ✅ Start Cooking
-            startBtn.addEventListener("click", function () {
-                if (steps.length === 0) {
-                    stepDisplay.innerHTML = "⚠️ No instructions available.";
-                    return;
-                }
-                stepIndex = 0;
-                showStep();
-                nextBtn.disabled = false;
+   <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const stepDisplay = document.querySelector(".step-display");
+        const startBtn = document.getElementById("startCooking");
+        const nextBtn = document.getElementById("nextStep");
+        const voiceBtn = document.getElementById("voiceAssist");
+
+        // ✅ Retrieve the latest recipe from sessionStorage
+        let storedRecipe = JSON.parse(sessionStorage.getItem("latestRecipe"));
+        if (!storedRecipe || !storedRecipe.recipeText) {
+            stepDisplay.innerHTML = "⚠️ No recipe found. Please generate one.";
+            return;
+        }
+
+        let recipeText = storedRecipe.recipeText;
+        console.log("✅ Loaded Recipe Text:", recipeText);
+
+        // ✅ Extract sections from the recipe
+        function extractSection(section) {
+            let regex = new RegExp(`-\\s*\\*{2}\\s*${section}\\s*\\*{2}\\s*:\\s*\\n?([\\s\\S]*?)(?=\\n-\\s*\\*{2}|$)`, "i");
+            let match = recipeText.match(regex);
+            return match ? match[1].trim().split("\n").map(line => line.trim()).filter(line => line !== "") : [];
+        }
+
+        // ✅ Combine Ingredients into One Step
+        let ingredients = extractSection("Ingredients List");
+        let steps = extractSection("Step-by-Step Instructions");
+
+        if (ingredients.length > 0) {
+            steps.unshift(`🛒 **Collect these ingredients:** ${ingredients.join(", ")}`);
+        }
+
+        console.log("✅ Processed Steps:", steps);
+
+        let stepIndex = 0;
+
+        // ✅ Function to speak text
+        function speak(text) {
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = "en-US";
+            speech.volume = 1;
+            speech.rate = 1;
+            speech.pitch = 1;
+            window.speechSynthesis.speak(speech);
+        }
+
+        // ✅ Function to show the next step
+        function showStep() {
+            if (stepIndex < steps.length) {
+                stepDisplay.innerHTML = steps[stepIndex];
+                stepIndex++;
                 voiceBtn.disabled = false;
-            });
-        
-            // ✅ Next Step Button
-            nextBtn.addEventListener("click", function () {
-                showStep();
-            });
-        
-            // ✅ Voice Assist Button
-            voiceBtn.addEventListener("click", function () {
-                speak(stepDisplay.innerText);
-            });
+            } else {
+                stepDisplay.innerHTML = "🎉 Cooking Complete! Enjoy your meal!";
+                nextBtn.disabled = true;
+                voiceBtn.disabled = true;
+            }
+        }
+
+        // ✅ Start Cooking
+        startBtn.addEventListener("click", function () {
+            if (steps.length === 0) {
+                stepDisplay.innerHTML = "⚠️ No instructions available.";
+                return;
+            }
+            stepIndex = 0;
+            showStep();
+            nextBtn.disabled = false;
+            voiceBtn.disabled = false;
         });
-        </script>
+
+        // ✅ Next Step Button
+        nextBtn.addEventListener("click", function () {
+            showStep();
+        });
+
+        // ✅ Voice Assist Button
+        voiceBtn.addEventListener("click", function () {
+            speak(stepDisplay.innerText);
+        });
+    });
+</script>
 </head>
 <body>
     <div class="container">
