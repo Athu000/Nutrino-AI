@@ -18,7 +18,7 @@ auth.onAuthStateChanged((user) => {
         window.location.href = "login.html"; 
     }
 });
-async function deleteOldMealPlan() {
+async function deleteOldMealPlan(shouldFetchNew = false) {
     console.log("🗑️ Removing old meal plan from frontend and Firestore...");
 
     const user = auth.currentUser;
@@ -65,7 +65,7 @@ async function deleteOldMealPlan() {
 }
 // ✅ FETCH LATEST MEAL PLAN FROM FIRESTORE
 async function fetchMealPlan() {
-    deleteOldMealPlan();  // ✅ Ensure old meal is cleared before fetching a new one
+    deleteOldMealPlan(true);  // ✅ Now fetches new plan only after deletion
     console.log("🔎 Checking Local Storage...");
     
     let mealPlanData = localStorage.getItem("latestMealPlan");
@@ -167,7 +167,7 @@ window.displayMealPlan = function displayMealPlan(mealPlanData = null) {
 
 // ✅ FETCH NEW MEAL PLAN
 async function fetchNewMealPlan() {
-    deleteOldMealPlan();  // ✅ Ensure old meal is cleared before fetching a new one
+    deleteOldMealPlan(true);  // ✅ Now fetches new plan only after deletion
     console.log("📤 Requesting new meal plan...");
     const preferences = {
         ingredients: document.getElementById("ingredients")?.value.trim() || "",
