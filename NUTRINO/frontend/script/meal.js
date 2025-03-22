@@ -19,30 +19,40 @@ auth.onAuthStateChanged((user) => {
     }
 });
 
-// ✅ DELETE OLD MEAL PLAN (Only from Frontend)
+// ✅ DELETE OLD MEAL PLAN (Frontend Only)
 async function deleteOldMealPlan() {
     console.log("🗑️ Removing old meal plan from frontend...");
 
-    // ✅ Remove from Local Storage
+    // ✅ Remove meal plan from Local Storage
     localStorage.removeItem("latestMealPlan");
     localStorage.removeItem("mealPlanId");
 
-    // ✅ Remove from UI (if meals.html is loaded)
-    const mealPlanContainer = document.getElementById("mealsContainer");
-    if (mealPlanContainer) {
-        mealPlanContainer.innerHTML = ""; // Clear meal plan display
-        console.log("✅ Old meal plan removed from UI.");
-    } else {
-        console.warn("⚠️ Meal plan container not found. Skipping UI deletion.");
-    }
+    // ✅ Remove meal plan from UI
+    const elementsToClear = ["ingredients", "mealsPerDay", "servings", "dietaryRestrictions", "planName", "mealPlanDescription", "mealsContainer", "importantNotes"];
+
+    elementsToClear.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            if (element.tagName === "DIV") {
+                element.innerHTML = ""; // Clear content for divs
+            } else {
+                element.textContent = ""; // Clear text content for spans, p, etc.
+            }
+        }
+    });
+
+    console.log("✅ Old meal plan cleared from UI and localStorage.");
 }
+
 
 // ✅ FETCH LATEST MEAL PLAN FROM FIRESTORE
 async function fetchMealPlan() {
     console.log("🔎 Checking Local Storage...");
     
     let mealPlanData = localStorage.getItem("latestMealPlan");
-
+    
+    console.log("🔄 Fetching Meal Plan...");
+    deleteOldMealPlan();  // ✅ Ensure old meal is cleared before fetching a new one
     if (!mealPlanData) {
         console.warn("⚠️ No meal plan found in localStorage. Fetching from Firestore...");
         
@@ -139,6 +149,10 @@ window.displayMealPlan = function displayMealPlan(mealPlanData = null) {
 
 // ✅ FETCH NEW MEAL PLAN
 async function fetchNewMealPlan() {
+    
+    console.log("📤 Requesting new meal plan...");
+    deleteOldMealPlan();  // ✅ Ensure old meal is cleared before generating a new one
+
     const preferences = {
         ingredients: document.getElementById("ingredients")?.value.trim() || "",
         mealsPerDay: parseInt(document.getElementById("meals")?.value) || 3,
