@@ -165,7 +165,7 @@ app.post("/api/generate-meal-plan", verifyAuthToken, async (req, res) => {
             - List exactly ${mealsPerDay} meals for the day.
             - Each meal should have:
                 1. **Meal Name**
-                2. **Ingredients Used**
+                2. **Each And Every Ingredients Used For Particular Meal**
                 3. **Step-by-Step Cooking Instructions**
             - Do NOT generate a multi-day plan.  
             - Do NOT include "Day 2" or "Day 3".  
