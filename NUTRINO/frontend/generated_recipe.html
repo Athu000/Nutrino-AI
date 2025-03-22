@@ -28,6 +28,27 @@
             <button class="cooking-assistant-button" id="cookingAssistantBtn">🍳 Start Cooking Assistant</button>
         </div>
     </div>
+    <script>
+        document.getElementById("cookingAssistantBtn").addEventListener("click", function () {
+            try {
+                // ✅ Get the latest recipe steps
+                const recipeSteps = extractSection(latestRecipe, "Step-by-Step Instructions");
+        
+                if (!recipeSteps || recipeSteps.includes("⚠️ No data available")) {
+                    alert("⚠️ No step-by-step instructions found.");
+                    return;
+                }
+        
+                // ✅ Save extracted steps to sessionStorage for use in Cooking Assistant
+                sessionStorage.setItem("recipeSteps", JSON.stringify(recipeSteps));
+        
+                // ✅ Redirect to Cooking Assistant page
+                window.location.href = "cookingassistant.html";
+            } catch (error) {
+                console.error("❌ Error starting Cooking Assistant:", error);
+            }
+        });
+        </script>
 
     <script type="module" src="./script/NutrinoAPI.js"></script>
     <script type="module" src="./script/auth.js"></script>
