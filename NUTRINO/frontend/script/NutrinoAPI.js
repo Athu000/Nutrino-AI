@@ -207,21 +207,21 @@ function extractTitle(text) {
 function extractSection(text, section) {
     if (!text) return `<li>⚠️ No data available.</li>`;
 
-    console.log(`🔎 Searching for section: ${section} in text...`);
+    console.log(`🔎 Searching for section: '${section}' in text...`);
 
-    // ✅ More flexible regex to match section headers properly
+    // ✅ Improved regex for section detection
     const regex = new RegExp(
-        `-\\s*\\*{2}\\s*${section}\\s*\\*{2}\\s*:\\s*\\n?([\\s\\S]*?)(?=\\n-\\s*\\*{2}|$)`,
+        `-\\s*\\*{2}${section}\\*{2}\\s*:?\\s*\\n?([\\s\\S]*?)(?=\\n-\\s*\\*{2}|$)`,
         "i"
     );
     const match = text.match(regex);
 
-    if (!match) {
+    if (!match || !match[1].trim()) {
         console.warn(`⚠️ Section '${section}' not found in text.`);
         return `<li>⚠️ No data available.</li>`;
     }
 
-    console.log(`✅ Found Section: ${section}`, match[1]);
+    console.log(`✅ Found Section: '${section}'`, match[1]);
 
     return match[1]
         .trim()
