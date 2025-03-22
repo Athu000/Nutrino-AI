@@ -62,6 +62,62 @@
             cursor: not-allowed;
         }
     </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const stepDisplay = document.querySelector(".step-display");
+            const startBtn = document.getElementById("startCooking");
+            const nextBtn = document.getElementById("nextStep");
+            const voiceBtn = document.getElementById("voiceAssist");
+        
+            let steps = JSON.parse(sessionStorage.getItem("recipeSteps")) || [];
+            let stepIndex = 0;
+        
+            // ✅ Function to speak text
+            function speak(text) {
+                const speech = new SpeechSynthesisUtterance(text);
+                speech.lang = "en-US";
+                speech.volume = 1;
+                speech.rate = 1;
+                speech.pitch = 1;
+                window.speechSynthesis.speak(speech);
+            }
+        
+            // ✅ Function to show next step
+            function showStep() {
+                if (stepIndex < steps.length) {
+                    stepDisplay.innerHTML = steps[stepIndex];
+                    stepIndex++;
+                    voiceBtn.disabled = false;
+                } else {
+                    stepDisplay.innerHTML = "🎉 Cooking Complete! Enjoy your meal!";
+                    nextBtn.disabled = true;
+                    voiceBtn.disabled = true;
+                }
+            }
+        
+            // ✅ Start Cooking
+            startBtn.addEventListener("click", function () {
+                if (steps.length === 0) {
+                    stepDisplay.innerHTML = "⚠️ No instructions available.";
+                    return;
+                }
+                stepIndex = 0;
+                showStep();
+                nextBtn.disabled = false;
+                voiceBtn.disabled = false;
+            });
+        
+            // ✅ Next Step Button
+            nextBtn.addEventListener("click", function () {
+                showStep();
+            });
+        
+            // ✅ Voice Assist Button
+            voiceBtn.addEventListener("click", function () {
+                speak(stepDisplay.innerText);
+            });
+        });
+        </script>
 </head>
 <body>
     <div class="container">
