@@ -171,9 +171,9 @@ async function displayRecipe() {
         console.log("✅ Latest Recipe Document:", latestDoc);
 
         // ✅ Fetching the correct field (content) instead of recipe
-        const latestRecipe = latestDoc.content || latestDoc.recipe;
+        window.latestRecipe = latestDoc.recipe || latestDoc.content;
 
-        if (!latestRecipe) {
+        if (!window.latestRecipe) {
             console.error("❌ Recipe field is missing in Firestore document!");
             document.getElementById("recipe-title").textContent = "No valid recipe found.";
             return;
