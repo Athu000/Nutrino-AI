@@ -203,14 +203,13 @@ function extractTitle(text) {
     const match = text.match(/^##\s*(.+)/);
     return match ? cleanText(match[1].trim()) : "AI-Generated Recipe";
 }
-
-// ✅ Extract Ingredients, Instructions & Nutrition
+// ✅ Extract Ingredients, Instructions & Nutrition in a structured format
 function extractSection(text, section) {
     if (!text) return `<li>⚠️ No data available.</li>`;
 
     console.log(`🔎 Searching for section: ${section} in text...`);
 
-    // Improved regex to handle flexible section formatting
+    // Improved regex to capture section content properly
     const regex = new RegExp(
         `\\*{0,2}\\s*${section}\\s*:?\\s*\\*{0,2}\\s*([\\s\\S]*?)(?=\\n\\s*\\*{0,2}[A-Z]|$)`,
         "i"
@@ -224,10 +223,20 @@ function extractSection(text, section) {
 
     console.log(`✅ Found Section: ${section}`, match[1]);
 
-    return match[1]
+    let lines = match[1]
         .trim()
         .split("\n")
-        .filter(line => line.trim() !== "")
+        .filter(line => line.trim() !== "");
+
+    // ✅ Special handling for Instructions (ensure step-by-step formatting)
+    if (section.toLowerCase().includes("instructions")) {
+        return lines
+            .map((line, index) => `<li><strong>Step ${index + 1}:</strong> ${cleanText(line.trim())}</li>`)
+            .join("");
+    }
+
+    // ✅ For other sections, keep default bullet formatting
+    return lines
         .map(line => `<li>${cleanText(line.trim())}</li>`)
         .join("");
 }
