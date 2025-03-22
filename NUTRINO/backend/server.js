@@ -153,26 +153,37 @@ app.post("/api/generate-meal-plan", verifyAuthToken, async (req, res) => {
         }
 
         const prompt = `
-            Generate a structured meal plan **ONLY for ONE DAY** using the given inputs:
-            
-            - Ingredients: ${ingredients}
-            - Number of meals in one day: ${mealsPerDay}
-            - Servings per meal: ${servings}
-            - Dietary restrictions: ${dietaryRestrictions.length > 0 ? dietaryRestrictions.join(", ") : "None"}
-        
-            Output Format:
-            - Meal Plan Name
-            - List exactly ${mealsPerDay} meals for the day.
-            - Each meal should have:
-                1. **Meal Name**
-                2. **Each And Every Ingredients Used For Particular Meal**
-                3. **Step-by-Step Cooking Instructions**
-            - Do NOT generate a multi-day plan.  
-            - Do NOT include "Day 2" or "Day 3".  
-            - Keep the response **concise and structured**.  
-        `;
-
-
+                Generate a **highly detailed** structured meal plan for **ONE DAY ONLY** using the given inputs:
+                
+                - **Ingredients available:** ${ingredients}
+                - **Number of meals per day:** ${mealsPerDay}
+                - **Servings per meal:** ${servings}
+                - **Dietary restrictions:** ${dietaryRestrictions.length > 0 ? dietaryRestrictions.join(", ") : "None"}
+                
+                ### **Output Format:**
+                📌 **Meal Plan Name:** [Give a clear, descriptive name]
+                
+                🍽️ **Meals for the day:** (Exactly ${mealsPerDay} meals)
+                
+                For each meal, provide:
+                1️⃣ **Meal Name** – A short, appetizing title  
+                2️⃣ **Ingredients Used** – List **each ingredient** with proper measurements  
+                3️⃣ **Step-by-Step Cooking Instructions** – Give **detailed** steps, including:
+                   - Preparation (washing, cutting, marination, soaking if required)
+                   - Cooking method (boiling, frying, baking, steaming, etc.)
+                   - Cooking time and seasoning tips
+                   - Final assembly and serving suggestions  
+                
+                📢 **Important Notes:**
+                - Ensure the instructions are **clear and easy to follow**.  
+                - Keep the portion sizes appropriate for ${servings} servings per meal.  
+                - Use **common household cooking terms** (e.g., sauté, simmer, bake, grill).  
+                - If an ingredient is used multiple times across meals, mention it but **avoid repetition in instructions**.  
+                - The plan should be **structured, engaging, and practical**.  
+                - **Do NOT generate multiple-day plans. Focus ONLY on one day.**  
+                
+                🎯 **Goal:** Provide a **realistic, easy-to-follow, and complete meal plan** that feels useful and practical for the user.  
+                `;
 
         const response = await fetch(API_URL, { 
             method: "POST",
