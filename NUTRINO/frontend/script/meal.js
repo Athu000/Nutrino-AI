@@ -19,26 +19,21 @@ auth.onAuthStateChanged((user) => {
     }
 });
 
-// ✅ DELETE OLD MEAL PLAN
+// ✅ DELETE OLD MEAL PLAN (Only from Frontend)
 async function deleteOldMealPlan() {
-    const authToken = await getAuthToken();
-    if (!authToken) {
-        console.error("❌ Failed to retrieve auth token.");
-        return;
-    }
+    console.log("🗑️ Removing old meal plan from frontend...");
 
-    try {
-        console.log("🗑️ Deleting old meal plan...");
-        const response = await fetch(`${API_BASE_URL}/delete-meal-plan`, {  
-            method: "DELETE",
-            headers: { "Authorization": `Bearer ${authToken}` }
-        });
+    // ✅ Remove from Local Storage
+    localStorage.removeItem("latestMealPlan");
+    localStorage.removeItem("mealPlanId");
 
-        if (!response.ok) throw new Error(`Delete Error: ${response.status} ${response.statusText}`);
-
-        console.log("✅ Old meal plan deleted successfully.");
-    } catch (error) {
-        console.error("❌ Error deleting meal plan:", error);
+    // ✅ Remove from UI (if meals.html is loaded)
+    const mealPlanContainer = document.getElementById("mealsContainer");
+    if (mealPlanContainer) {
+        mealPlanContainer.innerHTML = ""; // Clear meal plan display
+        console.log("✅ Old meal plan removed from UI.");
+    } else {
+        console.warn("⚠️ Meal plan container not found. Skipping UI deletion.");
     }
 }
 
