@@ -47,12 +47,12 @@ async function deleteOldMealPlan() {
 
 // ✅ FETCH LATEST MEAL PLAN FROM FIRESTORE
 async function fetchMealPlan() {
+    deleteOldMealPlan();  // ✅ Ensure old meal is cleared before fetching a new one
     console.log("🔎 Checking Local Storage...");
     
     let mealPlanData = localStorage.getItem("latestMealPlan");
     
     console.log("🔄 Fetching Meal Plan...");
-    deleteOldMealPlan();  // ✅ Ensure old meal is cleared before fetching a new one
     if (!mealPlanData) {
         console.warn("⚠️ No meal plan found in localStorage. Fetching from Firestore...");
         
@@ -149,10 +149,8 @@ window.displayMealPlan = function displayMealPlan(mealPlanData = null) {
 
 // ✅ FETCH NEW MEAL PLAN
 async function fetchNewMealPlan() {
-    
+    deleteOldMealPlan();  // ✅ Ensure old meal is cleared before fetching a new one
     console.log("📤 Requesting new meal plan...");
-    deleteOldMealPlan();  // ✅ Ensure old meal is cleared before generating a new one
-
     const preferences = {
         ingredients: document.getElementById("ingredients")?.value.trim() || "",
         mealsPerDay: parseInt(document.getElementById("meals")?.value) || 3,
@@ -200,7 +198,10 @@ async function fetchNewMealPlan() {
 
         localStorage.setItem("mealPlanId", docRef.id);
         console.log("✅ Meal plan saved successfully.");
-        setTimeout(() => window.location.href = "meals.html", 1000);
+        setTimeout(() =>  {
+            displayMealPlan(newMealPlan);
+            window.location.href = "meals.html";
+        }, 1000);
 
     } catch (error) {
         console.error("❌ Error generating meal plan:", error);
