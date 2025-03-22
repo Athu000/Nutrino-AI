@@ -97,7 +97,12 @@
         console.log("✅ Processed Steps:", steps);
 
         let stepIndex = 0;
-
+        // ✅ Function to clean text for speech (removes emojis & markdown)
+        function cleanForSpeech(text) {
+            return text.replace(/[\u{1F300}-\u{1F6FF}]/gu, '') // Remove emojis
+                       .replace(/\*\*/g, '') // Remove markdown (**bold**)
+                       .trim();
+        }
         // ✅ Function to speak text
         function speak(text) {
             const speech = new SpeechSynthesisUtterance(text);
@@ -142,6 +147,9 @@
         voiceBtn.addEventListener("click", function () {
             speak(stepDisplay.innerText);
         });
+        goBackBtn.addEventListener("click", function () {
+                window.location.href = "index.html"; // Redirect back to the index page
+        });
     });
 </script>
 </head>
@@ -159,6 +167,8 @@
             <button id="nextStep" disabled>Next Step</button>
             <button id="voiceAssist" disabled>🔊 Voice Assist</button>
         </div>
+        <!-- ✅ Go Back Button -->
+        <button id="goBackBtn" class="back-button">⬅️ Go Back</button>
     </div>
 </body>
 </html>
