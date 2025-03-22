@@ -77,14 +77,31 @@ app.post("/api/fetch-recipe", verifyAuthToken, async (req, res) => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                contents: [{ parts: [{
-                        text: `Provide a detailed, structured recipe for ${prompt}. 
-                        - Include a title, ingredients, step-by-step instructions.
-                        - Specify nutritional information from recipe with specific detail.
-                        - Specify the number of calories in a clear format.
-                        - Use appropriate food-related emojis to make the recipe visually engaging.
-                        - Format steps in a numbered list, removing any unnecessary symbols like "**".`
-                    }] }]
+                contents: [{parts: [{
+                        text: `Generate a **detailed, structured recipe** for ${prompt}. 
+                
+                        📌 **Output Format:**
+                        - **Recipe Title**: Provide a **clear and appealing title**.
+                        - **Ingredients List**: Mention **each ingredient** along with exact measurements.
+                        - **Step-by-Step Instructions**:  
+                          1️⃣ Write instructions **in a numbered list** with easy-to-follow steps.  
+                          2️⃣ Each step should be **detailed and include cooking techniques**.  
+                          3️⃣ Use **appropriate food-related emojis** to enhance readability.  
+                        - **Nutritional Information**:  
+                          ✅ Provide detailed nutrition facts, including:
+                            - **Calories (in kcal)**
+                            - **Protein, Carbohydrates, Fats (in grams)**
+                            - **Any relevant vitamins or minerals**
+                        - **Serving Suggestions**: Recommend how to serve the dish.
+                
+                        🎯 **Guidelines for Formatting:**
+                        - **Do NOT include unnecessary symbols like "**"**.
+                        - **Ensure readability by using proper spacing & structure**.
+                        - **Make the response concise, engaging, and useful**.
+                        - **DO NOT generate multiple recipes—ONLY one per request.**
+                        `
+                    }]
+                }]
             }),
         });
 
@@ -229,7 +246,6 @@ app.delete("/api/delete-meal-plan", verifyAuthToken, async (req, res) => {
         if (snapshot.empty) {
             return res.status(404).json({ error: "No meal plan found to delete." });
         }
-
         await snapshot.docs[0].ref.delete();
         return res.json({ message: "✅ Meal plan deleted successfully." });
 
