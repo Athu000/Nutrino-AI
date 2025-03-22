@@ -327,13 +327,21 @@
 
 /* HAMBURGER MENU */
 .hamburger {
-    display: none;
-    cursor: pointer;
-    font-size: 28px;
-    color: #fff;
-    background: none;
+    background-color: #333;
+    color: white;
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%; /* Circular shape */
     border: none;
-    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hamburger:hover {
+    background-color: #555;
 }
 
 /* AUTH BUTTONS */
@@ -1738,7 +1746,8 @@ padding-bottom: 24px;
                         <a href="cookingassistant.html">Cooking Assistant</a>
                         <a href="profile.html">Profile</a>
                     </nav>
-        
+                    <!-- Dark Mode Toggle -->
+                    <button id="darkModeToggle">🌙</button>
                     <!-- Auth & User Info -->
                     <div class="headContainer3" id="auth-links">
                         <a href="login.html" class="LOGIN1" id="login-link">Login</a>
