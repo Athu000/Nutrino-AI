@@ -104,15 +104,20 @@
                        .trim();
         }
         // ✅ Function to speak text
-        function speak(text) {
-            const speech = new SpeechSynthesisUtterance(text);
-            speech.lang = "en-US";
-            speech.volume = 1;
-            speech.rate = 1;
-            speech.pitch = 1;
-            window.speechSynthesis.speak(speech);
-        }
-
+            function speak(text) {
+                const speech = new SpeechSynthesisUtterance(cleanForSpeech(text)); // ✅ Apply cleaning function
+                speech.lang = "en-US";
+                speech.volume = 1;
+                speech.rate = 1;
+                speech.pitch = 1.2;
+                const voices = window.speechSynthesis.getVoices();
+                const femaleVoice = voices.find(voice => voice.name.includes("Female") || voice.name.includes("Google UK English Female"));
+            
+                if (femaleVoice) {
+                    speech.voice = femaleVoice;
+                }
+                window.speechSynthesis.speak(speech);
+            }
         // ✅ Function to show the next step
         function showStep() {
             if (stepIndex < steps.length) {
@@ -146,9 +151,10 @@
         // ✅ Voice Assist Button
         voiceBtn.addEventListener("click", function () {
             speak(stepDisplay.innerText);
+            speak(cleanForSpeech(stepDisplay.innerText)); 
         });
         goBackBtn.addEventListener("click", function () {
-                window.location.href = "index.html"; // Redirect back to the index page
+        window.location.href = "index.html"; // ✅ Go back to index page
         });
     });
 </script>
