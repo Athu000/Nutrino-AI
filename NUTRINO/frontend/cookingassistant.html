@@ -79,13 +79,19 @@
         let recipeText = storedRecipe.recipeText;
         console.log("✅ Loaded Recipe Text:", recipeText);
 
-        // ✅ Extract sections from the recipe
         function extractSection(section) {
             let regex = new RegExp(`-\\s*\\*{2}\\s*${section}\\s*\\*{2}\\s*:\\s*\\n?([\\s\\S]*?)(?=\\n-\\s*\\*{2}|$)`, "i");
             let match = recipeText.match(regex);
-            return match ? match[1].trim().split("\n").map(line => line.trim()).filter(line => line !== "") : [];
+        
+            return match 
+                ? match[1]
+                    .replace(/\*\*/g, '') // ✅ Remove all **bold** formatting
+                    .trim()
+                    .split("\n")
+                    .map(line => line.trim())
+                    .filter(line => line !== "")
+                : [];
         }
-
         // ✅ Combine Ingredients into One Step
         let ingredients = extractSection("Ingredients List");
         let steps = extractSection("Step-by-Step Instructions");
