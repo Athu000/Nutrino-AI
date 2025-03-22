@@ -209,9 +209,9 @@ function extractSection(text, section) {
 
     console.log(`🔎 Searching for section: ${section} in text...`);
 
-    // ✅ Improved regex for structured extraction
+    // ✅ More flexible regex to match section headers properly
     const regex = new RegExp(
-        `-\\s*\\*{2}${section}\\*{2}:(?:\\s*\\*{2}[A-Z][^\\n]*\\*{2})?\\s*([\\s\\S]*?)(?=\n-\\s*\\*{2}[A-Z]|$)`,
+        `-\\s*\\*{2}\\s*${section}\\s*\\*{2}\\s*:\\s*\\n?([\\s\\S]*?)(?=\\n-\\s*\\*{2}|$)`,
         "i"
     );
     const match = text.match(regex);
@@ -223,29 +223,18 @@ function extractSection(text, section) {
 
     console.log(`✅ Found Section: ${section}`, match[1]);
 
-    let lines = match[1]
+    return match[1]
         .trim()
         .split("\n")
-        .map(line => line.trim())
-        .filter(line => line !== "");
-
-    // ✅ Special formatting for "Step-by-Step Instructions"
-    if (section.toLowerCase().includes("instructions")) {
-        return lines
-            .map((line, index) => `<li><strong>Step ${index + 1}:</strong> ${cleanText(line)}</li>`)
-            .join("");
-    }
-
-    // ✅ Default formatting for Ingredients and Nutrition (bulleted list)
-    return lines
-        .map(line => `<li>${cleanText(line)}</li>`)
+        .filter(line => line.trim() !== "")
+        .map(line => `<li>${cleanText(line.trim())}</li>`)
         .join("");
 }
 // ✅ Improved Text Cleaner with Bullet Point Handling
 function cleanText(text) {
     let cleanedLine = text
-        .replace(/\*\*/g, "") // Remove **bold**
-        .replace(/^[-*•]\s*(?=\w)/g, "• ") // Keep bullet points
+        .replace(/\*\*/g, "") // Remove **bold** formatting
+        .replace(/^[-*•]\s*(?=\w)/g, "• ") // Ensure bullet points are formatted properly
         .trim();
 
     // 🍽️ Add Meaningful Cooking Emojis
