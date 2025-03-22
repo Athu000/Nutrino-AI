@@ -44,6 +44,7 @@
             display: flex;
             justify-content: center;
             gap: 10px;
+            flex-wrap: wrap;
         }
         button {
             background: #28a745;
@@ -61,6 +62,13 @@
             background: #ccc;
             cursor: not-allowed;
         }
+        .back-button {
+            background: #007bff;
+            margin-top: 15px;
+        }
+        .back-button:hover {
+            background: #0056b3;
+        }
     </style>
    <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -68,6 +76,7 @@
         const startBtn = document.getElementById("startCooking");
         const nextBtn = document.getElementById("nextStep");
         const voiceBtn = document.getElementById("voiceAssist");
+        const goBackBtn = document.getElementById("goBackBtn");
 
         // ✅ Retrieve the latest recipe from sessionStorage
         let storedRecipe = JSON.parse(sessionStorage.getItem("latestRecipe"));
@@ -81,9 +90,16 @@
 
         // ✅ Extract sections from the recipe
         function extractSection(section) {
-            let regex = new RegExp(-\\s*\\*{2}\\s*${section}\\s*\\*{2}\\s*:\\s*\\n?([\\s\\S]*?)(?=\\n-\\s*\\*{2}|$), "i");
+            let regex = new RegExp(`-\\s*\\*{2}\\s*${section}\\s*\\*{2}\\s*:\\s*\\n?([\\s\\S]*?)(?=\\n-\\s*\\*{2}|$)`, "i");
             let match = recipeText.match(regex);
-            return match ? match[1].trim().split("\n").map(line => line.trim()).filter(line => line !== "") : [];
+            return match 
+                ? match[1]
+                    .replace(/\*\*/g, '') // ✅ Remove all **bold** formatting
+                    .trim()
+                    .split("\n")
+                    .map(line => line.trim())
+                    .filter(line => line !== "")
+                : [];
         }
 
         // ✅ Combine Ingredients into One Step
@@ -91,25 +107,37 @@
         let steps = extractSection("Step-by-Step Instructions");
 
         if (ingredients.length > 0) {
-            steps.unshift(🛒 **Collect these ingredients:** ${ingredients.join(", ")});
+            steps.unshift(`🛒 Collect these ingredients: ${ingredients.join(", ")}`);
         }
 
         console.log("✅ Processed Steps:", steps);
 
         let stepIndex = 0;
+
         // ✅ Function to clean text for speech (removes emojis & markdown)
         function cleanForSpeech(text) {
             return text.replace(/[\u{1F300}-\u{1F6FF}]/gu, '') // Remove emojis
                        .replace(/\*\*/g, '') // Remove markdown (**bold**)
                        .trim();
         }
-        // ✅ Function to speak text
+
+        // ✅ Function to speak text and re-enable button after speech ends
         function speak(text) {
-            const speech = new SpeechSynthesisUtterance(text);
+            const speech = new SpeechSynthesisUtterance(cleanForSpeech(text));
             speech.lang = "en-US";
             speech.volume = 1;
             speech.rate = 1;
-            speech.pitch = 1;
+            speech.pitch = 1.2; // ✅ Slightly higher pitch for a female-like voice
+
+            // ✅ Select a female voice if available
+            let voices = window.speechSynthesis.getVoices();
+            speech.voice = voices.find(voice => voice.name.includes("Female")) || voices[0];
+
+            voiceBtn.disabled = true; // Disable button while speaking
+            speech.onend = () => {
+                voiceBtn.disabled = false; // Re-enable after speaking
+            };
+
             window.speechSynthesis.speak(speech);
         }
 
@@ -147,9 +175,17 @@
         voiceBtn.addEventListener("click", function () {
             speak(stepDisplay.innerText);
         });
+
+        // ✅ Go Back Button
         goBackBtn.addEventListener("click", function () {
-                window.location.href = "index.html"; // Redirect back to the index page
+            window.location.href = "index.html"; // Redirect back to the index page
         });
+
+        // ✅ Ensure voices are loaded before selecting
+        window.speechSynthesis.onvoiceschanged = function() {
+            let voices = window.speechSynthesis.getVoices();
+            console.log("Available Voices:", voices);
+        };
     });
 </script>
 </head>
@@ -167,6 +203,7 @@
             <button id="nextStep" disabled>Next Step</button>
             <button id="voiceAssist" disabled>🔊 Voice Assist</button>
         </div>
+        
         <!-- ✅ Go Back Button -->
         <button id="goBackBtn" class="back-button">⬅️ Go Back</button>
     </div>
