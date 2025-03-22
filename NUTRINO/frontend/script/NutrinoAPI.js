@@ -293,4 +293,5 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 // ✅ Make function globally accessible
 window.fetchRecipe = fetchRecipe;
-
+// ✅ Make extractSection globally available
+window.extractSection = extractSection;
