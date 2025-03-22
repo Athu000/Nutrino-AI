@@ -183,10 +183,10 @@ async function displayRecipe() {
         document.getElementById("recipe-title").textContent = extractTitle(latestRecipe);
         document.getElementById("recipe-desc").textContent = "A delicious AI-generated recipe! 😋";
         console.log("✅ Extracting Ingredients...");
-        document.getElementById("ingredients-list").innerHTML = extractSection(latestRecipe, "Ingredients");
+        document.getElementById("ingredients-list").innerHTML = extractSection(latestRecipe, "Ingredients List");
 
         console.log("✅ Extracting Instructions...");
-        document.getElementById("instructions-list").innerHTML = extractSection(latestRecipe, "Instructions");
+        document.getElementById("instructions-list").innerHTML = extractSection(latestRecipe, "Step-by-Step Instructions");
 
         console.log("✅ Extracting Nutrition...");
         document.getElementById("nutrition-list").innerHTML = extractSection(latestRecipe, "Nutritional Information");
@@ -207,21 +207,22 @@ function extractTitle(text) {
 function extractSection(text, section) {
     if (!text) return `<li>⚠️ No data available.</li>`;
 
-    console.log(`🔎 Searching for section: '${section}' in text...`);
+    console.log(`🔎 Searching for section: ${section} in text...`);
 
-    // ✅ Improved regex for section detection
+    // ✅ Regex pattern to match section headers and their corresponding content
     const regex = new RegExp(
-        `-\\s*\\*{2}${section}\\*{2}\\s*:?\\s*\\n?([\\s\\S]*?)(?=\\n-\\s*\\*{2}|$)`,
+        `-\\s*\\*{2}\\s*${section}\\s*\\*{2}\\s*:\\s*\\n?([\\s\\S]*?)(?=\\n-\\s*\\*{2}|$)`, 
         "i"
     );
+
     const match = text.match(regex);
 
-    if (!match || !match[1].trim()) {
+    if (!match) {
         console.warn(`⚠️ Section '${section}' not found in text.`);
         return `<li>⚠️ No data available.</li>`;
     }
 
-    console.log(`✅ Found Section: '${section}'`, match[1]);
+    console.log(`✅ Found Section: ${section}`, match[1]);
 
     return match[1]
         .trim()
