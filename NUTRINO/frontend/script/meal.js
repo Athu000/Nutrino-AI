@@ -4,31 +4,29 @@ import {
     doc, getDoc 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuthToken } from "./NutrinoAPI.js"; 
-
 const API_BASE_URL = "https://nutrino-ai.onrender.com/api";
 
 // ✅ Ensure User is Authenticated
 auth.onAuthStateChanged((user) => {
     if (user) {
         console.log("✅ User Logged In:", user.email);
-        fetchMealPlan(user.uid);
+        fetchMealPlan();
     } else {
         console.error("❌ User not authenticated.");
         alert("Please log in first.");
         window.location.href = "login.html"; 
     }
 });
-async function deleteOldMealPlan(shouldFetchNew = false) {
+
+// ✅ DELETE OLD MEAL PLAN
+async function deleteOldMealPlan() {
     console.log("🗑️ Removing old meal plan from frontend and Firestore...");
 
     const user = auth.currentUser;
-    if (!user) {
-        console.error("❌ User not authenticated.");
-        return;
-    }
+    if (!user) return console.error("❌ User not authenticated.");
 
     const mealPlanId = localStorage.getItem("mealPlanId");
-    
+
     if (mealPlanId) {
         try {
             await deleteDoc(doc(db, "meals", mealPlanId));
@@ -36,95 +34,63 @@ async function deleteOldMealPlan(shouldFetchNew = false) {
         } catch (error) {
             console.error("❌ Error deleting meal plan from Firestore:", error);
         }
-    } else {
-        console.warn("⚠️ No meal plan ID found in localStorage.");
     }
 
-    // ✅ Remove meal plan from Local Storage
+    // ✅ Clear Local Storage and UI
     localStorage.removeItem("latestMealPlan");
     localStorage.removeItem("mealPlanId");
 
-    // ✅ Remove meal plan from UI
-    const elementsToClear = ["ingredients", "mealsPerDay", "servings", "dietaryRestrictions", "planName", "mealPlanDescription", "mealsContainer", "importantNotes"];
+    ["ingredients", "mealsPerDay", "servings", "dietaryRestrictions", "planName", "mealPlanDescription", "mealsContainer", "importantNotes"]
+        .forEach(id => {
+            const element = document.getElementById(id);
+            if (element) element.innerHTML = "";
+        });
 
-    elementsToClear.forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-            if (element.tagName === "DIV") {
-                element.innerHTML = ""; // Clear content for divs
-            } else {
-                element.textContent = ""; // Clear text content for spans, p, etc.
-            }
-        }
-    });
-
-    console.log("✅ Old meal plan cleared from UI and localStorage.");
-
-    // ✅ Fetch new meal plan after deletion
-    fetchMealPlan();
+    console.log("✅ Old meal plan cleared.");
 }
-// ✅ FETCH LATEST MEAL PLAN FROM FIRESTORE
+
+// ✅ FETCH MEAL PLAN FROM FIRESTORE OR LOCAL STORAGE
 async function fetchMealPlan() {
-    deleteOldMealPlan(true);  // ✅ Now fetches new plan only after deletion
-    console.log("🔎 Checking Local Storage...");
-    
+    console.log("🔄 Checking for existing meal plan...");
+
     let mealPlanData = localStorage.getItem("latestMealPlan");
-    
-    console.log("🔄 Fetching Meal Plan...");
+
     if (!mealPlanData) {
         console.warn("⚠️ No meal plan found in localStorage. Fetching from Firestore...");
         
         const user = auth.currentUser;
-        if (!user) {
-            console.error("❌ User not authenticated.");
-            return;
-        }
+        if (!user) return console.error("❌ User not authenticated.");
 
         const mealPlanId = localStorage.getItem("mealPlanId");
-        if (!mealPlanId) {
-            console.error("❌ Meal Plan ID not found in localStorage.");
-            return;
-        }
+        if (!mealPlanId) return console.warn("⚠️ No meal plan ID found.");
 
         try {
-            const mealPlanRef = doc(db, "meals", mealPlanId);
-            const mealPlanSnap = await getDoc(mealPlanRef);
-            
-            if (!mealPlanSnap.exists()) {
-                console.warn("⚠️ Meal Plan does not exist in Firestore.");
-                return;
-            }
+            const mealPlanSnap = await getDoc(doc(db, "meals", mealPlanId));
+            if (!mealPlanSnap.exists()) return console.warn("⚠️ Meal Plan does not exist in Firestore.");
 
             mealPlanData = mealPlanSnap.data();
             localStorage.setItem("latestMealPlan", JSON.stringify(mealPlanData));
 
         } catch (error) {
-            console.error("❌ Error fetching meal plan:", error);
-            return;
+            return console.error("❌ Error fetching meal plan:", error);
         }
     } else {
         mealPlanData = JSON.parse(mealPlanData);
     }
 
     console.log("✅ Meal Plan Retrieved:", mealPlanData);
-
     displayMealPlan(mealPlanData);
 }
 
 // ✅ DISPLAY MEAL PLAN
-window.displayMealPlan = function displayMealPlan(mealPlanData = null) {
+function displayMealPlan(mealPlanData) {
     console.log("🖥️ Rendering Meal Plan...");
 
     if (!mealPlanData) {
-        const storedData = localStorage.getItem("latestMealPlan");
-        if (!storedData) {
-            console.warn("⚠️ No meal plan data available.");
-            return;
-        }
-        mealPlanData = JSON.parse(storedData);
+        console.warn("⚠️ No meal plan data available.");
+        return;
     }
 
-    // ✅ Ensure required elements exist
     const elements = {
         ingredients: document.getElementById("ingredients"),
         mealsPerDay: document.getElementById("mealsPerDay"),
@@ -137,13 +103,9 @@ window.displayMealPlan = function displayMealPlan(mealPlanData = null) {
     };
 
     for (let key in elements) {
-        if (!elements[key]) {
-            console.error(`❌ Missing element: #${key}`);
-            return;
-        }
+        if (!elements[key]) return console.error(`❌ Missing element: #${key}`);
     }
 
-    // ✅ Populate meal plan details
     elements.ingredients.textContent = mealPlanData.ingredients || "Not provided";
     elements.mealsPerDay.textContent = mealPlanData.mealsPerDay || "Unknown";
     elements.servings.textContent = mealPlanData.servings || "Unknown";
@@ -151,10 +113,10 @@ window.displayMealPlan = function displayMealPlan(mealPlanData = null) {
     elements.planName.textContent = "Custom AI-Generated Meal Plan";
     elements.mealPlanDescription.textContent = mealPlanData.mealPlan || "No meal description available.";
 
-    // ✅ Populate meals dynamically
+    // ✅ Populate Meals
     elements.mealsContainer.innerHTML = "";
     const mealSections = mealPlanData.mealPlan.split("\n\n").filter(section => section.trim() !== "");
-
+    
     mealSections.forEach(meal => {
         const mealItemDiv = document.createElement("div");
         mealItemDiv.classList.add("meal-item");
@@ -163,12 +125,14 @@ window.displayMealPlan = function displayMealPlan(mealPlanData = null) {
     });
 
     console.log("✅ Meal Plan Displayed Successfully.");
-};
+}
 
-// ✅ FETCH NEW MEAL PLAN
+// ✅ GENERATE NEW MEAL PLAN
 async function fetchNewMealPlan() {
-    deleteOldMealPlan(true);  // ✅ Now fetches new plan only after deletion
+    await deleteOldMealPlan();  // ✅ Ensures old plan is deleted before fetching new one
+    
     console.log("📤 Requesting new meal plan...");
+    
     const preferences = {
         ingredients: document.getElementById("ingredients")?.value.trim() || "",
         mealsPerDay: parseInt(document.getElementById("meals")?.value) || 3,
@@ -176,12 +140,7 @@ async function fetchNewMealPlan() {
         dietaryRestrictions: [...document.querySelectorAll("input[name='dietary']:checked")].map(input => input.value)
     };
 
-    if (!preferences.ingredients) {
-        alert("Please enter ingredients.");
-        return;
-    }
-
-    console.log("📤 Requesting new meal plan:", preferences);
+    if (!preferences.ingredients) return alert("Please enter ingredients.");
 
     try {
         const authToken = await getAuthToken();
@@ -202,10 +161,7 @@ async function fetchNewMealPlan() {
         console.log("✅ API Response:", newMealPlan);
 
         const user = auth.currentUser;
-        if (!user) {
-            console.error("❌ User not authenticated.");
-            return;
-        }
+        if (!user) return console.error("❌ User not authenticated.");
 
         const docRef = await addDoc(collection(db, "meals"), {
             userId: user.uid,
@@ -216,7 +172,8 @@ async function fetchNewMealPlan() {
 
         localStorage.setItem("mealPlanId", docRef.id);
         console.log("✅ Meal plan saved successfully.");
-        setTimeout(() =>  {
+        
+        setTimeout(() => {
             displayMealPlan(newMealPlan);
             window.location.href = "meals.html";
         }, 1000);
@@ -231,7 +188,7 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("✅ Document Loaded");
 
     if (window.location.pathname.includes("meals.html")) {
-        setTimeout(displayMealPlan, 500); // Ensure elements exist before rendering
+        setTimeout(fetchMealPlan, 500); // Ensure elements exist before rendering
     }
 
     const form = document.getElementById("meal-planner-form");
