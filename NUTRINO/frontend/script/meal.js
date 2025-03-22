@@ -18,10 +18,27 @@ auth.onAuthStateChanged((user) => {
         window.location.href = "login.html"; 
     }
 });
-
-// ✅ DELETE OLD MEAL PLAN (Frontend Only)
 async function deleteOldMealPlan() {
-    console.log("🗑️ Removing old meal plan from frontend...");
+    console.log("🗑️ Removing old meal plan from frontend and Firestore...");
+
+    const user = auth.currentUser;
+    if (!user) {
+        console.error("❌ User not authenticated.");
+        return;
+    }
+
+    const mealPlanId = localStorage.getItem("mealPlanId");
+    
+    if (mealPlanId) {
+        try {
+            await deleteDoc(doc(db, "meals", mealPlanId));
+            console.log("✅ Meal plan deleted from Firestore.");
+        } catch (error) {
+            console.error("❌ Error deleting meal plan from Firestore:", error);
+        }
+    } else {
+        console.warn("⚠️ No meal plan ID found in localStorage.");
+    }
 
     // ✅ Remove meal plan from Local Storage
     localStorage.removeItem("latestMealPlan");
@@ -42,9 +59,10 @@ async function deleteOldMealPlan() {
     });
 
     console.log("✅ Old meal plan cleared from UI and localStorage.");
+
+    // ✅ Fetch new meal plan after deletion
+    fetchMealPlan();
 }
-
-
 // ✅ FETCH LATEST MEAL PLAN FROM FIRESTORE
 async function fetchMealPlan() {
     deleteOldMealPlan();  // ✅ Ensure old meal is cleared before fetching a new one
