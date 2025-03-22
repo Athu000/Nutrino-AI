@@ -110,7 +110,7 @@ function displayMealPlan(mealPlanData) {
     elements.mealsPerDay.textContent = mealPlanData.mealsPerDay || "Unknown";
     elements.servings.textContent = mealPlanData.servings || "Unknown";
     elements.dietaryRestrictions.textContent = mealPlanData.dietaryRestrictions?.join(", ") || "None";
-    elements.planName.textContent = "Custom AI-Generated Meal Plan";
+    elements.planName.textContent = mealPlanData.planName || "Custom AI-Generated Meal Plan";
     elements.mealPlanDescription.textContent = mealPlanData.mealPlan || "No meal description available.";
 
     // ✅ Populate Meals
@@ -125,6 +125,22 @@ function displayMealPlan(mealPlanData) {
     });
 
     console.log("✅ Meal Plan Displayed Successfully.");
+}
+function formatText(text) {
+    return text
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // Convert **bold text** to <strong>bold text</strong>
+        .replace(/\n/g, "<br>") // Replace newlines with <br>
+        .replace(/Meal Plan Name:/gi, "📌 <strong>Meal Plan Name:</strong>") // Add emoji for meal plan name
+        .replace(/Meals:/gi, "🍽️ <strong>Meals:</strong>") 
+        .replace(/Breakfast:/gi, "🥞 <strong>Breakfast:</strong>")
+        .replace(/Lunch:/gi, "🍛 <strong>Lunch:</strong>")
+        .replace(/Dinner:/gi, "🌙 <strong>Dinner:</strong>")
+        .replace(/Ingredients Used:/gi, "🛒 <strong>Ingredients:</strong>")
+        .replace(/Step-by-Step Cooking Instructions:/gi, "👨‍🍳 <strong>Instructions:</strong>")
+        .replace(/\* Meal Name:\*/gi, "🍽️ <strong>Dish:</strong>") // Standardize meal names
+        .replace(/- /g, "➡️ ") // Replace bullet points with arrow emoji
+        .replace(/\s*\*\s*/g, "") // Remove stray asterisks
+        .trim(); // Clean unnecessary spaces
 }
 
 // ✅ GENERATE NEW MEAL PLAN
