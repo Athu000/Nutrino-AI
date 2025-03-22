@@ -79,25 +79,19 @@
         let recipeText = storedRecipe.recipeText;
         console.log("✅ Loaded Recipe Text:", recipeText);
 
+        // ✅ Extract sections from the recipe
         function extractSection(section) {
-            let regex = new RegExp(`-\\s*\\*{2}\\s*${section}\\s*\\*{2}\\s*:\\s*\\n?([\\s\\S]*?)(?=\\n-\\s*\\*{2}|$)`, "i");
+            let regex = new RegExp(-\\s*\\*{2}\\s*${section}\\s*\\*{2}\\s*:\\s*\\n?([\\s\\S]*?)(?=\\n-\\s*\\*{2}|$), "i");
             let match = recipeText.match(regex);
-        
-            return match 
-                ? match[1]
-                    .replace(/\*\*/g, '') // ✅ Remove all **bold** formatting
-                    .trim()
-                    .split("\n")
-                    .map(line => line.trim())
-                    .filter(line => line !== "")
-                : [];
+            return match ? match[1].trim().split("\n").map(line => line.trim()).filter(line => line !== "") : [];
         }
+
         // ✅ Combine Ingredients into One Step
         let ingredients = extractSection("Ingredients List");
         let steps = extractSection("Step-by-Step Instructions");
 
         if (ingredients.length > 0) {
-            steps.unshift(`🛒 **Collect these ingredients:** ${ingredients.join(", ")}`);
+            steps.unshift(🛒 **Collect these ingredients:** ${ingredients.join(", ")});
         }
 
         console.log("✅ Processed Steps:", steps);
@@ -110,20 +104,15 @@
                        .trim();
         }
         // ✅ Function to speak text
-            function speak(text) {
-                const speech = new SpeechSynthesisUtterance(cleanForSpeech(text)); // ✅ Apply cleaning function
-                speech.lang = "en-US";
-                speech.volume = 1;
-                speech.rate = 1;
-                speech.pitch = 1.2;
-                const voices = window.speechSynthesis.getVoices();
-                const femaleVoice = voices.find(voice => voice.name.includes("Female") || voice.name.includes("Google UK English Female"));
-            
-                if (femaleVoice) {
-                    speech.voice = femaleVoice;
-                }
-                window.speechSynthesis.speak(speech);
-            }
+        function speak(text) {
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = "en-US";
+            speech.volume = 1;
+            speech.rate = 1;
+            speech.pitch = 1;
+            window.speechSynthesis.speak(speech);
+        }
+
         // ✅ Function to show the next step
         function showStep() {
             if (stepIndex < steps.length) {
@@ -157,10 +146,9 @@
         // ✅ Voice Assist Button
         voiceBtn.addEventListener("click", function () {
             speak(stepDisplay.innerText);
-            speak(cleanForSpeech(stepDisplay.innerText)); 
         });
         goBackBtn.addEventListener("click", function () {
-        window.location.href = "index.html"; // ✅ Go back to index page
+                window.location.href = "index.html"; // Redirect back to the index page
         });
     });
 </script>
