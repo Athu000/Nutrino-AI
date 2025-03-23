@@ -36,14 +36,17 @@ async function fetchUserStats(user) {
 
         // ✅ Update Medals based on activity
         updateMedals(totalRecipes + totalMeals);
-
+        updateMedals(totalSearches);
+        updateUserRank(userId, totalSearches);
+        // ✅ Load User Profile Picture
+        loadUserProfilePicture(userId);
     } catch (error) {
         console.error("❌ Error fetching user stats:", error);
         alert("Failed to load user statistics. Please check your permissions.");
     }
 }
 
-// ✅ Function to Update Medals Based on Search Count
+// ✅ Update Medals Based on Search Count
 function updateMedals(totalSearches) {
     const achievementsList = document.querySelector(".achievements");
     achievementsList.innerHTML = "";
@@ -53,15 +56,44 @@ function updateMedals(totalSearches) {
     if (totalSearches >= 25) achievementsList.innerHTML += `<li>🌟 25+ Searches Pro User</li>`;
     if (totalSearches >= 50) achievementsList.innerHTML += `<li>🏆 50+ Master Chef</li>`;
 }
+// ✅ Function to Update User Rank in Firestore
+async function updateUserRank(userId, totalSearches) {
+    const rank =
+        totalSearches >= 50 ? "Master Chef" :
+        totalSearches >= 25 ? "Pro User" :
+        totalSearches >= 10 ? "Intermediate Cook" :
+        "Beginner";
+
+    const userRef = doc(db, "users", userId);
+    await updateDoc(userRef, { rank });
+
+    document.getElementById("user-rank").textContent = `🏅 ${rank}`;
+}
+// ✅ Function to Load & Save User Profile Picture in Firestore
+async function loadUserProfilePicture(userId) {
+    const userRef = doc(db, "users", userId);
+    const userDocSnap = await getDoc(userRef);
+
+    if (userDocSnap.exists() && userDocSnap.data().profilePicture) {
+        document.getElementById("avatar").src = userDocSnap.data().profilePicture;
+    }
+}
 
 // ✅ Function to Change & Persist Profile Picture
-document.getElementById("change-avatar").addEventListener("click", () => {
+document.getElementById("change-avatar").addEventListener("click", async () => {
     const randomSeed = Math.random().toString(36).substring(7);
     const newAvatarUrl = `https://api.dicebear.com/7.x/adventurer/svg?seed=${randomSeed}`;
 
     document.getElementById("avatar").src = newAvatarUrl;
-    localStorage.setItem("profileAvatar", newAvatarUrl); // Store the avatar till session ends
+    
+    // ✅ Store New Avatar in Firestore
+    const user = auth.currentUser;
+    if (user) {
+        const userRef = doc(db, "users", user.uid);
+        await setDoc(userRef, { profilePicture: newAvatarUrl }, { merge: true });
+    }
 });
+
 
 // ✅ Load Saved Profile Picture on Page Load
 document.addEventListener("DOMContentLoaded", () => {
