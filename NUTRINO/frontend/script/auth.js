@@ -73,9 +73,6 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// ✅ Export function for profile.html
-export { auth, db, fetchUserStats };
-
 // ✅ Call Fetch Function After Authentication
 onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -259,4 +256,4 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // ✅ Export Firebase Auth & Firestore for other scripts
-export { auth, db, provider };
+export { auth, db, provider ,fetchUserStats };
