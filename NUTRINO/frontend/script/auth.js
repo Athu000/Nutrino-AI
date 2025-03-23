@@ -22,53 +22,6 @@ const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 const db = getFirestore(app);
 
-async function fetchUserStats() {
-    try {
-        // ✅ Wait for user authentication
-        const user = auth.currentUser;
-        if (!user) {
-            console.log("⚠️ User not logged in.");
-            return;
-        }
-
-        console.log(`🔍 Fetching stats for: ${user.email}`);
-
-        // ✅ Fetch User Data from Firestore
-        const userDocRef = doc(db, "users", user.uid);
-        const userDocSnap = await getDoc(userDocRef);
-        
-        if (!userDocSnap.exists()) {
-            console.error("❌ User document not found in Firestore.");
-            return;
-        }
-
-        const userData = userDocSnap.data();
-        document.getElementById("user-name").textContent = userData.name || "Unknown";
-        document.getElementById("user-email").textContent = userData.email || "Not Available";
-
-        // ✅ Fetch Total Meals Searched
-        const mealsQuery = query(collection(db, "meals"), where("userId", "==", user.uid));
-        const mealsSnapshot = await getDocs(mealsQuery);
-        const totalMeals = mealsSnapshot.size;
-
-        // ✅ Fetch Total Recipes Searched
-        const recipesQuery = query(collection(db, "recipes"), where("userId", "==", user.uid));
-        const recipesSnapshot = await getDocs(recipesQuery);
-        const totalRecipes = recipesSnapshot.size;
-
-        // ✅ Update UI
-        document.getElementById("search-count").textContent = totalRecipes; // Total Recipe Searches
-        document.getElementById("meal-count").textContent = totalMeals; // Total Meals Searched
-
-        console.log(`✅ Fetched Stats - Meals: ${totalMeals}, Recipes: ${totalRecipes}`);
-    } catch (error) {
-        console.error("❌ Error fetching user stats:", error);
-        alert("Error fetching user statistics. Please try again.");
-    }
-}
-
-// ✅ Run Function When Page Loads
-document.addEventListener("DOMContentLoaded", fetchUserStats);
 // ✅ Google Sign-In Function
 export async function signInWithGoogle() {
   try {
