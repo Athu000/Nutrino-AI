@@ -88,6 +88,55 @@ function updateMedals(totalSearches) {
         achievementsList.innerHTML += `<li style="background: silver; color: black; font-weight: bold; opacity: 0.7;">🎯 Next: ${nextMedal.emoji} ${nextMedal.text} at ${nextMedal.threshold} searches</li>`;
     }
 }
+async function loadCookingChart(userId) {
+    try {
+        // ✅ Fetch total number of recipes searched by the user
+        const recipesQuery = query(collection(db, "recipes"), where("userId", "==", userId));
+        const recipesSnapshot = await getDocs(recipesQuery);
+        const totalRecipes = recipesSnapshot.size;
+
+        // ✅ Fetch total number of meals searched by the user
+        const mealsQuery = query(collection(db, "meals"), where("userId", "==", userId));
+        const mealsSnapshot = await getDocs(mealsQuery);
+        const totalMeals = mealsSnapshot.size;
+
+        // ✅ Calculate total searches
+        const totalSearches = totalRecipes + totalMeals;
+
+        // ✅ Update chart with fetched data
+        const ctx = document.getElementById("cookingChart").getContext("2d");
+
+        new Chart(ctx, {
+            type: "pie",
+            data: {
+                labels: ["Recipes", "Meals"],
+                datasets: [{
+                    data: [totalRecipes, totalMeals],
+                    backgroundColor: ["#ff6384", "#36a2eb"]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: "top"
+                    }
+                }
+            }
+        });
+
+        console.log(`✅ Cooking chart updated: Recipes - ${totalRecipes}, Meals - ${totalMeals}`);
+    } catch (error) {
+        console.error("❌ Error loading cooking chart:", error);
+    }
+}
+
+// ✅ Call the function when the user logs in
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        loadCookingChart(user.uid);
+    }
+});
 
 // ✅ Function to Update User Rank in Firestore
 async function updateUserRank(userId, totalSearches) {
