@@ -199,4 +199,4 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // ✅ Export Firebase Auth & Firestore for other scripts
-export { auth, db, provider ,fetchUserStats };
+export { auth, db, provider };
