@@ -34,7 +34,7 @@ async function fetchUserStats(user) {
         document.getElementById("search-count").textContent = totalRecipes;
         document.getElementById("meal-count").textContent = totalMeals;
 
-        totalSearches=totalRecipes+totalMeals;
+        var totalSearches = totalRecipes + totalMeals;
         // ✅ Update Medals based on activity
         updateMedals(totalRecipes + totalMeals);
         updateMedals(totalSearches);
