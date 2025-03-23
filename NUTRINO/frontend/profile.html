@@ -100,8 +100,9 @@
         </div>
         <p><strong>Name:</strong> <span id="user-name">Loading...</span></p>
         <p><strong>Email:</strong> <span id="user-email">Loading...</span></p>
-        <p><strong>Total Recipes Searched:</strong> <span id="recipe-count">0</span></p>
+        <p><strong>Total Recipes Searched:</strong> <span id="search-count">0</span></p>
         <p><strong>Total Meals Searched:</strong> <span id="meal-count">0</span></p>
+
 
         <!-- Stats & Charts -->
         <h3>Cooking Score & Achievements</h3>
@@ -118,42 +119,58 @@
 
    <script type="module">
     import { auth, db } from "./script/auth.js";
-    import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getDoc, getDocs, doc, collection, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     // ✅ Ensure user authentication before fetching stats
     auth.onAuthStateChanged(async (user) => {
         if (user) {
             console.log(`🔍 Fetching stats for: ${user.email}`);
-            fetchUserStats(user.uid);
+            await fetchUserStats(user.uid, user.email);
         } else {
             console.log("⚠️ User not logged in.");
         }
     });
 
     // ✅ Fetch User Stats from Firestore
-    async function fetchUserStats(uid) {
+    async function fetchUserStats(uid, email) {
         try {
             const userDocRef = doc(db, "users", uid);
             const userDocSnap = await getDoc(userDocRef);
 
             if (!userDocSnap.exists()) {
-                console.log("⚠️ No user stats found.");
+                console.log("⚠️ No user data found.");
                 return;
             }
 
             console.log("✅ User data found:", userDocSnap.data());
             const userStats = userDocSnap.data();
 
+            // ✅ Fetch total number of recipes & meals created
+            const recipeCount = await countUserDocuments("recipes", email);
+            const mealCount = await countUserDocuments("meals", email);
+
             // ✅ Display fetched stats
             document.getElementById("user-name").textContent = userStats.name || "Unknown";
             document.getElementById("user-email").textContent = userStats.email || "Not Available";
-            document.getElementById("recipe-count").textContent = userStats.recipes || 0;
-            document.getElementById("meal-count").textContent = userStats.meals || 0;
+            document.getElementById("recipe-count").textContent = recipeCount;
+            document.getElementById("meal-count").textContent = mealCount;
 
             // ✅ Update Achievements Chart
-            updateAchievementsChart(userStats.recipes, userStats.meals);
+            updateAchievementsChart(recipeCount, mealCount);
         } catch (error) {
             console.error("❌ Error fetching user stats:", error);
+        }
+    }
+
+    // ✅ Function to count documents for a specific user in Firestore
+    async function countUserDocuments(collectionName, email) {
+        try {
+            const q = query(collection(db, collectionName), where("userEmail", "==", email));
+            const querySnapshot = await getDocs(q);
+            return querySnapshot.size; // Returns total number of documents found
+        } catch (error) {
+            console.error(`❌ Error fetching ${collectionName} count:`, error);
+            return 0;
         }
     }
 
@@ -183,7 +200,7 @@
     // ✅ Dynamic Achievements Chart
     function updateAchievementsChart(recipes, meals) {
         const ctx = document.getElementById("cookingChart").getContext("2d");
-        
+
         const achievements = [
             { label: "Beginner", threshold: 5 },
             { label: "Intermediate", threshold: 15 },
@@ -208,6 +225,7 @@
         });
     }
 </script>
+
 
 </body>
 </html>
