@@ -1,76 +1,81 @@
-import { auth, db } from "./auth.js";
-import { doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { auth, db } from "./script/auth.js";
+import { getDocs, query, where, collection, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// ✅ Fetch User Stats from Firestore
-export async function fetchUserStats() {
+// ✅ Function to Fetch User Stats
+async function fetchUserStats() {
     try {
         const user = auth.currentUser;
         if (!user) {
-            console.log("⚠️ User not logged in.");
+            console.error("❌ User not logged in.");
             return;
         }
 
         console.log(`🔍 Fetching stats for: ${user.email}`);
 
-        // ✅ Fetch User Data from Firestore
-        const userDocRef = doc(db, "users", user.uid);
-        const userDocSnap = await getDoc(userDocRef);
-        
-        if (!userDocSnap.exists()) {
-            console.error("❌ User document not found in Firestore.");
-            return;
-        }
-
-        const userData = userDocSnap.data();
-        document.getElementById("user-name").textContent = userData.name || "Unknown";
-        document.getElementById("user-email").textContent = userData.email || "Not Available";
-
-        // ✅ Fetch Total Meals Searched
-        const mealsQuery = query(collection(db, "meals"), where("userId", "==", user.uid));
-        const mealsSnapshot = await getDocs(mealsQuery);
-        const totalMeals = mealsSnapshot.size;
+        // ✅ Get User UID
+        const userId = user.uid;
 
         // ✅ Fetch Total Recipes Searched
-        const recipesQuery = query(collection(db, "recipes"), where("userId", "==", user.uid));
+        const recipesQuery = query(collection(db, "recipes"), where("userId", "==", userId));
         const recipesSnapshot = await getDocs(recipesQuery);
         const totalRecipes = recipesSnapshot.size;
 
-        // ✅ Update UI
-        document.getElementById("search-count").textContent = totalRecipes;
-        document.getElementById("meal-count").textContent = totalMeals;
+        // ✅ Fetch Total Meals Searched
+        const mealsQuery = query(collection(db, "meals"), where("userId", "==", userId));
+        const mealsSnapshot = await getDocs(mealsQuery);
+        const totalMeals = mealsSnapshot.size;
 
-        console.log(`✅ Fetched Stats - Meals: ${totalMeals}, Recipes: ${totalRecipes}`);
+        // ✅ Fetch User Details from Firestore
+        const userDoc = await getDoc(doc(db, "users", userId));
+        const userData = userDoc.exists() ? userDoc.data() : null;
+
+        // ✅ Update UI
+        document.getElementById("user-name").textContent = userData?.name || "Unknown";
+        document.getElementById("user-email").textContent = userData?.email || "Not Available";
+        document.getElementById("search-count").textContent = totalRecipes + totalMeals;
+
+        // ✅ Update Medals based on activity
+        updateMedals(totalRecipes + totalMeals);
+        
     } catch (error) {
         console.error("❌ Error fetching user stats:", error);
-        alert("Error fetching user statistics. Please try again.");
+        alert("Failed to load user statistics. Please check your permissions.");
     }
 }
 
-// ✅ Change Avatar Functionality
-export function setupAvatar() {
-    const avatar = document.getElementById("avatar");
-    const changeAvatarBtn = document.getElementById("change-avatar");
-    const saveAvatarBtn = document.getElementById("save-avatar");
+// ✅ Function to Update Medals
+function updateMedals(totalSearches) {
+    const achievementsList = document.querySelector(".achievements");
+    achievementsList.innerHTML = ""; // Clear previous medals
 
-    // Load avatar from localStorage if available
-    const savedAvatar = localStorage.getItem("userAvatar");
-    if (savedAvatar) avatar.src = savedAvatar;
-
-    // Change Avatar
-    changeAvatarBtn.addEventListener("click", () => {
-        const randomSeed = Math.random().toString(36).substring(7);
-        avatar.src = `https://api.dicebear.com/7.x/adventurer/svg?seed=${randomSeed}`;
-    });
-
-    // Save Avatar
-    saveAvatarBtn.addEventListener("click", () => {
-        localStorage.setItem("userAvatar", avatar.src);
-        alert("✅ Avatar Saved!");
-    });
+    if (totalSearches >= 1) achievementsList.innerHTML += `<li>🥇 First Search Completed</li>`;
+    if (totalSearches >= 10) achievementsList.innerHTML += `<li>🔥 10+ Searches Achieved</li>`;
+    if (totalSearches >= 25) achievementsList.innerHTML += `<li>🌟 25+ Searches Pro User</li>`;
+    if (totalSearches >= 50) achievementsList.innerHTML += `<li>🏆 50+ Master Chef</li>`;
 }
 
-// ✅ Run Functions When Page Loads
-document.addEventListener("DOMContentLoaded", () => {
-    fetchUserStats();
-    setupAvatar();
+// ✅ Function to Change & Persist Profile Picture
+document.getElementById("change-avatar").addEventListener("click", () => {
+    const randomSeed = Math.random().toString(36).substring(7);
+    const newAvatarUrl = `https://api.dicebear.com/7.x/adventurer/svg?seed=${randomSeed}`;
+    
+    document.getElementById("avatar").src = newAvatarUrl;
+    localStorage.setItem("profileAvatar", newAvatarUrl); // Store the avatar till session ends
+});
+
+// ✅ Load Saved Profile Picture on Page Load
+document.addEventListener("DOMContentLoaded", async () => {
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            fetchUserStats(); // Fetch user stats after login
+        } else {
+            console.error("⚠️ User is not logged in.");
+        }
+    });
+
+    // Load stored profile picture
+    const savedAvatar = localStorage.getItem("profileAvatar");
+    if (savedAvatar) {
+        document.getElementById("avatar").src = savedAvatar;
+    }
 });
