@@ -22,63 +22,53 @@ const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 const db = getFirestore(app);
 
-// ✅ Fetch User Stats from Firestore
 async function fetchUserStats() {
-    const user = auth.currentUser;
-    if (!user) {
-        console.error("❌ No authenticated user found.");
-        return;
-    }
-
-    console.log(`🔍 Fetching stats for: ${user.email}`);
-
     try {
-        // ✅ Fetch user details
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (!userDoc.exists()) {
-            console.error("❌ User document not found.");
+        // ✅ Wait for user authentication
+        const user = auth.currentUser;
+        if (!user) {
+            console.log("⚠️ User not logged in.");
             return;
         }
-        const userData = userDoc.data();
 
-        // ✅ Fetch meals count
-        const mealsQuery = query(collection(db, "meals"), where("uid", "==", user.uid));
+        console.log(`🔍 Fetching stats for: ${user.email}`);
+
+        // ✅ Fetch User Data from Firestore
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        
+        if (!userDocSnap.exists()) {
+            console.error("❌ User document not found in Firestore.");
+            return;
+        }
+
+        const userData = userDocSnap.data();
+        document.getElementById("user-name").textContent = userData.name || "Unknown";
+        document.getElementById("user-email").textContent = userData.email || "Not Available";
+
+        // ✅ Fetch Total Meals Searched
+        const mealsQuery = query(collection(db, "meals"), where("userId", "==", user.uid));
         const mealsSnapshot = await getDocs(mealsQuery);
-        const mealCount = mealsSnapshot.size;
+        const totalMeals = mealsSnapshot.size;
 
-        // ✅ Fetch recipes count
-        const recipesQuery = query(collection(db, "recipes"), where("uid", "==", user.uid));
+        // ✅ Fetch Total Recipes Searched
+        const recipesQuery = query(collection(db, "recipes"), where("userId", "==", user.uid));
         const recipesSnapshot = await getDocs(recipesQuery);
-        const recipeCount = recipesSnapshot.size;
+        const totalRecipes = recipesSnapshot.size;
 
-        console.log(`🍽️ Meals: ${mealCount}, 📖 Recipes: ${recipeCount}`);
+        // ✅ Update UI
+        document.getElementById("search-count").textContent = totalRecipes; // Total Recipe Searches
+        document.getElementById("meal-count").textContent = totalMeals; // Total Meals Searched
 
-        // ✅ Store in sessionStorage (Temporary)
-        sessionStorage.setItem("userName", userData.name);
-        sessionStorage.setItem("userEmail", userData.email);
-        sessionStorage.setItem("mealCount", mealCount);
-        sessionStorage.setItem("recipeCount", recipeCount);
-
+        console.log(`✅ Fetched Stats - Meals: ${totalMeals}, Recipes: ${totalRecipes}`);
     } catch (error) {
         console.error("❌ Error fetching user stats:", error);
+        alert("Error fetching user statistics. Please try again.");
     }
 }
 
-// ✅ Check Login Status & Fetch Stats
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        fetchUserStats();
-    } else {
-        console.log("⚠️ User not logged in.");
-    }
-});
-
-// ✅ Call Fetch Function After Authentication
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        fetchUserStats();
-    }
-});
+// ✅ Run Function When Page Loads
+document.addEventListener("DOMContentLoaded", fetchUserStats);
 // ✅ Google Sign-In Function
 export async function signInWithGoogle() {
   try {
