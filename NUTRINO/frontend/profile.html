@@ -6,6 +6,7 @@
     <title>User Profile | Nutrino AI</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module" src="./script/auth.js"></script>
+    <script type="module" src="./script/profile.js"></script>
     <style>
         /* General Styles */
         body {
@@ -29,12 +30,8 @@
             text-align: center;
             padding: 20px;
         }
-        h2, h3, h4 {
-            color: #333;
-        }
-        p {
-            color: #555;
-        }
+        h2, h3, h4 { color: #333; }
+        p { color: #555; }
         /* Avatar Styles */
         .avatar-container {
             text-align: center;
@@ -47,12 +44,8 @@
             border: 3px solid #007bff;
             transition: transform 0.3s ease-in-out;
         }
-        .avatar-container img:hover {
-            transform: scale(1.1);
-        }
-        .avatar-buttons {
-            margin-top: 10px;
-        }
+        .avatar-container img:hover { transform: scale(1.1); }
+        .avatar-buttons { margin-top: 10px; }
         .avatar-buttons button {
             padding: 10px 15px;
             margin: 5px;
@@ -61,19 +54,10 @@
             cursor: pointer;
             font-size: 14px;
         }
-        #change-avatar {
-            background: #007bff;
-            color: white;
-        }
-        #save-avatar {
-            background: #28a745;
-            color: white;
-        }
+        #change-avatar { background: #007bff; color: white; }
+        #save-avatar { background: #28a745; color: white; }
         /* Chart Styles */
-        .chart-container {
-            width: 100%;
-            margin: 20px 0;
-        }
+        .chart-container { width: 100%; margin: 20px 0; }
         /* Achievements Styles */
         .achievements {
             list-style: none;
@@ -103,7 +87,6 @@
         <p><strong>Total Recipes Searched:</strong> <span id="search-count">0</span></p>
         <p><strong>Total Meals Searched:</strong> <span id="meal-count">0</span></p>
 
-
         <!-- Stats & Charts -->
         <h3>Cooking Score & Achievements</h3>
         <div class="chart-container">
@@ -115,27 +98,10 @@
             <li>🔥 10+ Meals Cooked</li>
             <li>🌟 Nutrino Pro User</li>
         </ul>
-    </div>
-<script type="module">
-    import { fetchUserStats } from "./script/auth.js";
-
-    // ✅ Load Profile Data from sessionStorage
-    document.addEventListener("DOMContentLoaded", () => {
-        document.getElementById("user-name").textContent = sessionStorage.getItem("userName") || "Loading...";
-        document.getElementById("user-email").textContent = sessionStorage.getItem("userEmail") || "Loading...";
-        document.getElementById("meal-count").textContent = sessionStorage.getItem("mealCount") || "0";
-        document.getElementById("recipe-count").textContent = sessionStorage.getItem("recipeCount") || "0";
-
-        fetchUserStats(); // Refresh stats on page load
-
-        document.getElementById("main-page").addEventListener("click", () => {
-            sessionStorage.clear();  // Clear previous data
-            window.location.href = "index.html"; // Navigate back
-        });
-    });
-</script>
     <button id="main-page" style="margin-top:20px; padding:10px; background:#007bff; color:white; border:none; border-radius:5px; cursor:pointer;">
-    Go to Main Page
-</button>
+        Go to Main Page
+    </button>
+    </div>
+    
 </body>
 </html>
