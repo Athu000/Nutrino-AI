@@ -22,65 +22,59 @@ const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 const db = getFirestore(app);
 
-// ✅ Function to Fetch User Statistics
-export async function fetchUserStats() {
+// ✅ Fetch User Stats from Firestore
+async function fetchUserStats() {
+    const user = auth.currentUser;
+    if (!user) {
+        console.error("❌ No authenticated user found.");
+        return;
+    }
+
+    console.log(`🔍 Fetching stats for: ${user.email}`);
+
     try {
-        const user = auth.currentUser;
-        if (!user) {
-            console.warn("⚠️ No user logged in.");
+        // ✅ Fetch user details
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (!userDoc.exists()) {
+            console.error("❌ User document not found.");
             return;
         }
+        const userData = userDoc.data();
 
-        console.log(`🔍 Fetching stats for: ${user.email}`);
-
-        const userId = user.uid;
-        const userDocRef = doc(db, "users", userId);
-        const userDocSnap = await getDoc(userDocRef);
-
-        if (!userDocSnap.exists()) {
-            console.warn("⚠️ No user data found.");
-            return;
-        }
-
-        const userData = userDocSnap.data();
-
-        // ✅ Fetch Total Meals Searched by User
-        const mealsQuery = query(collection(db, "meals"), where("userId", "==", userId));
+        // ✅ Fetch meals count
+        const mealsQuery = query(collection(db, "meals"), where("uid", "==", user.uid));
         const mealsSnapshot = await getDocs(mealsQuery);
-        const totalMeals = mealsSnapshot.size;
+        const mealCount = mealsSnapshot.size;
 
-        // ✅ Fetch Total Recipes Searched by User
-        const recipesQuery = query(collection(db, "recipes"), where("userId", "==", userId));
+        // ✅ Fetch recipes count
+        const recipesQuery = query(collection(db, "recipes"), where("uid", "==", user.uid));
         const recipesSnapshot = await getDocs(recipesQuery);
-        const totalRecipes = recipesSnapshot.size;
+        const recipeCount = recipesSnapshot.size;
 
-        console.log(`✅ User has searched ${totalRecipes} recipes and ${totalMeals} meals.`);
+        console.log(`🍽️ Meals: ${mealCount}, 📖 Recipes: ${recipeCount}`);
 
-        // ✅ Update Profile Page UI
-        if (window.location.pathname.includes("profile.html")) {
-            document.getElementById("user-name").textContent = userData.name || "Unknown";
-            document.getElementById("user-email").textContent = userData.email || "Not Available";
-            document.getElementById("search-count").textContent = totalRecipes || 0;
-            document.getElementById("meals-count").textContent = totalMeals || 0;
+        // ✅ Store in sessionStorage (Temporary)
+        sessionStorage.setItem("userName", userData.name);
+        sessionStorage.setItem("userEmail", userData.email);
+        sessionStorage.setItem("mealCount", mealCount);
+        sessionStorage.setItem("recipeCount", recipeCount);
 
-            // ✅ Generate Achievements
-            const achievementsList = document.querySelector(".achievements");
-            achievementsList.innerHTML = ""; // Clear existing list
-
-            if (totalRecipes >= 10) {
-                achievementsList.innerHTML += `<li>🔍 10+ Recipe Searches</li>`;
-            }
-            if (totalMeals >= 5) {
-                achievementsList.innerHTML += `<li>🍽️ Cooked 5+ Meals</li>`;
-            }
-            if (totalMeals >= 20) {
-                achievementsList.innerHTML += `<li>👨‍🍳 Master Chef - 20 Meals Cooked</li>`;
-            }
-        }
     } catch (error) {
         console.error("❌ Error fetching user stats:", error);
     }
 }
+
+// ✅ Check Login Status & Fetch Stats
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        fetchUserStats();
+    } else {
+        console.log("⚠️ User not logged in.");
+    }
+});
+
+// ✅ Export function for profile.html
+export { auth, db, fetchUserStats };
 
 // ✅ Call Fetch Function After Authentication
 onAuthStateChanged(auth, (user) => {
