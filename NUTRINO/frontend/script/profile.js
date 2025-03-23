@@ -56,15 +56,37 @@ async function fetchUserStats(user) {
     }
 }
 
-// ✅ Update Medals Based on Search Count
 function updateMedals(totalSearches) {
     const achievementsList = document.querySelector(".achievements");
     achievementsList.innerHTML = ""; // Clear previous list
 
-    if (totalSearches >= 1) achievementsList.innerHTML += `<li>🥇 First Search Completed</li>`;
-    if (totalSearches >= 10) achievementsList.innerHTML += `<li>🔥 10+ Searches Achieved</li>`;
-    if (totalSearches >= 25) achievementsList.innerHTML += `<li>🌟 25+ Searches Pro User</li>`;
-    if (totalSearches >= 50) achievementsList.innerHTML += `<li>🏆 50+ Master Chef</li>`;
+    const medals = [
+        { threshold: 1, emoji: "🥇", text: "First Search Completed" },
+        { threshold: 10, emoji: "🔥", text: "10+ Searches Achieved" },
+        { threshold: 25, emoji: "🌟", text: "25+ Searches Pro User" },
+        { threshold: 50, emoji: "🏆", text: "50+ Master Chef" },
+        { threshold: 100, emoji: "🎖", text: "100+ Recipe Expert" },
+        { threshold: 250, emoji: "🥈", text: "250+ Culinary Genius" },
+        { threshold: 500, emoji: "🥇", text: "500+ AI Recipe King" },
+        { threshold: 750, emoji: "👑", text: "750+ Kitchen Maestro" },
+        { threshold: 900, emoji: "🚀", text: "900+ Ultimate Foodie" },
+        { threshold: 1000, emoji: "🌍", text: "1000+ Global AI Chef" }
+    ];
+
+    let nextMedal = null;
+
+    medals.forEach((medal) => {
+        if (totalSearches >= medal.threshold) {
+            achievementsList.innerHTML += `<li style="background: gold; color: black; font-weight: bold;">${medal.emoji} ${medal.text}</li>`;
+        } else if (!nextMedal) {
+            nextMedal = medal;
+        }
+    });
+
+    // ✅ Show the next medal if there is one
+    if (nextMedal) {
+        achievementsList.innerHTML += `<li style="background: silver; color: black; font-weight: bold; opacity: 0.7;">🎯 Next: ${nextMedal.emoji} ${nextMedal.text} at ${nextMedal.threshold} searches</li>`;
+    }
 }
 
 // ✅ Function to Update User Rank in Firestore
@@ -137,6 +159,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("avatar").src = savedAvatar;
     }
     // ✅ Add Event Listener to Main Page Button
-    document.getElementById("go-to-main").addEventListener("click", goToMainPage);
+    document.getElementById("main-page").addEventListener("click", goToMainPage);
 
 });
