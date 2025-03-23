@@ -3,7 +3,7 @@ import {
     getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { 
-    getFirestore, collection, setDoc, doc 
+    getFirestore, collection, setDoc, getDocs, query, where, doc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // ✅ Firebase Configuration
@@ -22,6 +22,72 @@ const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 const db = getFirestore(app);
 
+// ✅ Function to Fetch User Statistics
+export async function fetchUserStats() {
+    try {
+        const user = auth.currentUser;
+        if (!user) {
+            console.warn("⚠️ No user logged in.");
+            return;
+        }
+
+        console.log(`🔍 Fetching stats for: ${user.email}`);
+
+        const userId = user.uid;
+        const userDocRef = doc(db, "users", userId);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (!userDocSnap.exists()) {
+            console.warn("⚠️ No user data found.");
+            return;
+        }
+
+        const userData = userDocSnap.data();
+
+        // ✅ Fetch Total Meals Searched by User
+        const mealsQuery = query(collection(db, "meals"), where("userId", "==", userId));
+        const mealsSnapshot = await getDocs(mealsQuery);
+        const totalMeals = mealsSnapshot.size;
+
+        // ✅ Fetch Total Recipes Searched by User
+        const recipesQuery = query(collection(db, "recipes"), where("userId", "==", userId));
+        const recipesSnapshot = await getDocs(recipesQuery);
+        const totalRecipes = recipesSnapshot.size;
+
+        console.log(`✅ User has searched ${totalRecipes} recipes and ${totalMeals} meals.`);
+
+        // ✅ Update Profile Page UI
+        if (window.location.pathname.includes("profile.html")) {
+            document.getElementById("user-name").textContent = userData.name || "Unknown";
+            document.getElementById("user-email").textContent = userData.email || "Not Available";
+            document.getElementById("search-count").textContent = totalRecipes || 0;
+            document.getElementById("meals-count").textContent = totalMeals || 0;
+
+            // ✅ Generate Achievements
+            const achievementsList = document.querySelector(".achievements");
+            achievementsList.innerHTML = ""; // Clear existing list
+
+            if (totalRecipes >= 10) {
+                achievementsList.innerHTML += `<li>🔍 10+ Recipe Searches</li>`;
+            }
+            if (totalMeals >= 5) {
+                achievementsList.innerHTML += `<li>🍽️ Cooked 5+ Meals</li>`;
+            }
+            if (totalMeals >= 20) {
+                achievementsList.innerHTML += `<li>👨‍🍳 Master Chef - 20 Meals Cooked</li>`;
+            }
+        }
+    } catch (error) {
+        console.error("❌ Error fetching user stats:", error);
+    }
+}
+
+// ✅ Call Fetch Function After Authentication
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        fetchUserStats();
+    }
+});
 // ✅ Google Sign-In Function
 export async function signInWithGoogle() {
   try {
