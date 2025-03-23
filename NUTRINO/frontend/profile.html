@@ -131,36 +131,49 @@
         }
     });
 
-    // ✅ Fetch User Stats from Firestore
-    async function fetchUserStats(uid, email) {
-        try {
-            const userDocRef = doc(db, "users", uid);
-            const userDocSnap = await getDoc(userDocRef);
-
-            if (!userDocSnap.exists()) {
-                console.log("⚠️ No user data found.");
-                return;
-            }
-
-            console.log("✅ User data found:", userDocSnap.data());
-            const userStats = userDocSnap.data();
-
-            // ✅ Fetch total number of recipes & meals created
-            const recipeCount = await countUserDocuments("recipes", email);
-            const mealCount = await countUserDocuments("meals", email);
-
-            // ✅ Display fetched stats
-            document.getElementById("user-name").textContent = userStats.name || "Unknown";
-            document.getElementById("user-email").textContent = userStats.email || "Not Available";
-            document.getElementById("recipe-count").textContent = recipeCount;
-            document.getElementById("meal-count").textContent = mealCount;
-
-            // ✅ Update Achievements Chart
-            updateAchievementsChart(recipeCount, mealCount);
-        } catch (error) {
-            console.error("❌ Error fetching user stats:", error);
-        }
+    async function fetchUserStats() {
+    const user = auth.currentUser;
+    if (!user) {
+        console.error("❌ No authenticated user found.");
+        return;
     }
+
+    console.log(`🔍 Fetching stats for: ${user.email}`);
+
+    try {
+        // ✅ Fetch user details from Firestore
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (!userDoc.exists()) {
+            console.error("❌ User document not found.");
+            return;
+        }
+        const userData = userDoc.data();
+
+        // ✅ Fetch total number of meals created
+        const mealsQuery = query(collection(db, "meals"), where("uid", "==", user.uid));
+        const mealsSnapshot = await getDocs(mealsQuery);
+        const mealCount = mealsSnapshot.size;
+
+        // ✅ Fetch total number of recipes searched
+        const recipesQuery = query(collection(db, "recipes"), where("uid", "==", user.uid));
+        const recipesSnapshot = await getDocs(recipesQuery);
+        const recipeCount = recipesSnapshot.size;
+
+        console.log(`🍽️ Meals: ${mealCount}, 📖 Recipes: ${recipeCount}`);
+
+        // ✅ Update HTML Elements (Ensure IDs exist in profile.html)
+        document.getElementById("user-name").textContent = userData.name;
+        document.getElementById("user-email").textContent = userData.email;
+        document.getElementById("meal-count").textContent = mealCount;
+        document.getElementById("recipe-count").textContent = recipeCount;
+
+    } catch (error) {
+        console.error("❌ Error fetching user stats:", error);
+    }
+}
+
+// ✅ Run function when page loads
+document.addEventListener("DOMContentLoaded", fetchUserStats);
 
     // ✅ Function to count documents for a specific user in Firestore
     async function countUserDocuments(collectionName, email) {
