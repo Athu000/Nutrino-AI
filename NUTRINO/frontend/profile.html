@@ -26,6 +26,7 @@
             width: 90%;
             max-width: 800px;
             margin: 20px;
+            text-align: center;
         }
         .profile-card, .stats-container {
             padding: 20px;
@@ -89,7 +90,8 @@
             </div>
             <p><strong>Name:</strong> <span id="user-name">Loading...</span></p>
             <p><strong>Email:</strong> <span id="user-email">Loading...</span></p>
-            <p><strong>Searches:</strong> <span id="search-count">0</span></p>
+            <p><strong>Total Searches:</strong> <span id="search-count">0</span></p>
+            <p><strong>Meals Cooked:</strong> <span id="meal-count">0</span></p>
         </div>
 
         <!-- Stats & Charts -->
@@ -99,43 +101,81 @@
                 <canvas id="cookingChart"></canvas>
             </div>
             <h4>Achievements</h4>
-            <ul class="achievements">
-                <li>🥇 First Recipe Created</li>
-                <li>🔥 10+ Meals Cooked</li>
-                <li>🌟 Nutrino Pro User</li>
-            </ul>
+            <ul class="achievements" id="achievements-list"></ul>
         </div>
     </div>
 
     <script>
-        // ✅ Load User Data
-        document.addEventListener("DOMContentLoaded", () => {
+        document.addEventListener("DOMContentLoaded", async () => {
             const userData = JSON.parse(localStorage.getItem("loggedInUser"));
             if (userData) {
                 document.getElementById("user-name").textContent = userData.name || "Unknown";
                 document.getElementById("user-email").textContent = userData.email || "Not Available";
             }
 
-            // ✅ Generate Random Cooking Score Data
-            const ctx = document.getElementById("cookingChart").getContext("2d");
-            new Chart(ctx, {
-                type: "pie",
-                data: {
-                    labels: ["Beginner", "Intermediate", "Advanced"],
-                    datasets: [{
-                        data: [40, 35, 25], // Sample data
-                        backgroundColor: ["#ff6384", "#36a2eb", "#ffcc56"]
-                    }]
-                }
-            });
+            // ✅ Retrieve stats from Firebase (auth.js should handle this)
+            const fetchUserStats = async () => {
+                try {
+                    const response = await fetch("/api/getUserStats"); // 🔹 Adjust API route if needed
+                    const data = await response.json();
+                    
+                    document.getElementById("search-count").textContent = data.searchCount;
+                    document.getElementById("meal-count").textContent = data.mealCount;
 
-            // ✅ Change Avatar Randomly
+                    updateAchievements(data.searchCount, data.mealCount);
+                    updateCookingChart(data.searchCount, data.mealCount);
+                } catch (error) {
+                    console.error("❌ Error fetching stats:", error);
+                }
+            };
+
+            fetchUserStats();
+
+            // ✅ Update Achievements Based on Searches & Meals Cooked
+            function updateAchievements(searchCount, mealCount) {
+                const achievementsList = document.getElementById("achievements-list");
+                achievementsList.innerHTML = "";
+
+                if (searchCount >= 1) achievementsList.innerHTML += `<li>🥇 First Recipe Searched</li>`;
+                if (mealCount >= 1) achievementsList.innerHTML += `<li>🍽️ First Meal Cooked</li>`;
+                if (mealCount >= 10) achievementsList.innerHTML += `<li>🔥 10+ Meals Cooked</li>`;
+                if (searchCount >= 50) achievementsList.innerHTML += `<li>🌟 Super Chef: 50+ Recipes Explored</li>`;
+            }
+
+            // ✅ Generate Cooking Score Based on User Activity
+            function updateCookingChart(searchCount, mealCount) {
+                const totalActivity = searchCount + mealCount;
+                const beginner = Math.max(30, (searchCount / totalActivity) * 100);
+                const intermediate = Math.max(40, (mealCount / totalActivity) * 100);
+                const advanced = Math.max(20, totalActivity > 100 ? 30 : 10);
+
+                const ctx = document.getElementById("cookingChart").getContext("2d");
+                new Chart(ctx, {
+                    type: "pie",
+                    data: {
+                        labels: ["Beginner", "Intermediate", "Advanced"],
+                        datasets: [{
+                            data: [beginner, intermediate, advanced],
+                            backgroundColor: ["#ff6384", "#36a2eb", "#ffcc56"]
+                        }]
+                    }
+                });
+            }
+
+            // ✅ Persist Avatar Across Sessions
+            const avatar = document.getElementById("avatar");
+            const savedAvatar = localStorage.getItem("userAvatar");
+            if (savedAvatar) avatar.src = savedAvatar;
+
             document.getElementById("change-avatar").addEventListener("click", () => {
                 const randomSeed = Math.random().toString(36).substring(7);
-                document.getElementById("avatar").src = `https://api.dicebear.com/7.x/adventurer/svg?seed=${randomSeed}`;
+                const newAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${randomSeed}`;
+                avatar.src = newAvatar;
+                localStorage.setItem("userAvatar", newAvatar);
             });
         });
     </script>
 </body>
 </html>
+
 
