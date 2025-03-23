@@ -1,4 +1,4 @@
-import { auth, db } from "./script/auth.js";
+import { auth, db } from "./auth.js";
 import { getDocs, query, where, collection, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // ✅ Function to Fetch User Stats
