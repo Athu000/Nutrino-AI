@@ -118,7 +118,9 @@ document.getElementById("change-avatar").addEventListener("click", async () => {
         }
     }
 });
-
+function goToMainPage() {
+    window.location.href = "index.html";
+}
 // ✅ Load Data on Page Load
 document.addEventListener("DOMContentLoaded", () => {
     onAuthStateChanged(auth, (user) => {
@@ -134,4 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (savedAvatar) {
         document.getElementById("avatar").src = savedAvatar;
     }
+    // ✅ Add Event Listener to Main Page Button
+    document.getElementById("go-to-main").addEventListener("click", goToMainPage);
+
 });
