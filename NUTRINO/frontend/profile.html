@@ -116,129 +116,24 @@
             <li>🌟 Nutrino Pro User</li>
         </ul>
     </div>
+<script type="module">
+    import { fetchUserStats } from "./script/auth.js";
 
-   <script type="module">
-    import { auth, db } from "./script/auth.js";
-    import { getDoc, getDocs, doc, collection, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    // ✅ Ensure user authentication before fetching stats
-    auth.onAuthStateChanged(async (user) => {
-        if (user) {
-            console.log(`🔍 Fetching stats for: ${user.email}`);
-            await fetchUserStats(user.uid, user.email);
-        } else {
-            console.log("⚠️ User not logged in.");
-        }
-    });
-
-    async function fetchUserStats() {
-    const user = auth.currentUser;
-    if (!user) {
-        console.error("❌ No authenticated user found.");
-        return;
-    }
-
-    console.log(`🔍 Fetching stats for: ${user.email}`);
-
-    try {
-        // ✅ Fetch user details from Firestore
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (!userDoc.exists()) {
-            console.error("❌ User document not found.");
-            return;
-        }
-        const userData = userDoc.data();
-
-        // ✅ Fetch total number of meals created
-        const mealsQuery = query(collection(db, "meals"), where("uid", "==", user.uid));
-        const mealsSnapshot = await getDocs(mealsQuery);
-        const mealCount = mealsSnapshot.size;
-
-        // ✅ Fetch total number of recipes searched
-        const recipesQuery = query(collection(db, "recipes"), where("uid", "==", user.uid));
-        const recipesSnapshot = await getDocs(recipesQuery);
-        const recipeCount = recipesSnapshot.size;
-
-        console.log(`🍽️ Meals: ${mealCount}, 📖 Recipes: ${recipeCount}`);
-
-        // ✅ Update HTML Elements (Ensure IDs exist in profile.html)
-        document.getElementById("user-name").textContent = userData.name;
-        document.getElementById("user-email").textContent = userData.email;
-        document.getElementById("meal-count").textContent = mealCount;
-        document.getElementById("recipe-count").textContent = recipeCount;
-
-    } catch (error) {
-        console.error("❌ Error fetching user stats:", error);
-    }
-}
-
-// ✅ Run function when page loads
-document.addEventListener("DOMContentLoaded", fetchUserStats);
-
-    // ✅ Function to count documents for a specific user in Firestore
-    async function countUserDocuments(collectionName, email) {
-        try {
-            const q = query(collection(db, collectionName), where("userEmail", "==", email));
-            const querySnapshot = await getDocs(q);
-            return querySnapshot.size; // Returns total number of documents found
-        } catch (error) {
-            console.error(`❌ Error fetching ${collectionName} count:`, error);
-            return 0;
-        }
-    }
-
-    // ✅ Load & Save Avatar
-    function loadAvatar() {
-        const savedAvatar = localStorage.getItem("avatar");
-        document.getElementById("avatar").src = savedAvatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=nutrino-${Math.random().toString(36).substring(7)}`;
-    }
-
-    function changeAvatar() {
-        const newAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=nutrino-${Math.random().toString(36).substring(7)}`;
-        document.getElementById("avatar").src = newAvatar;
-    }
-
-    function saveAvatar() {
-        localStorage.setItem("avatar", document.getElementById("avatar").src);
-        alert("✅ Avatar saved!");
-    }
-
-    // ✅ Initialize Page
+    // ✅ Load Profile Data from sessionStorage
     document.addEventListener("DOMContentLoaded", () => {
-        loadAvatar();
-        document.getElementById("change-avatar").addEventListener("click", changeAvatar);
-        document.getElementById("save-avatar").addEventListener("click", saveAvatar);
-    });
+        document.getElementById("user-name").textContent = sessionStorage.getItem("userName") || "Loading...";
+        document.getElementById("user-email").textContent = sessionStorage.getItem("userEmail") || "Loading...";
+        document.getElementById("meal-count").textContent = sessionStorage.getItem("mealCount") || "0";
+        document.getElementById("recipe-count").textContent = sessionStorage.getItem("recipeCount") || "0";
 
-    // ✅ Dynamic Achievements Chart
-    function updateAchievementsChart(recipes, meals) {
-        const ctx = document.getElementById("cookingChart").getContext("2d");
+        fetchUserStats(); // Refresh stats on page load
 
-        const achievements = [
-            { label: "Beginner", threshold: 5 },
-            { label: "Intermediate", threshold: 15 },
-            { label: "Advanced", threshold: 30 }
-        ];
-
-        const userLevel = [
-            recipes + meals >= achievements[2].threshold ? 30 : 0,
-            recipes + meals >= achievements[1].threshold ? 40 : 0,
-            recipes + meals >= achievements[0].threshold ? 30 : 0
-        ];
-
-        new Chart(ctx, {
-            type: "pie",
-            data: {
-                labels: ["Beginner", "Intermediate", "Advanced"],
-                datasets: [{
-                    data: userLevel,
-                    backgroundColor: ["#ff6384", "#36a2eb", "#ffcc56"]
-                }]
-            }
+        document.getElementById("main-page").addEventListener("click", () => {
+            sessionStorage.clear();  // Clear previous data
+            window.location.href = "index.html"; // Navigate back
         });
-    }
+    });
 </script>
-
 
 </body>
 </html>
