@@ -116,78 +116,98 @@
         </ul>
     </div>
 
-    <script type="module">
-        import { auth, db } from "./script/auth.js";
-        import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+   <script type="module">
+    import { auth, db } from "./script/auth.js";
+    import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // ✅ Load User Data
-        async function fetchUserStats() {
-            const userData = JSON.parse(localStorage.getItem("loggedInUser"));
-            if (!userData) return console.log("❌ No user found in local storage.");
+    // ✅ Ensure user authentication before fetching stats
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            console.log(`🔍 Fetching stats for: ${user.email}`);
+            fetchUserStats(user.uid);
+        } else {
+            console.log("⚠️ User not logged in.");
+        }
+    });
 
-            document.getElementById("user-name").textContent = userData.name || "Unknown";
-            document.getElementById("user-email").textContent = userData.email || "Not Available";
+    // ✅ Fetch User Stats from Firestore
+    async function fetchUserStats(uid) {
+        try {
+            const userDocRef = doc(db, "users", uid);
+            const userDocSnap = await getDoc(userDocRef);
 
-            console.log(`🔍 Fetching stats for: ${userData.email}`);
-
-            try {
-                const userDocRef = doc(db, "users", auth.currentUser.uid);
-                const userDocSnap = await getDoc(userDocRef);
-
-                if (userDocSnap.exists()) {
-                    console.log("✅ User data found:", userDocSnap.data());
-                    const userStats = userDocSnap.data();
-                    document.getElementById("recipe-count").textContent = userStats.recipes || 0;
-                    document.getElementById("meal-count").textContent = userStats.meals || 0;
-                } else {
-                    console.log("⚠️ No user stats found.");
-                }
-            } catch (error) {
-                console.error("❌ Error fetching user stats:", error);
+            if (!userDocSnap.exists()) {
+                console.log("⚠️ No user stats found.");
+                return;
             }
-        }
 
-        // ✅ Load & Save Avatar
-        function loadAvatar() {
-            const savedAvatar = localStorage.getItem("avatar");
-            if (savedAvatar) {
-                document.getElementById("avatar").src = savedAvatar;
-            } else {
-                document.getElementById("avatar").src = `https://api.dicebear.com/7.x/adventurer/svg?seed=${Math.random().toString(36).substring(7)}`;
+            console.log("✅ User data found:", userDocSnap.data());
+            const userStats = userDocSnap.data();
+
+            // ✅ Display fetched stats
+            document.getElementById("user-name").textContent = userStats.name || "Unknown";
+            document.getElementById("user-email").textContent = userStats.email || "Not Available";
+            document.getElementById("recipe-count").textContent = userStats.recipes || 0;
+            document.getElementById("meal-count").textContent = userStats.meals || 0;
+
+            // ✅ Update Achievements Chart
+            updateAchievementsChart(userStats.recipes, userStats.meals);
+        } catch (error) {
+            console.error("❌ Error fetching user stats:", error);
+        }
+    }
+
+    // ✅ Load & Save Avatar
+    function loadAvatar() {
+        const savedAvatar = localStorage.getItem("avatar");
+        document.getElementById("avatar").src = savedAvatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=nutrino-${Math.random().toString(36).substring(7)}`;
+    }
+
+    function changeAvatar() {
+        const newAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=nutrino-${Math.random().toString(36).substring(7)}`;
+        document.getElementById("avatar").src = newAvatar;
+    }
+
+    function saveAvatar() {
+        localStorage.setItem("avatar", document.getElementById("avatar").src);
+        alert("✅ Avatar saved!");
+    }
+
+    // ✅ Initialize Page
+    document.addEventListener("DOMContentLoaded", () => {
+        loadAvatar();
+        document.getElementById("change-avatar").addEventListener("click", changeAvatar);
+        document.getElementById("save-avatar").addEventListener("click", saveAvatar);
+    });
+
+    // ✅ Dynamic Achievements Chart
+    function updateAchievementsChart(recipes, meals) {
+        const ctx = document.getElementById("cookingChart").getContext("2d");
+        
+        const achievements = [
+            { label: "Beginner", threshold: 5 },
+            { label: "Intermediate", threshold: 15 },
+            { label: "Advanced", threshold: 30 }
+        ];
+
+        const userLevel = [
+            recipes + meals >= achievements[2].threshold ? 30 : 0,
+            recipes + meals >= achievements[1].threshold ? 40 : 0,
+            recipes + meals >= achievements[0].threshold ? 30 : 0
+        ];
+
+        new Chart(ctx, {
+            type: "pie",
+            data: {
+                labels: ["Beginner", "Intermediate", "Advanced"],
+                datasets: [{
+                    data: userLevel,
+                    backgroundColor: ["#ff6384", "#36a2eb", "#ffcc56"]
+                }]
             }
-        }
-
-        function changeAvatar() {
-            const newAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${Math.random().toString(36).substring(7)}`;
-            document.getElementById("avatar").src = newAvatar;
-        }
-
-        function saveAvatar() {
-            const avatarSrc = document.getElementById("avatar").src;
-            localStorage.setItem("avatar", avatarSrc);
-            alert("✅ Avatar saved!");
-        }
-
-        // ✅ Initialize Data
-        document.addEventListener("DOMContentLoaded", () => {
-            loadAvatar();
-            fetchUserStats();
-            document.getElementById("change-avatar").addEventListener("click", changeAvatar);
-            document.getElementById("save-avatar").addEventListener("click", saveAvatar);
-
-            // ✅ Cooking Score Chart
-            const ctx = document.getElementById("cookingChart").getContext("2d");
-            new Chart(ctx, {
-                type: "pie",
-                data: {
-                    labels: ["Beginner", "Intermediate", "Advanced"],
-                    datasets: [{
-                        data: [40, 35, 25],
-                        backgroundColor: ["#ff6384", "#36a2eb", "#ffcc56"]
-                    }]
-                }
-            });
         });
-    </script>
+    }
+</script>
+
 </body>
 </html>
