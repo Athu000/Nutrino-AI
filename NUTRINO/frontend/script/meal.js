@@ -131,6 +131,7 @@ function displayMealPlan(mealPlanData) {
 }
 function formatText(text) {
     return text
+        .replace(/[*]+/g, '')
         .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // Convert **bold text** to <strong>bold text</strong>
         .replace(/\*/g, "") // Remove any remaining stray * symbols
         .replace(/\n/g, "<br>") // Replace newlines with <br>
