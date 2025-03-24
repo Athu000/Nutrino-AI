@@ -71,9 +71,6 @@
         }
     </style>
    <script>
-        document.getElementById("goBackBtn").addEventListener("click", function () {
-        window.location.href = "index.html";
-    });
     document.addEventListener("DOMContentLoaded", function () {
         const stepDisplay = document.querySelector(".step-display");
         const startBtn = document.getElementById("startCooking");
@@ -118,27 +115,27 @@
         let stepIndex = 0;
 
         // ✅ Function to clean text for speech (removes emojis & markdown)
-function cleanForSpeech(text) {
-    return text.replace(/[\u{1F300}-\u{1F6FF}]/gu, '') // Remove emojis
-               .replace(/\*\*/g, '') // Remove markdown (**bold**)
-               .trim();
-}
+        function cleanForSpeech(text) {
+            return text.replace(/[\u{1F300}-\u{1F6FF}]/gu, '') // Remove emojis
+           .replace(/[*]+/g, '') // Remove markdown (**bold**)
+           .trim();
+        }
 
-// ✅ Function to speak text and re-enable button after speech ends
-function speak(text) {
-    const speech = new SpeechSynthesisUtterance(cleanForSpeech(text));
-    speech.lang = "en-US";
-    speech.volume = 1;
-    speech.rate = 1;
-    speech.pitch = 1; // ✅ Default pitch
-
-    voiceBtn.disabled = true; // Disable button while speaking
-    speech.onend = () => {
-        voiceBtn.disabled = false; // Re-enable after speaking
-    };
-
-    window.speechSynthesis.speak(speech);
-}
+        // ✅ Function to speak text and re-enable button after speech ends
+        function speak(text) {
+            const speech = new SpeechSynthesisUtterance(cleanForSpeech(text));
+            speech.lang = "en-US";
+            speech.volume = 1;
+            speech.rate = 1;
+            speech.pitch = 1; // ✅ Default pitch
+        
+            voiceBtn.disabled = true; // Disable button while speaking
+            speech.onend = () => {
+                voiceBtn.disabled = false; // Re-enable after speaking
+            };
+        
+            window.speechSynthesis.speak(speech);
+        }
 
 
         // ✅ Function to show the next step
