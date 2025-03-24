@@ -77,12 +77,6 @@ async function fetchMealPlan() {
     } else {
         mealPlanData = JSON.parse(mealPlanData);
     }
-    // Assuming mealPlanData is the object fetched from Firebase
-    if (mealPlanData) {
-        document.getElementById("mealPlanDescription").innerHTML = formatText(mealPlanData.mealPlan || "No meal description available.");
-    } else {
-        console.error("❌ No meal plan data found.");
-    }
 
     console.log("✅ Meal Plan Retrieved:", mealPlanData);
     displayMealPlan(mealPlanData);
@@ -117,8 +111,8 @@ function displayMealPlan(mealPlanData) {
     elements.servings.textContent = mealPlanData.servings || "Unknown";
     elements.dietaryRestrictions.textContent = mealPlanData.dietaryRestrictions?.join(", ") || "None";
     elements.planName.textContent = mealPlanData.planName || "Custom AI-Generated Meal Plan";
-    elements.mealPlanDescription.innerHTML = formatText(mealPlanData.mealPlan || "No meal description available.");
-
+    elements.mealPlanDescription.textContent = mealPlanData.mealPlan || "No meal description available.";
+    elements.importantNotes.textContent = mealPlanData.ImportantNotes || "No meal description available.";
 
     // ✅ Populate Meals
     elements.mealsContainer.innerHTML = "";
