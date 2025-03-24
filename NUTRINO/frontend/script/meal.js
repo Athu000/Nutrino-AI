@@ -112,7 +112,9 @@ function displayMealPlan(mealPlanData) {
     elements.dietaryRestrictions.textContent = mealPlanData.dietaryRestrictions?.join(", ") || "None";
     elements.planName.textContent = mealPlanData.planName || "Custom AI-Generated Meal Plan";
     elements.mealPlanDescription.textContent = mealPlanData.mealPlan || "No meal description available.";
-    elements.importantNotes.textContent = mealPlanData.ImportantNotes || "No meal description available.";
+    // ✅ Extract "Important Notes" if mentioned in the text
+    const notesMatch = mealPlanData.mealPlan.match(/Important Notes:\s*(.*)/i);
+    elements.importantNotes.textContent = notesMatch ? notesMatch[1] : "No important notes available.";
 
     // ✅ Populate Meals
     elements.mealsContainer.innerHTML = "";
