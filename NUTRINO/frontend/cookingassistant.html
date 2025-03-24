@@ -97,7 +97,7 @@
             let match = recipeText.match(regex);
             return match 
                 ? match[1]
-                    .replace(/\*\*/g, '') // ✅ Remove all **bold** formatting
+                    .replace(/[*]+/g, '') // ✅ Remove all **bold** formatting
                     .trim()
                     .split("\n")
                     .map(line => line.trim())
