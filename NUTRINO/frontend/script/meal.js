@@ -131,7 +131,7 @@ function formatText(text) {
         .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // Convert **bold text** to <strong>bold text</strong>
         .replace(/\n/g, "<br>") // Replace newlines with <br>
         .replace(/Meal Plan Name:/gi, "📌 <strong>Meal Plan Name:</strong>") // Add emoji for meal plan name
-        .replace(/Meals:/gi, "🍽️ <strong>Meals:</strong>") 
+        .replace(/Meals for the day:/gi, "🍽️ <strong>Meals for the Day:</strong>") 
         .replace(/Breakfast:/gi, "🥞 <strong>Breakfast:</strong>")
         .replace(/Lunch:/gi, "🍛 <strong>Lunch:</strong>")
         .replace(/Dinner:/gi, "🌙 <strong>Dinner:</strong>")
@@ -140,9 +140,9 @@ function formatText(text) {
         .replace(/\* Meal Name:\*/gi, "🍽️ <strong>Dish:</strong>") // Standardize meal names
         .replace(/- /g, "➡️ ") // Replace bullet points with arrow emoji
         .replace(/\s*\*\s*/g, "") // Remove stray asterisks
+        .replace(/\s*[*]\s*/g, "") // Remove additional lone * symbols
         .trim(); // Clean unnecessary spaces
 }
-
 // ✅ GENERATE NEW MEAL PLAN
 async function fetchNewMealPlan() {
     await deleteOldMealPlan();  // ✅ Ensures old plan is deleted before fetching new one
