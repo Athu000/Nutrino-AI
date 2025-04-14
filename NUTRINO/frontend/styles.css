@@ -76,6 +76,7 @@ body {
     background: white;
     box-shadow: 0px 0px 10px gray;
     border-radius: 8px;
+    z-index: 1;
 }
 
 .recipe-content {
